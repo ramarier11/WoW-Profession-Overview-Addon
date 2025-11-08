@@ -1,0 +1,9 @@
+## Interface: 110205
+## Version: 1.0.0
+## Title: Profession Tracker
+## Notes: My first addon
+## Author: YourName
+## SavedVariables: ProfessionTrackerDB
+
+ProfessionTracker.lua
+ProfessionTrackerUI.lua
