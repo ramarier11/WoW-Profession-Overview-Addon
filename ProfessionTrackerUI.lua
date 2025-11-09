@@ -275,7 +275,32 @@ function ProfessionTrackerUI:ShowDashboard()
     
     local yOffset = 0
     
-    if not ProfessionTrackerDB or not ProfessionTrackerDB.characters then
+    if not ProfessionTrackerDB then
+        print("|cffff0000[Profession Tracker]|r ProfessionTrackerDB is nil in ShowDashboard")
+        local noDataText = self.scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        noDataText:SetPoint("TOP", 0, -20)
+        noDataText:SetText("Database not initialized. Try reloading UI (/reload)")
+        return
+    end
+    
+    if not ProfessionTrackerDB.characters then
+        print("|cffff0000[Profession Tracker]|r No characters table found")
+        local noDataText = self.scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        noDataText:SetPoint("TOP", 0, -20)
+        noDataText:SetText("No character data found. Open your professions to scan.")
+        return
+    end
+    
+    -- Debug: Print character count
+    local charCount = 0
+    for charKey, charData in pairs(ProfessionTrackerDB.characters) do
+        if charKey ~= "version" and type(charData) == "table" then
+            charCount = charCount + 1
+            print("|cff00ff00[Profession Tracker]|r Found character:", charKey)
+        end
+    end
+    
+    if charCount == 0 then
         local noDataText = self.scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         noDataText:SetPoint("TOP", 0, -20)
         noDataText:SetText("No character data found. Open your professions to scan.")
@@ -291,6 +316,7 @@ function ProfessionTrackerUI:ShowDashboard()
     end
     
     self.scrollChild:SetHeight(math.abs(yOffset))
+    print("|cff00ff00[Profession Tracker]|r Created", charCount, "character cards")
 end
 
 --------------------------------------------------------
@@ -370,6 +396,14 @@ end
 -- Main Refresh Function
 --------------------------------------------------------
 function ProfessionTrackerUI:Refresh()
+    -- Debug: Check if database exists
+    if not ProfessionTrackerDB then
+        print("|cffff0000[Profession Tracker]|r ProfessionTrackerDB is nil!")
+        return
+    end
+    
+    print("|cff00ff00[Profession Tracker]|r Refreshing UI in", self.viewMode, "mode")
+    
     -- Update button states
     if self.viewMode == "dashboard" then
         self.dashboardButton:Disable()
@@ -388,12 +422,67 @@ end
 SLASH_PROFTRACKER1 = "/proftrack"
 SLASH_PROFTRACKER2 = "/pt"
 SlashCmdList["PROFTRACKER"] = function(msg)
-    if ProfessionTrackerUI:IsShown() then
-        ProfessionTrackerUI:Hide()
-    else
+    if msg == "debug" then
+        -- Debug command to check database
+        print("|cff00ff00[Profession Tracker]|r === DEBUG INFO ===")
+        if not ProfessionTrackerDB then
+            print("ProfessionTrackerDB is NIL!")
+            return
+        end
+        
+        print("Database exists:", ProfessionTrackerDB ~= nil)
+        print("Characters table:", ProfessionTrackerDB.characters ~= nil)
+        
+        if ProfessionTrackerDB.characters then
+            local count = 0
+            for charKey, charData in pairs(ProfessionTrackerDB.characters) do
+                if charKey ~= "version" and type(charData) == "table" then
+                    count = count + 1
+                    print(string.format("  Character %d: %s", count, charKey))
+                    print(string.format("    Name: %s, Class: %s, Level: %s", 
+                        tostring(charData.name), 
+                        tostring(charData.class), 
+                        tostring(charData.level)))
+                    
+                    if charData.professions then
+                        print(string.format("    Professions: %d", #charData.professions))
+                        for i, prof in ipairs(charData.professions) do
+                            print(string.format("      %d. %s", i, prof.name or "Unknown"))
+                            if prof.expansions then
+                                local expCount = 0
+                                for expName, _ in pairs(prof.expansions) do
+                                    expCount = expCount + 1
+                                end
+                                print(string.format("         Expansions: %d", expCount))
+                            end
+                        end
+                    else
+                        print("    No professions table")
+                    end
+                end
+            end
+            print(string.format("Total characters: %d", count))
+        end
+        print("|cff00ff00[Profession Tracker]|r === END DEBUG ===")
+        
+    elseif msg == "reload" then
+        -- Force refresh
+        print("|cff00ff00[Profession Tracker]|r Forcing UI refresh...")
         ProfessionTrackerUI.viewMode = "dashboard"
         ProfessionTrackerUI:Refresh()
-        ProfessionTrackerUI:Show()
+        if not ProfessionTrackerUI:IsShown() then
+            ProfessionTrackerUI:Show()
+        end
+        
+    else
+        -- Normal toggle
+        if ProfessionTrackerUI:IsShown() then
+            ProfessionTrackerUI:Hide()
+        else
+            ProfessionTrackerUI.viewMode = "dashboard"
+            ProfessionTrackerUI:Refresh()
+            ProfessionTrackerUI:Show()
+        end
     end
 end
 
