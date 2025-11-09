@@ -285,6 +285,7 @@ local function UpdateCharacterProfessionData()
                 local profession = professions[name]
                 if not profession then
                     profession = {
+                        name = name,
                         expansions = {},
                         lastUpdated = time(),
                     }
