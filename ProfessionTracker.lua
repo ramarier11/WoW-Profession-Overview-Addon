@@ -255,7 +255,7 @@ local function UpdateCharacterProfessionData()
     end
 
     local charKey = GetCharacterKey()
-    local charData = EnsureTable(ProfessionTrackerDB, charKey)
+    local charData = EnsureTable(ProfessionTrackerDB.characters, charKey)
     
     -- Initialize character metadata if needed
     if not charData.name then
