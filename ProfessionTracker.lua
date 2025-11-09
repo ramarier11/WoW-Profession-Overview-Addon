@@ -511,8 +511,8 @@ function ProfessionTracker:PrintCharacterData()
                 for expName, expData in pairs(profData.expansions) do
                     local knowledgeInfo = ""
                     if expData.knowledgePoints then
-                        knowledgeInfo = string.format(" [Knowledge: %d/%d]",
-                            expData.knowledgePoints
+                        knowledgeInfo = string.format(" [Knowledge: %d Remaining %d]",
+                            expData.knowledgePoints or 0,
                             expData.pointsUntilMaxKnowledge or 0)
                     end
                     print(string.format("      %s: %d/%d%s",
