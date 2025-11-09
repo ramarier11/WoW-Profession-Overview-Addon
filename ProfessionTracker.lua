@@ -285,7 +285,6 @@ local function UpdateCharacterProfessionData()
                 local profession = professions[name]
                 if not profession then
                     profession = {
-                        name = name,
                         expansions = {},
                         lastUpdated = time(),
                     }
@@ -313,7 +312,6 @@ local function UpdateCharacterProfessionData()
                     if not expData then
                         -- Create new expansion entry
                         expData = {
-                            name = expName,
                             id = expID,
                             skillLineID = exp.skillLineID,
                             skillLevel = exp.skillLevel or 0,
