@@ -9,6 +9,10 @@ function ProfessionTracker:RegisterUI(uiFrame)
     self.UI = uiFrame
 end
 
+-- ========================================================
+-- Constants & Configuration
+-- ========================================================
+
 local ExpansionIndex = {
     ["Classic"] = 1,
     ["Outland"] = 2,
@@ -21,8 +25,10 @@ local ExpansionIndex = {
     ["Kul Tiran"] = 8,
     ["Shadowlands"] = 9,
     ["Dragon Isles"] = 10,
-    ["Khaz Algar"] = 11, -- newest expansion
+    ["Khaz Algar"] = 11,
 }
+
+local KNOWLEDGE_SYSTEM_START = 10 -- Dragon Isles and later
 
 local ProfessionData = {
     {
@@ -95,6 +101,7 @@ local ProfessionData = {
 -- ========================================================
 -- Utility Functions
 -- ========================================================
+
 local function GetCharacterKey()
     local name, realm = UnitFullName("player")
 
@@ -110,15 +117,26 @@ local function GetCharacterKey()
     return string.format("%s-%s", name, realm)
 end
 
-
 local function EnsureTable(t, key)
     if not t[key] then t[key] = {} end
     return t[key]
 end
 
---------------------------------------------------------
--- Profession Expansion Lookup
---------------------------------------------------------
+local function GetCurrentWeekTimestamp()
+    -- Get Tuesday 00:00:00 of current week (US reset time)
+    local serverTime = GetServerTime()
+    local weekday = date("%w", serverTime) -- 0 = Sunday, 2 = Tuesday
+    local daysSinceTuesday = (weekday - 2) % 7
+    local tuesdayMidnight = serverTime - (daysSinceTuesday * 86400)
+    
+    -- Align to midnight
+    local midnight = tuesdayMidnight - (tuesdayMidnight % 86400)
+    return midnight
+end
+
+-- ========================================================
+-- Profession Data Retrieval
+-- ========================================================
 
 -- Attempts to dynamically fetch expansion data from Blizzard API
 local function GetCharacterProfessionExpansions(professionName)
@@ -126,7 +144,6 @@ local function GetCharacterProfessionExpansions(professionName)
 
     -- Attempt dynamic retrieval from API
     if C_TradeSkillUI and C_TradeSkillUI.GetChildProfessionInfos then
-        
         local childInfos = C_TradeSkillUI.GetChildProfessionInfos()
         if childInfos then
             for _, info in ipairs(childInfos) do
@@ -145,54 +162,116 @@ local function GetCharacterProfessionExpansions(professionName)
     return expansions
 end
 
---------------------------------------------------------
+-- ========================================================
 -- Knowledge Point Calculations
---------------------------------------------------------
+-- ========================================================
 
 local function GetPointsMissingForTree(configID, nodeID)
     local todo = { nodeID }
     local missing = 0
+    
     while next(todo) do
-        local nodeID = table.remove(todo)
-        tAppendAll(todo, C_ProfSpecs.GetChildrenForPath(nodeID))
-        local info = C_Traits.GetNodeInfo(configID, nodeID)
+        local currentNodeID = table.remove(todo)
+        
+        -- Add children to process
+        local children = C_ProfSpecs.GetChildrenForPath(currentNodeID)
+        if children then
+            for _, childID in ipairs(children) do
+                table.insert(todo, childID)
+            end
+        end
+        
+        -- Calculate missing points for this node
+        local info = C_Traits.GetNodeInfo(configID, currentNodeID)
         if info then
             -- Enabling a node counts as 1 rank but doesn't cost anything
             local enableFix = info.activeRank == 0 and 1 or 0
             missing = missing + info.maxRanks - info.activeRank - enableFix
         end
     end
+    
     return missing
 end
 
 -- Calculate how many knowledge points are still missing for a profession
 local function CalculateMissingKnowledgePoints(skillLineID)
-    print("calculating")
+    if not skillLineID then return 0 end
+    
     local configID = C_ProfSpecs.GetConfigIDForSkillLine(skillLineID)
+    if not configID then return 0 end
+    
     local traitTreeIDs = C_ProfSpecs.GetSpecTabIDsForSkillLine(skillLineID)
+    if not traitTreeIDs then return 0 end
+    
     local totalMissing = 0
+    
     for _, traitTreeID in ipairs(traitTreeIDs) do
         local tabInfo = C_ProfSpecs.GetTabInfo(traitTreeID)
-        totalMissing = totalMissing + GetPointsMissingForTree(configID, tabInfo.rootNodeID)
+        if tabInfo and tabInfo.rootNodeID then
+            totalMissing = totalMissing + GetPointsMissingForTree(configID, tabInfo.rootNodeID)
+        end
     end
-    local currencyInfo = C_ProfSpecs.GetCurrencyInfoForSkillLine(skillLineID) or {numAvailable = 0}
-    return totalMissing - currencyInfo.numAvailable
+    
+    -- Subtract available unspent points
+    local currencyInfo = C_ProfSpecs.GetCurrencyInfoForSkillLine(skillLineID)
+    if currencyInfo and currencyInfo.numAvailable then
+        totalMissing = totalMissing - currencyInfo.numAvailable
+    end
+    
+    return totalMissing
 end
 
---------------------------------------------------------
--- ## Unified Character Data Initialization + Update
---------------------------------------------------------
+-- ========================================================
+-- Weekly Reset Handling
+-- ========================================================
+
+local function CheckAndResetWeeklyProgress(weeklyProgress)
+    if not weeklyProgress then return end
+    
+    local currentWeek = GetCurrentWeekTimestamp()
+    
+    for activity, data in pairs(weeklyProgress) do
+        if data.lastReset and data.lastReset < currentWeek then
+            -- Reset this activity
+            data.completed = false
+            data.lastReset = currentWeek
+        elseif not data.lastReset then
+            -- Initialize reset timestamp
+            data.lastReset = currentWeek
+        end
+    end
+end
+
+-- ========================================================
+-- Data Initialization & Update
+-- ========================================================
 
 local function UpdateCharacterProfessionData()
     if not ProfessionTrackerDB then
-        ProfessionTrackerDB = {}
+        ProfessionTrackerDB = {
+            version = "1.0.0",
+            characters = {},
+        }
     end
 
     local charKey = GetCharacterKey()
     local charData = EnsureTable(ProfessionTrackerDB, charKey)
+    
+    -- Initialize character metadata if needed
+    if not charData.name then
+        local name, realm = UnitFullName("player")
+        charData.name = name
+        charData.realm = realm or GetRealmName()
+        charData.class = UnitClass("player")
+        charData.level = UnitLevel("player")
+        charData.faction = UnitFactionGroup("player")
+    end
+    
+    charData.lastLogin = time()
+    
     local professions = EnsureTable(charData, "professions")
 
-    -- Build a set of current profession names
+    -- Track currently learned professions
     local currentProfs = {}
     local profIndices = { GetProfessions() }
 
@@ -202,9 +281,21 @@ local function UpdateCharacterProfessionData()
             if name then
                 currentProfs[name] = true
 
-                -- Create or reuse profession entry
-                local profession = EnsureTable(professions, name)
-                local expansions = EnsureTable(profession, "expansions")
+                -- Initialize or get profession entry
+                local profession = professions[name]
+                if not profession then
+                    profession = {
+                        name = name,
+                        expansions = {},
+                        lastUpdated = time(),
+                    }
+                    professions[name] = profession
+                    print(string.format("|cff00ff00[Profession Tracker]|r Tracking new profession: %s", name))
+                else
+                    profession.lastUpdated = time()
+                end
+
+                local expansions = profession.expansions
 
                 -- Retrieve expansion-specific data from Blizzard API
                 local expansionList = GetCharacterProfessionExpansions(name)
@@ -212,46 +303,95 @@ local function UpdateCharacterProfessionData()
                 for _, exp in ipairs(expansionList) do
                     local expName = exp.expansionName or "Unknown"
                     local expID = ExpansionIndex[expName] or 0
-                    local dragonflightID = ExpansionIndex["Dragon Isles"] or 10                       
-                    -- Create or update expansion entry
+                    
+                    -- Check if this expansion has the knowledge system
+                    local hasKnowledgeSystem = expID >= KNOWLEDGE_SYSTEM_START
+
+                    -- Get or create expansion data
                     local expData = expansions[expName]
-                    if expData then
+                    
+                    if not expData then
+                        -- Create new expansion entry
                         expData = {
                             name = expName,
                             id = expID,
                             skillLineID = exp.skillLineID,
                             skillLevel = exp.skillLevel or 0,
                             maxSkillLevel = exp.maxSkillLevel or 0,
+                            lastUpdated = time(),
                         }
 
-                        -- Add knowledge data only for Dragonflight and newer
-                        if expID >= dragonflightID then
+                        -- Initialize knowledge system data for modern expansions
+                        if hasKnowledgeSystem then
                             local missing = CalculateMissingKnowledgePoints(exp.skillLineID)
-                            expData.knowledgePoints = expData.knowledgePoints or 0
-                            expData.pointsUntilMaxKnowledge = missing                            
-                            expData.weeklyKnowledgePoints = expData.weeklyKnowledgePoints or {
-                                treatise = false,
-                                treasures = false,
-                                craftingOrderQuest = false,
+                            expData.knowledgePoints = 0  -- Start at 0, will be calculated from changes
+                            expData.pointsUntilMaxKnowledge = missing
+                            expData.maxKnowledgePoints = missing  -- Store the theoretical max
+                            expData.weeklyKnowledgeProgress = {
+                                treatise = { completed = false, lastReset = GetCurrentWeekTimestamp() },
+                                treasures = { completed = false, lastReset = GetCurrentWeekTimestamp() },
+                                craftingOrderQuest = { completed = false, lastReset = GetCurrentWeekTimestamp() },
                             }
                         end
-                    end
+
+                        expansions[expName] = expData
+                    else
+                        -- Update existing expansion entry
+                        local oldSkillLevel = expData.skillLevel
                         
-                    expansions[expName] = expData
+                        expData.skillLineID = exp.skillLineID
+                        expData.skillLevel = exp.skillLevel or expData.skillLevel
+                        expData.maxSkillLevel = exp.maxSkillLevel or expData.maxSkillLevel
+                        expData.lastUpdated = time()
+
+                        -- Update knowledge data for modern expansions
+                        if hasKnowledgeSystem then
+                            local missing = CalculateMissingKnowledgePoints(exp.skillLineID)
+                            local previousMissing = expData.pointsUntilMaxKnowledge or missing
+                            
+                            -- Calculate knowledge gain (if points remaining decreased)
+                            if previousMissing and missing < previousMissing then
+                                local gained = previousMissing - missing
+                                expData.knowledgePoints = (expData.knowledgePoints or 0) + gained
+                                
+                                print(string.format("|cff00ff00[Profession Tracker]|r %s (%s): Gained %d knowledge points!", 
+                                    name, expName, gained))
+                            end
+                            
+                            expData.pointsUntilMaxKnowledge = missing
+                            
+                            -- Initialize max if not present
+                            if not expData.maxKnowledgePoints then
+                                expData.maxKnowledgePoints = missing + (expData.knowledgePoints or 0)
+                            end
+                            
+                            -- Ensure weekly progress structure exists
+                            if not expData.weeklyKnowledgeProgress then
+                                expData.weeklyKnowledgeProgress = {
+                                    treatise = { completed = false, lastReset = GetCurrentWeekTimestamp() },
+                                    treasures = { completed = false, lastReset = GetCurrentWeekTimestamp() },
+                                    craftingOrderQuest = { completed = false, lastReset = GetCurrentWeekTimestamp() },
+                                }
+                            else
+                                -- Check and reset weekly activities if needed
+                                CheckAndResetWeeklyProgress(expData.weeklyKnowledgeProgress)
+                            end
+                        end
+                    end
                 end
-                
             end
         end
     end
 
-    -- Remove any professions the player no longer has
+    -- Remove professions the player no longer has
     for savedName in pairs(professions) do
         if not currentProfs[savedName] then
             print("|cffff0000[Profession Tracker]|r Removed profession:", savedName)
             professions[savedName] = nil
         end
     end
-   -- ✅ Auto-refresh the UI if it’s open
+
+    -- Auto-refresh UI if it's open
     if ProfessionTracker.UI and ProfessionTracker.UI:IsShown() then
         C_Timer.After(0.25, function()
             if ProfessionTracker.UI.selectedProfession then
@@ -263,10 +403,10 @@ local function UpdateCharacterProfessionData()
     print("|cff00ff00[Profession Tracker]|r Data updated for:", charKey)
 end
 
+-- ========================================================
+-- Public Accessors
+-- ========================================================
 
--- ========================================================
--- Accessors
--- ========================================================
 function ProfessionTracker:GetCharacterData()
     local key = GetCharacterKey()
     return ProfessionTrackerDB and ProfessionTrackerDB[key]
@@ -278,9 +418,53 @@ function ProfessionTracker:GetProfessionData(profession)
     return charData.professions and charData.professions[profession]
 end
 
+function ProfessionTracker:GetAllCharacters()
+    if not ProfessionTrackerDB then return {} end
+    local chars = {}
+    for key, data in pairs(ProfessionTrackerDB) do
+        if key ~= "version" and type(data) == "table" then
+            table.insert(chars, {
+                key = key,
+                name = data.name,
+                realm = data.realm,
+                class = data.class,
+                level = data.level,
+                lastLogin = data.lastLogin,
+            })
+        end
+    end
+    return chars
+end
+
 -- ========================================================
--- Events
+-- Weekly Activity Tracking
 -- ========================================================
+
+function ProfessionTracker:MarkWeeklyActivityComplete(profession, expansion, activity)
+    local charData = self:GetCharacterData()
+    if not charData or not charData.professions then return false end
+    
+    local profData = charData.professions[profession]
+    if not profData or not profData.expansions then return false end
+    
+    local expData = profData.expansions[expansion]
+    if not expData or not expData.weeklyKnowledgeProgress then return false end
+    
+    if expData.weeklyKnowledgeProgress[activity] then
+        expData.weeklyKnowledgeProgress[activity].completed = true
+        expData.weeklyKnowledgeProgress[activity].lastCompleted = time()
+        print(string.format("|cff00ff00[Profession Tracker]|r Marked %s complete for %s (%s)", 
+            activity, profession, expansion))
+        return true
+    end
+    
+    return false
+end
+
+-- ========================================================
+-- Event Registration & Handling
+-- ========================================================
+
 ProfessionTracker:RegisterEvent("TRADE_SKILL_SHOW")
 ProfessionTracker:RegisterEvent("SKILL_LINES_CHANGED")
 ProfessionTracker:RegisterEvent("TRAIT_TREE_CURRENCY_INFO_UPDATED")
@@ -288,25 +472,61 @@ ProfessionTracker:RegisterEvent("TRADE_SKILL_DATA_SOURCE_CHANGED")
 ProfessionTracker:RegisterEvent("TRADE_SKILL_LIST_UPDATE")
 ProfessionTracker:RegisterEvent("LEARNED_SPELL_IN_SKILL_LINE")
 ProfessionTracker:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
+ProfessionTracker:RegisterEvent("PLAYER_LOGIN")
 
-
-ProfessionTracker:SetScript("OnEvent", function(self, event, arg1, arg2, arg3)
-    if event == "TRADE_SKILL_SHOW" or
-       event == "SKILL_LINES_CHANGED" or
-       event == "TRADE_SKILL_LIST_UPDATE" or
-       event == "TRADE_SKILL_DATA_SOURCE_CHANGED" or
-       event == "LEARNED_SPELL_IN_SKILL_LINE" or
-       event == "TRAIT_TREE_CURRENCY_INFO_UPDATED" or 
-       event == "CURRENCY_DISPLAY_UPDATE"
-    then
+ProfessionTracker:SetScript("OnEvent", function(self, event, ...)
+    if event == "PLAYER_LOGIN" then
+        -- Initialize database on login
+        C_Timer.After(2, function()
+            UpdateCharacterProfessionData()
+        end)
+    elseif event == "TRADE_SKILL_SHOW" or
+           event == "SKILL_LINES_CHANGED" or
+           event == "TRADE_SKILL_LIST_UPDATE" or
+           event == "TRADE_SKILL_DATA_SOURCE_CHANGED" or
+           event == "LEARNED_SPELL_IN_SKILL_LINE" or
+           event == "TRAIT_TREE_CURRENCY_INFO_UPDATED" or 
+           event == "CURRENCY_DISPLAY_UPDATE" then
+        -- Update data on profession-related events
         UpdateCharacterProfessionData()
-
-        
     end
-
-    
 end)
 
+-- ========================================================
+-- Debug Commands
+-- ========================================================
 
-
-
+function ProfessionTracker:PrintCharacterData()
+    local charData = self:GetCharacterData()
+    if not charData then
+        print("|cffff0000[Profession Tracker]|r No data found for this character")
+        return
+    end
+    
+    print("|cff00ff00[Profession Tracker]|r Character Data:")
+    print(string.format("  Name: %s-%s", charData.name or "Unknown", charData.realm or "Unknown"))
+    print(string.format("  Class: %s, Level: %d", charData.class or "Unknown", charData.level or 0))
+    
+    if charData.professions then
+        print("  Professions:")
+        for profName, profData in pairs(charData.professions) do
+            print(string.format("    - %s", profName))
+            if profData.expansions then
+                for expName, expData in pairs(profData.expansions) do
+                    local knowledgeInfo = ""
+                    if expData.knowledgePoints then
+                        knowledgeInfo = string.format(" [Knowledge: %d/%d, Remaining: %d]",
+                            expData.knowledgePoints,
+                            expData.maxKnowledgePoints or 0,
+                            expData.pointsUntilMaxKnowledge or 0)
+                    end
+                    print(string.format("      %s: %d/%d%s",
+                        expName,
+                        expData.skillLevel or 0,
+                        expData.maxSkillLevel or 0,
+                        knowledgeInfo))
+                end
+            end
+        end
+    end
+end
