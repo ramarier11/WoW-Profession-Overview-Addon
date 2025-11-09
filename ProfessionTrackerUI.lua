@@ -124,7 +124,7 @@ local function CreateCharacterCard(parent, charKey, charData, yOffset)
     
     -- Count ready/cooldown tasks (simplified for now)
     if charData.professions then
-        for _, prof in ipairs(charData.professions) do
+        for _, prof in pairs(charData.professions) do
             readyCount = readyCount + 1 -- Placeholder
             cooldownCount = cooldownCount + 1 -- Placeholder
         end
@@ -153,7 +153,7 @@ local function CreateCharacterCard(parent, charKey, charData, yOffset)
     
     local yPos = -5
     if charData.professions then
-        for profIndex, prof in ipairs(charData.professions) do
+        for profIndex, prof in pairs(charData.professions) do
             if profIndex <= 2 then -- Show first 2 professions
                 local profText = profInfoFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
                 profText:SetPoint("TOPLEFT", 10, yPos)
@@ -165,7 +165,7 @@ local function CreateCharacterCard(parent, charKey, charData, yOffset)
                     local maxedCount = 0
                     for expName, expData in pairs(prof.expansions) do
                         expCount = expCount + 1
-                        if expData.currentSkill == expData.maxSkill then
+                        if expData.skillLevel == expData.maxSkillLevel then
                             maxedCount = maxedCount + 1
                         end
                     end
@@ -203,62 +203,29 @@ local function CreateExpansionDisplay(parent, profData, expansionName, expansion
     local skillText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     skillText:SetPoint("TOPLEFT", titleText, "BOTTOMLEFT", 0, -5)
     
-    local skillColor = (expansionData.currentSkill == expansionData.maxSkill) and {0, 1, 0} or {1, 0.5, 0}
+    local skillColor = (expansionData.skillLevel == expansionData.maxSkillLevel) and {0, 1, 0} or {1, 0.5, 0}
     skillText:SetTextColor(unpack(skillColor))
-    skillText:SetText(string.format("Skill: %d / %d", expansionData.currentSkill or 0, expansionData.maxSkill or 0))
+    skillText:SetText(string.format("Skill: %d / %d", expansionData.skillLevel or 0, expansionData.maxSkillLevel or 0))
     
     -- Knowledge Points (if exists)
-    if expansionData.knowledge then
+    if expansionData.knowledgePoints or expansionData.maxKnowledgePoints then
         local knowledgeText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
         knowledgeText:SetPoint("TOPLEFT", skillText, "BOTTOMLEFT", 0, -5)
-        
-        local kpColor = (expansionData.knowledge.current == expansionData.knowledge.max) and {0, 1, 0} or {0.3, 0.7, 1}
-        knowledgeText:SetTextColor(unpack(kpColor))
+        knowledgeText:SetTextColor(0.3, 0.7, 1)
         knowledgeText:SetText(string.format("Knowledge: %d / %d", 
-            expansionData.knowledge.current or 0, 
-            expansionData.knowledge.max or 0))
-        
-        if expansionData.knowledge.missing and expansionData.knowledge.missing > 0 then
+            (expansionData.knowledgePoints or 0),
+            (expansionData.maxKnowledgePoints or 0)
+        ))
+    
+        local missing = expansionData.maxKnowledgePoints or 0
+        if missing > 0 then
             local missingText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
             missingText:SetPoint("TOPLEFT", knowledgeText, "BOTTOMLEFT", 0, -3)
             missingText:SetTextColor(1, 0.2, 0.2)
-            missingText:SetText(string.format("📚 %d KP remaining to collect", expansionData.knowledge.missing))
-        end
-        
-        -- Weekly Tasks Checklist
-        if expansionData.knowledge.weeklyTasks then
-            local checklistY = -70
-            local checklistTitle = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-            checklistTitle:SetPoint("TOPLEFT", 10, checklistY)
-            checklistTitle:SetText("Weekly KP Tasks:")
-            
-            local tasks = expansionData.knowledge.weeklyTasks
-            
-            -- Quest
-            local questIcon = tasks.quest.completed and "✓" or "○"
-            local questColor = tasks.quest.completed and {0, 1, 0} or {0.5, 0.5, 0.5}
-            local questText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-            questText:SetPoint("TOPLEFT", 150, checklistY)
-            questText:SetTextColor(unpack(questColor))
-            questText:SetText(string.format("%s Quest", questIcon))
-            
-            -- Treasures
-            local treasureIcon = tasks.treasures.completed and "✓" or "○"
-            local treasureColor = tasks.treasures.completed and {0, 1, 0} or {0.5, 0.5, 0.5}
-            local treasureText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-            treasureText:SetPoint("LEFT", questText, "RIGHT", 20, 0)
-            treasureText:SetTextColor(unpack(treasureColor))
-            treasureText:SetText(string.format("%s Treasures", treasureIcon))
-            
-            -- Treatise
-            local treatiseIcon = tasks.treatise.completed and "✓" or "○"
-            local treatiseColor = tasks.treatise.completed and {0, 1, 0} or {0.5, 0.5, 0.5}
-            local treatiseText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-            treatiseText:SetPoint("LEFT", treasureText, "RIGHT", 20, 0)
-            treatiseText:SetTextColor(unpack(treatiseColor))
-            treatiseText:SetText(string.format("%s Treatise", treatiseIcon))
+            missingText:SetText(string.format("📚 %d KP remaining to collect", missing))
         end
     end
+    
     
     return frame
 end
@@ -364,7 +331,7 @@ function ProfessionTrackerUI:ShowDetailView()
     
     -- Display each profession and its expansions
     if charData.professions then
-        for profIndex, profData in ipairs(charData.professions) do
+        for profIndex, profData in pairs(charData.professions) do
             -- Profession header
             local profHeader = self.scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
             profHeader:SetPoint("TOPLEFT", 20, yOffset)
@@ -446,7 +413,7 @@ SlashCmdList["PROFTRACKER"] = function(msg)
                     
                     if charData.professions then
                         print(string.format("    Professions: %d", #charData.professions))
-                        for i, prof in ipairs(charData.professions) do
+                        for i, prof in pairs(charData.professions) do
                             print(string.format("      %d. %s", i, prof.name or "Unknown"))
                             if prof.expansions then
                                 local expCount = 0
