@@ -153,8 +153,10 @@ local function CreateCharacterCard(parent, charKey, charData, yOffset)
     
     local yPos = -5
     if charData.professions then
-        for profIndex, prof in pairs(charData.professions) do
-            if profIndex <= 2 then -- Show first 2 professions
+        local count = 0
+        for profName, prof in pairs(charData.professions) do
+            count = count + 1
+            if count <= 2 then -- Show first 2 professions
                 local profText = profInfoFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
                 profText:SetPoint("TOPLEFT", 10, yPos)
                 profText:SetText(string.format("⚒ %s", prof.name or "Unknown"))
