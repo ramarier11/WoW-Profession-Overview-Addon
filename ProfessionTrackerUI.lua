@@ -216,7 +216,7 @@ local function CreateExpansionDisplay(parent, profData, expansionName, expansion
         knowledgeText:SetTextColor(0.3, 0.7, 1)
         -- knowledgeText:SetText(string.format("Knowledge: %d, 
         --     (expansionData.knowledgePoints or 0)
-        ))
+        --))
     
         local missing = expansionData.pointsUntilMaxKnowledge or 0
         if missing > 0 then
