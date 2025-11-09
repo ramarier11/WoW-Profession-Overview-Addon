@@ -256,9 +256,9 @@ local function UpdateCharacterProfessionData()
 
     local charKey = GetCharacterKey()
     local charData = EnsureTable(ProfessionTrackerDB.characters, charKey)
-    print(charData.name)
+    
     -- Initialize character metadata if needed
-    if not charData.name then
+    if not charData then
         local name, realm = UnitFullName("player")
         charData.name = name
         charData.realm = realm or GetRealmName()
