@@ -167,7 +167,7 @@ end
 
 -- Calculate how many knowledge points are still missing for a profession
 local function CalculateMissingKnowledgePoints(skillLineID)
-    print("calculating")
+
     local configID = C_ProfSpecs.GetConfigIDForSkillLine(skillLineID)
     local traitTreeIDs = C_ProfSpecs.GetSpecTabIDsForSkillLine(skillLineID)
     local totalMissing = 0

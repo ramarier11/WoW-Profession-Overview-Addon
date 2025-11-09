@@ -210,16 +210,15 @@ local function CreateExpansionDisplay(parent, profData, expansionName, expansion
     skillText:SetText(string.format("Skill: %d / %d", expansionData.skillLevel or 0, expansionData.maxSkillLevel or 0))
     
     -- Knowledge Points (if exists)
-    if expansionData.knowledgePoints or expansionData.maxKnowledgePoints then
+    if expansionData.knowledgePoints or expansionData.pointsUntilMaxKnowledge then
         local knowledgeText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
         knowledgeText:SetPoint("TOPLEFT", skillText, "BOTTOMLEFT", 0, -5)
         knowledgeText:SetTextColor(0.3, 0.7, 1)
         knowledgeText:SetText(string.format("Knowledge: %d / %d", 
             (expansionData.knowledgePoints or 0),
-            (expansionData.maxKnowledgePoints or 0)
         ))
     
-        local missing = expansionData.maxKnowledgePoints or 0
+        local missing = expansionData.pointsUntilMaxKnowledge or 0
         if missing > 0 then
             local missingText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
             missingText:SetPoint("TOPLEFT", knowledgeText, "BOTTOMLEFT", 0, -3)
