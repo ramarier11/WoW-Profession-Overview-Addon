@@ -326,7 +326,6 @@ local function UpdateCharacterProfessionData()
                             local missing = CalculateMissingKnowledgePoints(exp.skillLineID)
                             expData.knowledgePoints = 0  -- Start at 0, will be calculated from changes
                             expData.pointsUntilMaxKnowledge = missing
-                            expData.maxKnowledgePoints = missing  -- Store the theoretical max
                             expData.weeklyKnowledgeProgress = {
                                 treatise = { completed = false, lastReset = GetCurrentWeekTimestamp() },
                                 treasures = { completed = false, lastReset = GetCurrentWeekTimestamp() },
@@ -360,10 +359,7 @@ local function UpdateCharacterProfessionData()
                             
                             expData.pointsUntilMaxKnowledge = missing
                             
-                            -- Initialize max if not present
-                            if not expData.maxKnowledgePoints then
-                                expData.maxKnowledgePoints = missing + (expData.knowledgePoints or 0)
-                            end
+                    
                             
                             -- Ensure weekly progress structure exists
                             if not expData.weeklyKnowledgeProgress then
@@ -516,8 +512,7 @@ function ProfessionTracker:PrintCharacterData()
                     local knowledgeInfo = ""
                     if expData.knowledgePoints then
                         knowledgeInfo = string.format(" [Knowledge: %d/%d, Remaining: %d]",
-                            expData.knowledgePoints,
-                            expData.maxKnowledgePoints or 0,
+                            expData.knowledgePoints
                             expData.pointsUntilMaxKnowledge or 0)
                     end
                     print(string.format("      %s: %d/%d%s",
