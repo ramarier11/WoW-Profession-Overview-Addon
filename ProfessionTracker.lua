@@ -306,72 +306,29 @@ local function UpdateCharacterProfessionData()
                     -- Check if this expansion has the knowledge system
                     local hasKnowledgeSystem = expID >= KNOWLEDGE_SYSTEM_START
 
-                    -- Get or create expansion data
-                    local expData = expansions[expName]
-                    
-                    if not expData then
-                        -- Create new expansion entry
-                        expData = {
-                            id = expID,
-                            skillLineID = exp.skillLineID,
-                            skillLevel = exp.skillLevel or 0,
-                            maxSkillLevel = exp.maxSkillLevel or 0,
-                            lastUpdated = time(),
-                        }
+                     -- ✅ reuse existing expansion table if present
+                    local expData = expansions[expName] or {}
+                    expData.name = expName
+                    expData.id = expID
+                    expData.skillLineID = exp.skillLineID or expData.skillLineID
+                    expData.skillLevel = exp.skillLevel or expData.skillLevel or 0
+                    expData.maxSkillLevel = exp.maxSkillLevel or expData.maxSkillLevel or 0
 
                         -- Initialize knowledge system data for modern expansions
                         if hasKnowledgeSystem then
                             local missing = CalculateMissingKnowledgePoints(exp.skillLineID)
-                            expData.knowledgePoints = 0  -- Start at 0, will be calculated from changes
-                            expData.pointsUntilMaxKnowledge = missing
-                            expData.weeklyKnowledgeProgress = {
-                                treatise = { completed = false, lastReset = GetCurrentWeekTimestamp() },
-                                treasures = { completed = false, lastReset = GetCurrentWeekTimestamp() },
-                                craftingOrderQuest = { completed = false, lastReset = GetCurrentWeekTimestamp() },
-                            }
+                            expData.pointsUntilMaxKnowledge = missing or expData.pointsUntilMaxKnowledge or 0
+                            expData.knowledgePoints = expData.knowledgePoints or 0
+                            expData.weeklyKnowledgePoints = expData.weeklyKnowledgePoints or {
+                                treatise = false,
+                                treasures = false,
+                                craftingOrderQuest = false,
+                        }
                         end
 
                         expansions[expName] = expData
-                    else
-                        -- Update existing expansion entry
-                        local oldSkillLevel = expData.skillLevel
-                        
-                        expData.skillLineID = exp.skillLineID
-                        expData.skillLevel = exp.skillLevel or expData.skillLevel
-                        expData.maxSkillLevel = exp.maxSkillLevel or expData.maxSkillLevel
-                        expData.lastUpdated = time()
 
-                        -- Update knowledge data for modern expansions
-                        if hasKnowledgeSystem then
-                            local missing = CalculateMissingKnowledgePoints(exp.skillLineID)
-                            local previousMissing = expData.pointsUntilMaxKnowledge or missing
-                            
-                            -- Calculate knowledge gain (if points remaining decreased)
-                            if previousMissing and missing < previousMissing then
-                                local gained = previousMissing - missing
-                                expData.knowledgePoints = (expData.knowledgePoints or 0) + gained
-                                
-                                print(string.format("|cff00ff00[Profession Tracker]|r %s (%s): Gained %d knowledge points!", 
-                                    name, expName, gained))
-                            end
-                            
-                            expData.pointsUntilMaxKnowledge = missing
-                            
-                    
-                            
-                            -- Ensure weekly progress structure exists
-                            if not expData.weeklyKnowledgeProgress then
-                                expData.weeklyKnowledgeProgress = {
-                                    treatise = { completed = false, lastReset = GetCurrentWeekTimestamp() },
-                                    treasures = { completed = false, lastReset = GetCurrentWeekTimestamp() },
-                                    craftingOrderQuest = { completed = false, lastReset = GetCurrentWeekTimestamp() },
-                                }
-                            else
-                                -- Check and reset weekly activities if needed
-                                CheckAndResetWeeklyProgress(expData.weeklyKnowledgeProgress)
-                            end
-                        end
-                    end
+
                 end
             end
         end
