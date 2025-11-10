@@ -370,7 +370,7 @@ function ProfessionTracker:GetAllCharacters()
             })
         end
     end
-    print(chars.type)
+    print(type(chars))
     return chars
 end
 
