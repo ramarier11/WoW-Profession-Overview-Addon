@@ -140,10 +140,10 @@ end
 
 -- Attempts to dynamically fetch expansion data from Blizzard API
 local function GetCharacterProfessionExpansions(professionName)
-    local expansions = {}
+    local expansions = {} -- creates local table called expansions
 
     -- Attempt dynamic retrieval from API
-    if C_TradeSkillUI and C_TradeSkillUI.GetChildProfessionInfos then
+    if C_TradeSkillUI and C_TradeSkillUI.GetChildProfessionInfos then --checks if C_TradeSkillUI and C_TradeSkillUI.GetChildProfessionInfos is true (is tradeskill window open?)
         local childInfos = C_TradeSkillUI.GetChildProfessionInfos()
         if childInfos then
             for _, info in ipairs(childInfos) do
@@ -279,12 +279,12 @@ local function UpdateCharacterProfessionData()
             if name then -- always true
                 currentProfs[name] = true
 
-                local profession = EnsureTable(professions, name)
+                local profession = EnsureTable(professions, name) -- checks if "professions"["ProfessionName"] exists and creates if not
                 profession.lastUpdated = time()
-                local expansions = EnsureTable(profession, "expansions")
+                local expansions = EnsureTable(profession, "expansions") -- checks if "professionName"["expansions"] exists and creates if not
 
-                local expansionList = GetCharacterProfessionExpansions(name)
-
+                local expansionList = GetCharacterProfessionExpansions(name) -- calls GetCharacterProfessionExpansions(professionName) and returns value stored in expansionList var
+                print(expansionList == {})
                 for _, exp in ipairs(expansionList) do
                     if not expansions[exp.expansionName] then 
                         local expName = exp.expansionName or "Unknown"
