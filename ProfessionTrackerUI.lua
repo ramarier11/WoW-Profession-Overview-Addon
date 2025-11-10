@@ -235,6 +235,8 @@ end
 -- Dashboard View
 --------------------------------------------------------
 function ProfessionTrackerUI:ShowDashboard()
+
+    local allChars = ProfessionTracker:GetAllCharacters()
     -- Clear existing content
     for _, child in pairs({self.scrollChild:GetChildren()}) do
         child:Hide()
@@ -251,7 +253,7 @@ function ProfessionTrackerUI:ShowDashboard()
         return
     end
     
-    if not ProfessionTrackerDB.characters then
+    if not allChars then
         print("|cffff0000[Profession Tracker]|r No characters table found")
         local noDataText = self.scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         noDataText:SetPoint("TOP", 0, -20)
@@ -261,7 +263,8 @@ function ProfessionTrackerUI:ShowDashboard()
     
     -- Debug: Print character count
     local charCount = 0
-    for charKey, charData in pairs(ProfessionTrackerDB.characters) do
+    
+    for charKey, charData in pairs(allChars) do
         if charKey ~= "version" and type(charData) == "table" then
             charCount = charCount + 1
             print("|cff00ff00[Profession Tracker]|r Found character:", charKey)
@@ -276,7 +279,7 @@ function ProfessionTrackerUI:ShowDashboard()
     end
     
     -- Create character cards
-    for charKey, charData in pairs(ProfessionTrackerDB.characters) do
+    for charKey, charData in pairs(allChars) do
         if charKey ~= "version" and type(charData) == "table" then
             CreateCharacterCard(self.scrollChild, charKey, charData, yOffset)
             yOffset = yOffset - 130
@@ -291,6 +294,7 @@ end
 -- Detail View
 --------------------------------------------------------
 function ProfessionTrackerUI:ShowDetailView()
+    local allChars = ProfessionTracker:GetAllCharacters()
     -- Clear existing content
     for _, child in pairs({self.scrollChild:GetChildren()}) do
         child:Hide()
@@ -305,7 +309,7 @@ function ProfessionTrackerUI:ShowDetailView()
         return
     end
     
-    local charData = ProfessionTrackerDB.characters[self.selectedCharacter]
+    local charData = allChars[self.selectedCharacter]
     if not charData then
         local errorText = self.scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         errorText:SetPoint("TOP", 0, -20)
@@ -397,13 +401,13 @@ SlashCmdList["PROFTRACKER"] = function(msg)
             print("ProfessionTrackerDB is NIL!")
             return
         end
-        
+        local allChars = ProfessionTracker:GetAllCharacters()
         print("Database exists:", ProfessionTrackerDB ~= nil)
-        print("Characters table:", ProfessionTrackerDB.characters ~= nil)
+        print("Characters table:", allChars ~= nil)
         
-        if ProfessionTrackerDB.characters then
+        if allChars then
             local count = 0
-            for charKey, charData in pairs(ProfessionTrackerDB.characters) do
+            for charKey, charData in pairs(allChars) do
                 if charKey ~= "version" and type(charData) == "table" then
                     count = count + 1
                     print(string.format("  Character %d: %s", count, charKey))
