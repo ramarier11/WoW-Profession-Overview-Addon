@@ -371,11 +371,24 @@ function ProfessionTrackerUI:ShowDetailView()
             yOffset = yOffset - 30
 
             if profData.expansions then
+                -- Convert expansions table into a sortable list
+                local expansionsList = {}
                 for expName, expData in pairs(profData.expansions) do
-                    CreateExpansionDisplay(self.scrollChild, profData, expName, expData, yOffset)
+                    table.insert(expansionsList, { name = expName, data = expData })
+                end
+
+                -- Sort in descending order by expansion ID (higher = newer)
+                table.sort(expansionsList, function(a, b)
+                    return (a.data.id or 0) > (b.data.id or 0)
+                end)
+
+                -- Create UI cards in sorted order
+                for _, exp in ipairs(expansionsList) do
+                    CreateExpansionDisplay(self.scrollChild, profData, exp.name, exp.data, yOffset)
                     yOffset = yOffset - 130
                 end
             end
+
 
             yOffset = yOffset - 20
         end
