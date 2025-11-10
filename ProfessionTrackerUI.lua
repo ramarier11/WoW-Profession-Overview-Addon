@@ -159,7 +159,7 @@ local function CreateCharacterCard(parent, charKey, charData, yOffset)
             if count <= 2 then -- Show first 2 professions
                 local profText = profInfoFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
                 profText:SetPoint("TOPLEFT", 10, yPos)
-                profText:SetText(string.format("⚒ %s", prof.name or "Unknown"))
+                profText:SetText(string.format("⚒ %s", profName or "Unknown"))
                 
                 -- Show expansion summary
                 if prof.expansions then
