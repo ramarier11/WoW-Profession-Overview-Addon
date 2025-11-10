@@ -420,12 +420,7 @@ ProfessionTracker:SetScript("OnEvent", function(self, event, ...)
             UpdateCharacterProfessionData()
         end)
     elseif event == "TRADE_SKILL_SHOW" or
-           event == "SKILL_LINES_CHANGED" or
-           event == "TRADE_SKILL_LIST_UPDATE" or
-           event == "TRADE_SKILL_DATA_SOURCE_CHANGED" or
-           event == "LEARNED_SPELL_IN_SKILL_LINE" or
-           event == "TRAIT_TREE_CURRENCY_INFO_UPDATED" or 
-           event == "CURRENCY_DISPLAY_UPDATE" then
+
         -- Update data on profession-related events
         UpdateCharacterProfessionData()
     end
