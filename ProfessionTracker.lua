@@ -254,11 +254,11 @@ local function UpdateCharacterProfessionData()
         }
     end
 
-    local charKey = GetCharacterKey()
-    local charData = EnsureTable(ProfessionTrackerDB.characters, charKey)
+    local charKey = GetCharacterKey() -- returns Charname - RealmName as String
+    local charData = EnsureTable(ProfessionTrackerDB.characters, charKey) -- checks if table key "characters"[charKey] exists and if not creates it
 
     -- ✅ Initialize metadata if not set yet
-    if not charData.name then
+    if not charData.name then -- if "characters"[charKey].name doesn't exist -> create a new entry
         local name, realm = UnitFullName("player")
         charData.name = name or UnitName("player") or "Unknown"
         charData.realm = realm or GetRealmName() or "UnknownRealm"
@@ -267,13 +267,14 @@ local function UpdateCharacterProfessionData()
         charData.faction = UnitFactionGroup("player")
     end
 
-    charData.lastLogin = time()
+    charData.lastLogin = time() -- save last login time
 
-    local professions = EnsureTable(charData, "professions")
-    local currentProfs = {}
-    local profIndices = { GetProfessions() }
-
-    for _, profIndex in ipairs(profIndices) do
+    local professions = EnsureTable(charData, "professions") -- checks if table key "characters"["UnitName-RealmName"]["professions"] exists and if not creates it
+    local currentProfs = {} -- creates empty table called currentProfs
+    local profIndices = { GetProfessions() } -- creates table of current characters professions
+    print(#profIndices .. type(profIndices))
+    for _, profIndex in ipairs(profIndices) do -- loops through current characters professions
+        print(profIndex)
         if profIndex then
             local name, _, skillLevel, maxSkillLevel = GetProfessionInfo(profIndex)
             if name then
