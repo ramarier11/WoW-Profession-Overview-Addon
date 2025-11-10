@@ -274,9 +274,9 @@ local function UpdateCharacterProfessionData()
     local profIndices = { GetProfessions() } -- creates table of current characters professions
     for _, profIndex in ipairs(profIndices) do -- loops through current characters professions
         
-        if profIndex then
-            local name, _, skillLevel, maxSkillLevel = GetProfessionInfo(profIndex)
-            if name then
+        if profIndex then -- checks if profIndex exists (always true if you have a profession)
+            local name, _, skillLevel, maxSkillLevel = GetProfessionInfo(profIndex) -- sets local vars equal to associated data
+            if name then -- always true
                 currentProfs[name] = true
 
                 local profession = EnsureTable(professions, name)
@@ -286,34 +286,36 @@ local function UpdateCharacterProfessionData()
                 local expansionList = GetCharacterProfessionExpansions(name)
 
                 for _, exp in ipairs(expansionList) do
-                    local expName = exp.expansionName or "Unknown"
-                    local expID = ExpansionIndex[expName] or 0
-                    local hasKnowledgeSystem = expID >= KNOWLEDGE_SYSTEM_START
+                    if not expansions[exp.expansionName] then 
+                        local expName = exp.expansionName or "Unknown"
+                        local expID = ExpansionIndex[expName] or 0
+                        local hasKnowledgeSystem = expID >= KNOWLEDGE_SYSTEM_START
 
-                    -- ✅ Merge rather than replace existing data
-                    local expData = expansions[expName] or {}
-                    expData.name = expName
-                    expData.id = expID
-                    expData.skillLineID = exp.skillLineID or expData.skillLineID
-                    expData.skillLevel = exp.skillLevel or expData.skillLevel or 0
-                    expData.maxSkillLevel = exp.maxSkillLevel or expData.maxSkillLevel or 0
+                        -- ✅ Merge rather than replace existing data
+                        local expData = expansions[expName] or {}
+                        expData.name = expName
+                        expData.id = expID
+                        expData.skillLineID = exp.skillLineID or expData.skillLineID
+                        expData.skillLevel = exp.skillLevel or expData.skillLevel or 0
+                        expData.maxSkillLevel = exp.maxSkillLevel or expData.maxSkillLevel or 0
 
-                    if hasKnowledgeSystem then
-                        local missing = CalculateMissingKnowledgePoints(exp.skillLineID)
-                        expData.pointsUntilMaxKnowledge = missing or expData.pointsUntilMaxKnowledge or 0
-                        expData.knowledgePoints = expData.knowledgePoints or 0
-                        expData.weeklyKnowledgePoints = expData.weeklyKnowledgePoints or {
-                            treatise = false,
-                            treasures = false,
-                            craftingOrderQuest = false,
-                        }
-                    end
+                        if hasKnowledgeSystem then
+                            local missing = CalculateMissingKnowledgePoints(exp.skillLineID)
+                            expData.pointsUntilMaxKnowledge = missing or expData.pointsUntilMaxKnowledge or 0
+                            expData.knowledgePoints = expData.knowledgePoints or 0
+                            expData.weeklyKnowledgePoints = expData.weeklyKnowledgePoints or {
+                                treatise = false,
+                                treasures = false,
+                                craftingOrderQuest = false,
+                            }
+                        end
 
-                    -- ✅ Clean out legacy or unused fields
-                    expData.maxKnowledgePoints = nil
+                        -- ✅ Clean out legacy or unused fields
+                        expData.maxKnowledgePoints = nil
 
                     -- ✅ Save back to DB
                     expansions[expName] = expData
+                    end
                 end
             end
         end
