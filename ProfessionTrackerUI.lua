@@ -294,29 +294,28 @@ end
 -- Detail View
 --------------------------------------------------------
 function ProfessionTrackerUI:ShowDetailView()
-    local allChars = ProfessionTracker:GetAllCharacters()
     -- Clear existing content
     for _, child in pairs({self.scrollChild:GetChildren()}) do
         child:Hide()
-        child:SetParent(nil)
+        child:ClearAllPoints()
     end
-    
+
     if not self.selectedCharacter then
-        -- Show character selection if none selected
         local selectText = self.scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         selectText:SetPoint("TOP", 0, -20)
         selectText:SetText("Select a character from the dashboard")
         return
     end
-    
-    local charData = allChars[self.selectedCharacter]
+
+    -- ✅ Correct: get full data directly
+    local charData = ProfessionTrackerDB.characters and ProfessionTrackerDB.characters[self.selectedCharacter]
     if not charData then
         local errorText = self.scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         errorText:SetPoint("TOP", 0, -20)
         errorText:SetText("Character data not found")
         return
     end
-    
+
     -- Back button
     local backButton = CreateFrame("Button", nil, self.scrollChild, "UIPanelButtonTemplate")
     backButton:SetSize(100, 25)
@@ -326,43 +325,41 @@ function ProfessionTrackerUI:ShowDetailView()
         self.viewMode = "dashboard"
         self:Refresh()
     end)
-    
-    -- Character header
+
+    -- Header
     local headerText = self.scrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
     headerText:SetPoint("TOP", 0, -15)
     headerText:SetText(string.format("%s - %s", charData.name or "Unknown", charData.realm or ""))
-    
+
     local yOffset = -50
-    
-    -- Display each profession and its expansions
+
+    -- Professions
     if charData.professions then
-        for profIndex, profData in pairs(charData.professions) do
-            -- Profession header
+        for profName, profData in pairs(charData.professions) do
             local profHeader = self.scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
             profHeader:SetPoint("TOPLEFT", 20, yOffset)
             profHeader:SetTextColor(1, 0.8, 0)
-            profHeader:SetText(profData.name or "Unknown Profession")
-            
+            profHeader:SetText(profName or "Unknown Profession")
             yOffset = yOffset - 30
-            
-            -- Display expansions
+
             if profData.expansions then
                 for expName, expData in pairs(profData.expansions) do
                     CreateExpansionDisplay(self.scrollChild, profData, expName, expData, yOffset)
                     yOffset = yOffset - 130
                 end
             end
-            
-            yOffset = yOffset - 20 -- Space between professions
+
+            yOffset = yOffset - 20
         end
     else
         local noProfText = self.scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         noProfText:SetPoint("TOP", 0, -80)
         noProfText:SetText("No profession data available")
     end
-    
+
     self.scrollChild:SetHeight(math.abs(yOffset))
 end
+
 
 --------------------------------------------------------
 -- Main Refresh Function
