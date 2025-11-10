@@ -272,9 +272,8 @@ local function UpdateCharacterProfessionData()
     local professions = EnsureTable(charData, "professions") -- checks if table key "characters"["UnitName-RealmName"]["professions"] exists and if not creates it
     local currentProfs = {} -- creates empty table called currentProfs
     local profIndices = { GetProfessions() } -- creates table of current characters professions
-    print(#profIndices .. type(profIndices))
     for _, profIndex in ipairs(profIndices) do -- loops through current characters professions
-        print(profIndex)
+        
         if profIndex then
             local name, _, skillLevel, maxSkillLevel = GetProfessionInfo(profIndex)
             if name then
