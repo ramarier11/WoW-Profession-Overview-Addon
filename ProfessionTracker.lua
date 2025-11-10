@@ -284,7 +284,7 @@ local function UpdateCharacterProfessionData()
                 local expansions = EnsureTable(profession, "expansions") -- checks if "professionName"["expansions"] exists and creates if not
 
                 local expansionList = GetCharacterProfessionExpansions(name) -- calls GetCharacterProfessionExpansions(professionName) and returns value stored in expansionList var
-                print(expansionList == {})
+                print(#expansionList)
                 for _, exp in ipairs(expansionList) do
                     if not expansions[exp.expansionName] then 
                         local expName = exp.expansionName or "Unknown"
