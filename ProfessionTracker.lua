@@ -363,22 +363,23 @@ function ProfessionTracker:GetProfessionData(profession)
 end
 
 function ProfessionTracker:GetAllCharacters()
-    if not ProfessionTrackerDB then return {} end
+    if not ProfessionTrackerDB or not ProfessionTrackerDB.characters then return {} end
     local chars = {}
-    for key, data in pairs(ProfessionTrackerDB) do
-        if key ~= "version" and type(data) == "table" then
-            table.insert(chars, {
-                key = key,
+    for key, data in pairs(ProfessionTrackerDB.characters) do
+        if type(data) == "table" then
+            chars[key] = {
                 name = data.name,
                 realm = data.realm,
                 class = data.class,
                 level = data.level,
                 lastLogin = data.lastLogin,
-            })
+                professions = data.professions, -- ✅ Add this line
+            }
         end
     end
     return chars
 end
+
 
 -- ========================================================
 -- Weekly Activity Tracking
