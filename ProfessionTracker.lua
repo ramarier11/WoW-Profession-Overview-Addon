@@ -360,6 +360,7 @@ function ProfessionTracker:GetAllCharacters()
     local chars = {}
     for key, data in pairs(ProfessionTrackerDB) do
         if key ~= "version" and type(data) == "table" then
+            print(key .. " - " .. data)
             table.insert(chars, {
                 key = key,
                 name = data.name,
@@ -370,7 +371,6 @@ function ProfessionTracker:GetAllCharacters()
             })
         end
     end
-    print(type(chars))
     return chars
 end
 
