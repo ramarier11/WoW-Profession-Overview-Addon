@@ -285,7 +285,7 @@ local function UpdateCharacterProfessionData()
 
                 local expansionList = GetCharacterProfessionExpansions(name) -- calls GetCharacterProfessionExpansions(professionName) and returns value stored in expansionList var
                 -- ✅ Skip if the table is empty or nil
-                if expansionList and #expansionList > 0 then
+                if expansionList and #expansionList > 0 then --checks if expansionList is not nil and length is > 0 
                     for _, exp in ipairs(expansionList) do
                         if not expansions[exp.expansionName] then 
                             local expName = exp.expansionName or "Unknown"
