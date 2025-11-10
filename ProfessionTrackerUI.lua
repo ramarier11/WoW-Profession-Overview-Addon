@@ -86,6 +86,29 @@ ProfessionTrackerUI.scrollFrame = scrollFrame
 ProfessionTrackerUI.scrollChild = scrollChild
 
 --------------------------------------------------------
+-- Clears Scroller when navigating to different views
+--------------------------------------------------------
+function ProfessionTrackerUI:ClearScrollChild()
+    if not self.scrollChild then return end
+    
+    -- Clear all child frames (buttons, frames, etc.)
+    for _, child in pairs({self.scrollChild:GetChildren()}) do
+        child:Hide()
+        child:ClearAllPoints()
+        child:SetParent(nil)
+    end
+    
+    -- Clear fontstrings and textures attached directly to scrollChild
+    for _, region in pairs({self.scrollChild:GetRegions()}) do
+        if region and region.Hide then
+            region:Hide()
+        end
+    end
+end
+
+
+
+--------------------------------------------------------
 -- Helper Functions
 --------------------------------------------------------
 
@@ -235,6 +258,7 @@ end
 -- Dashboard View
 --------------------------------------------------------
 function ProfessionTrackerUI:ShowDashboard()
+    self:ClearScrollChild()
 
     local allChars = ProfessionTracker:GetAllCharacters()
     -- Clear existing content
@@ -287,6 +311,8 @@ function ProfessionTrackerUI:ShowDashboard()
     end
     
     self.scrollChild:SetHeight(math.abs(yOffset))
+    self.scrollFrame:SetVerticalScroll(0)
+
     print("|cff00ff00[Profession Tracker]|r Created", charCount, "character cards")
 end
 
@@ -294,6 +320,8 @@ end
 -- Detail View
 --------------------------------------------------------
 function ProfessionTrackerUI:ShowDetailView()
+    self:ClearScrollChild()
+
     -- Clear existing content
     for _, child in pairs({self.scrollChild:GetChildren()}) do
         child:Hide()
@@ -358,6 +386,8 @@ function ProfessionTrackerUI:ShowDetailView()
     end
 
     self.scrollChild:SetHeight(math.abs(yOffset))
+    self.scrollFrame:SetVerticalScroll(0)
+
 end
 
 
