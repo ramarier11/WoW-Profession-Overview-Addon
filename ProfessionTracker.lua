@@ -286,58 +286,54 @@ local function UpdateCharacterProfessionData()
                     ["Archaeology"] = true,
                     ["First Aid"] = true,
                 }
-                if excludedProfs[name] then
-                    print(string.format("|cffff0000[Profession Tracker]|r Skipping secondary profession: %s", name))
-                    goto continue
-                end
+                if not excludedProfs[name] then
+                    currentProfs[name] = true
+                    local profession = EnsureTable(professions, name) -- checks if "professions"["ProfessionName"] exists and creates if not
+                    profession.lastUpdated = time()
+                    local expansions = EnsureTable(profession, "expansions") -- checks if "professionName"["expansions"] exists and creates if not
 
-                currentProfs[name] = true
-                local profession = EnsureTable(professions, name) -- checks if "professions"["ProfessionName"] exists and creates if not
-                profession.lastUpdated = time()
-                local expansions = EnsureTable(profession, "expansions") -- checks if "professionName"["expansions"] exists and creates if not
+                    local expansionList = GetCharacterProfessionExpansions(name) -- calls GetCharacterProfessionExpansions(professionName) and returns value stored in expansionList var
+                    -- ✅ Skip if the table is empty or nil
+                    if expansionList and #expansionList > 0 then --checks if expansionList is not nil and length is > 0 
+                        for _, exp in ipairs(expansionList) do
+                            if not expansions[exp.expansionName] then 
+                                local expName = exp.expansionName or "Unknown"
+                                local expID = ExpansionIndex[expName] or 0
+                                local hasKnowledgeSystem = expID >= KNOWLEDGE_SYSTEM_START
 
-                local expansionList = GetCharacterProfessionExpansions(name) -- calls GetCharacterProfessionExpansions(professionName) and returns value stored in expansionList var
-                -- ✅ Skip if the table is empty or nil
-                if expansionList and #expansionList > 0 then --checks if expansionList is not nil and length is > 0 
-                    for _, exp in ipairs(expansionList) do
-                        if not expansions[exp.expansionName] then 
-                            local expName = exp.expansionName or "Unknown"
-                            local expID = ExpansionIndex[expName] or 0
-                            local hasKnowledgeSystem = expID >= KNOWLEDGE_SYSTEM_START
+                                -- ✅ Merge rather than replace existing data
+                                local expData = expansions[expName] or {}
+                                expData.name = expName
+                                expData.id = expID
+                                expData.skillLineID = exp.skillLineID or expData.skillLineID
+                                expData.skillLevel = exp.skillLevel or expData.skillLevel or 0
+                                expData.maxSkillLevel = exp.maxSkillLevel or expData.maxSkillLevel or 0
 
-                            -- ✅ Merge rather than replace existing data
-                            local expData = expansions[expName] or {}
-                            expData.name = expName
-                            expData.id = expID
-                            expData.skillLineID = exp.skillLineID or expData.skillLineID
-                            expData.skillLevel = exp.skillLevel or expData.skillLevel or 0
-                            expData.maxSkillLevel = exp.maxSkillLevel or expData.maxSkillLevel or 0
+                                if hasKnowledgeSystem then
+                                    local missing = CalculateMissingKnowledgePoints(exp.skillLineID)
+                                    expData.pointsUntilMaxKnowledge = missing or expData.pointsUntilMaxKnowledge or 0
+                                    expData.knowledgePoints = expData.knowledgePoints or 0
+                                    expData.weeklyKnowledgePoints = expData.weeklyKnowledgePoints or {
+                                        treatise = false,
+                                        treasures = false,
+                                        craftingOrderQuest = false,
+                                    }
+                                end
 
-                            if hasKnowledgeSystem then
-                                local missing = CalculateMissingKnowledgePoints(exp.skillLineID)
-                                expData.pointsUntilMaxKnowledge = missing or expData.pointsUntilMaxKnowledge or 0
-                                expData.knowledgePoints = expData.knowledgePoints or 0
-                                expData.weeklyKnowledgePoints = expData.weeklyKnowledgePoints or {
-                                    treatise = false,
-                                    treasures = false,
-                                    craftingOrderQuest = false,
-                                }
+                                -- ✅ Clean out legacy or unused fields
+                                expData.maxKnowledgePoints = nil
+
+                            -- ✅ Save back to DB
+                            expansions[expName] = expData
                             end
-
-                            -- ✅ Clean out legacy or unused fields
-                            expData.maxKnowledgePoints = nil
-
-                        -- ✅ Save back to DB
-                        expansions[expName] = expData
                         end
-                    end
-                else
+                    else
                     -- ✅ Optionally log for debugging
                     print(string.format("|cffff0000[Profession Tracker]|r Skipped empty expansion data for %s", name))
                 end
             end
+            end
         end
-        ::continue::
     end
 
     -- Remove unlearned professions
