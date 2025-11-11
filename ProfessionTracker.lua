@@ -277,8 +277,21 @@ local function UpdateCharacterProfessionData()
         if profIndex then -- checks if profIndex exists (always true if you have a profession)
             local name, _, skillLevel, maxSkillLevel = GetProfessionInfo(profIndex) -- sets local vars equal to associated data
             if name then -- always true
-                currentProfs[name] = true
+                
 
+                -- Exclude secondary professions for now
+                local excludedProfs = {
+                    ["Cooking"] = true,
+                    ["Fishing"] = true,
+                    ["Archaeology"] = true,
+                    ["First Aid"] = true,
+                }
+                if excludedProfs[name] then
+                    print(string.format("|cffff0000[Profession Tracker]|r Skipping secondary profession: %s", name))
+                    goto continue
+                end
+
+                currentProfs[name] = true
                 local profession = EnsureTable(professions, name) -- checks if "professions"["ProfessionName"] exists and creates if not
                 profession.lastUpdated = time()
                 local expansions = EnsureTable(profession, "expansions") -- checks if "professionName"["expansions"] exists and creates if not
@@ -324,6 +337,7 @@ local function UpdateCharacterProfessionData()
                 end
             end
         end
+        ::continue::
     end
 
     -- Remove unlearned professions
