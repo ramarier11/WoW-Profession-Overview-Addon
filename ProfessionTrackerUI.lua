@@ -296,8 +296,8 @@ local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
     for _, obj in ipairs(objectives) do
         local cb = CreateFrame("CheckButton", nil, checkboxFrame, "ChatConfigCheckButtonTemplate")
         cb:SetPoint("LEFT", xOffset, 0)
-        cb:SetChecked(false) -- placeholder, will be dynamic later
-        _G[cb:GetName() .. "Text"]:SetText(obj.label)
+        cb:SetChecked(false) -- placeholder
+        cb.Text:SetText(obj.label)
         xOffset = xOffset + 100
     end
 
