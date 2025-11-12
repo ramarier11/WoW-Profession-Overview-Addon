@@ -121,16 +121,33 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
     })
     card:SetBackdropColor(0, 0, 0, 0.6)
 
-    -- Collect and sort expansions (most recent first)
-    local expansionNames = {}
-    for expName, _ in pairs(profData.expansions or {}) do
-        table.insert(expansionNames, expName)
+    -- Build a sortable list of expansions using per-character expData.id (fallback to 0)
+    local expansionsList = {}
+    for expName, expData in pairs(profData.expansions or {}) do
+        local id = expData and expData.id or 0
+        table.insert(expansionsList, { name = expName, id = id, data = expData })
     end
-    table.sort(expansionNames, function(a, b)
-        local aID = (ProfessionTracker.ExpansionIndex and ProfessionTracker.ExpansionIndex[a]) or 0
-        local bID = (ProfessionTracker.ExpansionIndex and ProfessionTracker.ExpansionIndex[b]) or 0
-        return aID > bID -- descending: newest → oldest
+
+    -- If id wasn't saved for some reason, try to prefer ones with any skillLevel > 0
+    if #expansionsList == 0 then
+        -- no expansion data
+    end
+
+    -- Sort descending by id (newest first). If ids are equal, put expansions with higher skillLevel first
+    table.sort(expansionsList, function(a, b)
+        if (a.id or 0) ~= (b.id or 0) then
+            return (a.id or 0) > (b.id or 0)
+        end
+        local aSkill = (a.data and a.data.skillLevel) or 0
+        local bSkill = (b.data and b.data.skillLevel) or 0
+        return aSkill > bSkill
     end)
+
+    -- Extract ordered names for the carousel logic
+    local expansionNames = {}
+    for _, item in ipairs(expansionsList) do
+        table.insert(expansionNames, item.name)
+    end
 
     local currentIndex = 1
 
@@ -178,8 +195,13 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
         end
 
         local expName = expansionNames[currentIndex]
-        local expData = profData.expansions[expName]
-        if not expData then return end
+        local expData = profData.expansions and profData.expansions[expName]
+        if not expData then
+            expansionLabel:SetText(expName or "Unknown")
+            skillText:SetText("Skill: 0 / 0")
+            knowledgeText:SetText("")
+            return
+        end
 
         expansionLabel:SetText(expName)
         skillText:SetText(string.format("Skill: %d / %d",
@@ -213,6 +235,7 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
     UpdateDisplay()
     return card
 end
+
 
 
 --------------------------------------------------------
