@@ -305,56 +305,88 @@ local function CreateCharacterCard(parent, charKey, charData, yOffset)
     profInfoFrame:SetPoint("TOP", 0, -40)
     
     local yPos = -5
+    
     if charData.professions then
-        local count = 0
-        for profName, prof in pairs(charData.professions) do
-            local profText = profInfoFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-            profText:SetPoint("TOPLEFT", 10, yPos)
-
-            -- Find the latest expansion (highest ID)
-            local latestExp, latestData
-            for expName, expData in pairs(prof.expansions or {}) do
-                if not latestData or (expData.id or 0) > (latestData.id or 0) then
-                    latestExp, latestData = expName, expData
-                end
+    local count = 0
+        for profName, profData in pairs(charData.professions) do
+            count = count + 1
+            if count <= 2 then -- Show first 2 professions
+                local _, newY = AddProfessionObjectives(profInfoFrame, profName, profData, yPos)
+                yPos = newY
             end
-
-            local isMaxed = latestData and latestData.skillLevel == latestData.maxSkillLevel
-            local checkSymbol = isMaxed and "✓" or "✗"
-            profText:SetText(string.format("%s %s", profName, checkSymbol))
-
-            -- Weekly Knowledge placeholders
-            local checkboxFrame = CreateFrame("Frame", nil, profInfoFrame)
-            checkboxFrame:SetSize(200, 20)
-            checkboxFrame:SetPoint("TOPLEFT", profText, "BOTTOMLEFT", 15, -2)
-
-            local objectives = { "KP Quest", "KP Treasures", "KP Treatise" }
-            local xOffset = 0
-            for _, label in ipairs(objectives) do
-                local cb = CreateFrame("CheckButton", nil, checkboxFrame, "ChatConfigCheckButtonTemplate")
-                cb:SetPoint("LEFT", xOffset, 0)
-                cb:SetChecked(false) -- Placeholder: later set dynamically
-                _G[cb:GetName() .. "Text"]:SetText(label)
-                xOffset = xOffset + 100
-            end
-
-            -- Concentration Display (Placeholder)
-            local concText = profInfoFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-            concText:SetPoint("TOPLEFT", checkboxFrame, "BOTTOMLEFT", 0, -5)
-            local concValue = latestData and latestData.concentration or math.random(0, 100) -- placeholder
-            local color = {1, 0, 0}
-            if concValue >= 75 then color = {0, 1, 0}
-            elseif concValue >= 40 then color = {1, 0.8, 0} end
-            concText:SetTextColor(unpack(color))
-            concText:SetText(string.format("Concentration: %d%%", concValue))
-
-            yPos = yPos - 55
         end
-
     end
+
     
     return card
 end
+
+--------------------------------------------------------
+-- Modular: Add Profession Objectives to Dashboard Card
+--------------------------------------------------------
+local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
+    local container = CreateFrame("Frame", nil, parentFrame)
+    container:SetSize(440, 60)
+    container:SetPoint("TOPLEFT", 10, yOffset)
+
+    -- Find the most recent expansion (highest ID)
+    local latestExp, latestData
+    for expName, expData in pairs(profData.expansions or {}) do
+        if not latestData or (expData.id or 0) > (latestData.id or 0) then
+            latestExp, latestData = expName, expData
+        end
+    end
+
+    ----------------------------------------------------
+    -- Profession Name + Checkmark if Maxed
+    ----------------------------------------------------
+    local profText = container:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    profText:SetPoint("TOPLEFT", 0, 0)
+
+    local isMaxed = latestData and latestData.skillLevel == latestData.maxSkillLevel
+    local checkSymbol = isMaxed and "✓" or "✗"
+    profText:SetText(string.format("%s %s", profName, checkSymbol))
+
+    ----------------------------------------------------
+    -- Weekly Knowledge Checkboxes (Placeholders)
+    ----------------------------------------------------
+    local checkboxFrame = CreateFrame("Frame", nil, container)
+    checkboxFrame:SetSize(300, 20)
+    checkboxFrame:SetPoint("TOPLEFT", profText, "BOTTOMLEFT", 15, -3)
+
+    local objectives = {
+        { key = "quest", label = "KP Quest" },
+        { key = "treasures", label = "KP Treasures" },
+        { key = "treatise", label = "KP Treatise" },
+    }
+
+    local xOffset = 0
+    for _, obj in ipairs(objectives) do
+        local cb = CreateFrame("CheckButton", nil, checkboxFrame, "ChatConfigCheckButtonTemplate")
+        cb:SetPoint("LEFT", xOffset, 0)
+        cb:SetChecked(false) -- placeholder, will be dynamic later
+        _G[cb:GetName() .. "Text"]:SetText(obj.label)
+        xOffset = xOffset + 100
+    end
+
+    ----------------------------------------------------
+    -- Concentration Display (Placeholder)
+    ----------------------------------------------------
+    local concText = container:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    concText:SetPoint("TOPLEFT", checkboxFrame, "BOTTOMLEFT", 0, -5)
+
+    -- Placeholder logic: random concentration value if not yet tracked
+    local concValue = latestData and latestData.concentration or math.random(0, 100)
+    local color = {1, 0, 0} -- default red
+    if concValue >= 75 then color = {0, 1, 0}      -- green
+    elseif concValue >= 40 then color = {1, 0.8, 0} end -- yellow
+
+    concText:SetTextColor(unpack(color))
+    concText:SetText(string.format("Concentration: %d%%", concValue))
+
+    return container, yOffset - 55
+end
+
 
 local function CreateExpansionDisplay(parent, profData, expansionName, expansionData, yOffset)
     local frame = CreateFrame("Frame", nil, parent)
