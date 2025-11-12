@@ -308,32 +308,49 @@ local function CreateCharacterCard(parent, charKey, charData, yOffset)
     if charData.professions then
         local count = 0
         for profName, prof in pairs(charData.professions) do
-            count = count + 1
-            if count <= 2 then -- Show first 2 professions
-                local profText = profInfoFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-                profText:SetPoint("TOPLEFT", 10, yPos)
-                profText:SetText(string.format("⚒ %s", profName or "Unknown"))
-                
-                -- Show expansion summary
-                if prof.expansions then
-                    local expCount = 0
-                    local maxedCount = 0
-                    for expName, expData in pairs(prof.expansions) do
-                        expCount = expCount + 1
-                        if expData.skillLevel == expData.maxSkillLevel then
-                            maxedCount = maxedCount + 1
-                        end
-                    end
-                    
-                    local summaryText = profInfoFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-                    summaryText:SetPoint("TOPLEFT", profText, "BOTTOMLEFT", 15, -3)
-                    summaryText:SetTextColor(0.7, 0.7, 0.7)
-                    summaryText:SetText(string.format("%d/%d expansions maxed", maxedCount, expCount))
+            local profText = profInfoFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+            profText:SetPoint("TOPLEFT", 10, yPos)
+
+            -- Find the latest expansion (highest ID)
+            local latestExp, latestData
+            for expName, expData in pairs(prof.expansions or {}) do
+                if not latestData or (expData.id or 0) > (latestData.id or 0) then
+                    latestExp, latestData = expName, expData
                 end
-                
-                yPos = yPos - 35
             end
+
+            local isMaxed = latestData and latestData.skillLevel == latestData.maxSkillLevel
+            local checkSymbol = isMaxed and "✓" or "✗"
+            profText:SetText(string.format("%s %s", profName, checkSymbol))
+
+            -- Weekly Knowledge placeholders
+            local checkboxFrame = CreateFrame("Frame", nil, profInfoFrame)
+            checkboxFrame:SetSize(200, 20)
+            checkboxFrame:SetPoint("TOPLEFT", profText, "BOTTOMLEFT", 15, -2)
+
+            local objectives = { "KP Quest", "KP Treasures", "KP Treatise" }
+            local xOffset = 0
+            for _, label in ipairs(objectives) do
+                local cb = CreateFrame("CheckButton", nil, checkboxFrame, "ChatConfigCheckButtonTemplate")
+                cb:SetPoint("LEFT", xOffset, 0)
+                cb:SetChecked(false) -- Placeholder: later set dynamically
+                _G[cb:GetName() .. "Text"]:SetText(label)
+                xOffset = xOffset + 100
+            end
+
+            -- Concentration Display (Placeholder)
+            local concText = profInfoFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+            concText:SetPoint("TOPLEFT", checkboxFrame, "BOTTOMLEFT", 0, -5)
+            local concValue = latestData and latestData.concentration or math.random(0, 100) -- placeholder
+            local color = {1, 0, 0}
+            if concValue >= 75 then color = {0, 1, 0}
+            elseif concValue >= 40 then color = {1, 0.8, 0} end
+            concText:SetTextColor(unpack(color))
+            concText:SetText(string.format("Concentration: %d%%", concValue))
+
+            yPos = yPos - 55
         end
+
     end
     
     return card
