@@ -302,13 +302,37 @@ function ProfessionTrackerUI:ShowDashboard()
         return
     end
     
-    -- Create character cards
-    for charKey, charData in pairs(allChars) do
-        if charKey ~= "version" and type(charData) == "table" then
-            CreateCharacterCard(self.scrollChild, charKey, charData, yOffset)
-            yOffset = yOffset - 130
-        end
+    -- Sort characters so current player is first
+local currentKey = UnitFullName("player")
+if currentKey then
+    local realm = GetRealmName()
+    currentKey = string.format("%s-%s", currentKey, realm)
+end
+
+-- Build a sorted list
+local sortedKeys = {}
+for charKey, charData in pairs(allChars) do
+    if charKey ~= "version" and type(charData) == "table" then
+        table.insert(sortedKeys, charKey)
     end
+end
+
+table.sort(sortedKeys, function(a, b)
+    -- Put current character first, others sorted by last login
+    if a == currentKey then return true end
+    if b == currentKey then return false end
+    local aData = allChars[a]
+    local bData = allChars[b]
+    return (aData.lastLogin or 0) > (bData.lastLogin or 0)
+end)
+
+-- Create cards in sorted order
+for _, charKey in ipairs(sortedKeys) do
+    local charData = allChars[charKey]
+    CreateCharacterCard(self.scrollChild, charKey, charData, yOffset)
+    yOffset = yOffset - 130
+end
+
     
     self.scrollChild:SetHeight(math.abs(yOffset))
     self.scrollFrame:SetVerticalScroll(0)
