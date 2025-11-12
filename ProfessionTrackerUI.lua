@@ -253,74 +253,6 @@ local function GetCharacterKey()
     return string.format("%s-%s", name, realm)
 end
 
-local function CreateCharacterCard(parent, charKey, charData, yOffset)
-    local card = CreateFrame("Frame", nil, parent)
-    card:SetSize(460, 120)
-    card:SetPoint("TOP", 0, yOffset)
-    
-    -- Background
-    card.bg = card:CreateTexture(nil, "BACKGROUND")
-    card.bg:SetAllPoints()
-    card.bg:SetColorTexture(0.1, 0.1, 0.1, 0.5)
-    
-    -- Character Header (clickable for detail view)
-    local header = CreateFrame("Button", nil, card)
-    header:SetSize(460, 40)
-    header:SetPoint("TOP", 0, 0)
-    
-    local nameText = header:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    nameText:SetPoint("TOPLEFT", 10, -10)
-    nameText:SetText(string.format("%s - Lv%d %s", charData.name or "Unknown", charData.level or 0, charData.class or ""))
-    
-    local readyCount = 0
-    local cooldownCount = 0
-    
-    -- Count ready/cooldown tasks (simplified for now)
-    if charData.professions then
-        for _, prof in pairs(charData.professions) do
-            readyCount = readyCount + 1 -- Placeholder
-            cooldownCount = cooldownCount + 1 -- Placeholder
-        end
-    end
-    
-    local statusText = header:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    statusText:SetPoint("TOPLEFT", nameText, "BOTTOMLEFT", 0, -5)
-    statusText:SetTextColor(0, 1, 0)
-    statusText:SetText(string.format("✓ %d Ready  ", readyCount))
-    
-    local cooldownText = header:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    cooldownText:SetPoint("LEFT", statusText, "RIGHT", 5, 0)
-    cooldownText:SetTextColor(1, 0.5, 0)
-    cooldownText:SetText(string.format("⏱ %d On Cooldown", cooldownCount))
-    
-    header:SetScript("OnClick", function()
-        ProfessionTrackerUI.selectedCharacter = charKey
-        ProfessionTrackerUI.viewMode = "detail"
-        ProfessionTrackerUI:Refresh()
-    end)
-    
-    -- Profession Info Section
-    local profInfoFrame = CreateFrame("Frame", nil, card)
-    profInfoFrame:SetSize(460, 80)
-    profInfoFrame:SetPoint("TOP", 0, -40)
-    
-    local yPos = -5
-    
-    if charData.professions then
-    local count = 0
-        for profName, profData in pairs(charData.professions) do
-            count = count + 1
-            if count <= 2 then -- Show first 2 professions
-                local _, newY = AddProfessionObjectives(profInfoFrame, profName, profData, yPos)
-                yPos = newY
-            end
-        end
-    end
-
-    
-    return card
-end
-
 --------------------------------------------------------
 -- Modular: Add Profession Objectives to Dashboard Card
 --------------------------------------------------------
@@ -386,6 +318,76 @@ local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
 
     return container, yOffset - 55
 end
+
+local function CreateCharacterCard(parent, charKey, charData, yOffset)
+    local card = CreateFrame("Frame", nil, parent)
+    card:SetSize(460, 120)
+    card:SetPoint("TOP", 0, yOffset)
+    
+    -- Background
+    card.bg = card:CreateTexture(nil, "BACKGROUND")
+    card.bg:SetAllPoints()
+    card.bg:SetColorTexture(0.1, 0.1, 0.1, 0.5)
+    
+    -- Character Header (clickable for detail view)
+    local header = CreateFrame("Button", nil, card)
+    header:SetSize(460, 40)
+    header:SetPoint("TOP", 0, 0)
+    
+    local nameText = header:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    nameText:SetPoint("TOPLEFT", 10, -10)
+    nameText:SetText(string.format("%s - Lv%d %s", charData.name or "Unknown", charData.level or 0, charData.class or ""))
+    
+    local readyCount = 0
+    local cooldownCount = 0
+    
+    -- Count ready/cooldown tasks (simplified for now)
+    if charData.professions then
+        for _, prof in pairs(charData.professions) do
+            readyCount = readyCount + 1 -- Placeholder
+            cooldownCount = cooldownCount + 1 -- Placeholder
+        end
+    end
+    
+    local statusText = header:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    statusText:SetPoint("TOPLEFT", nameText, "BOTTOMLEFT", 0, -5)
+    statusText:SetTextColor(0, 1, 0)
+    statusText:SetText(string.format("✓ %d Ready  ", readyCount))
+    
+    local cooldownText = header:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    cooldownText:SetPoint("LEFT", statusText, "RIGHT", 5, 0)
+    cooldownText:SetTextColor(1, 0.5, 0)
+    cooldownText:SetText(string.format("⏱ %d On Cooldown", cooldownCount))
+    
+    header:SetScript("OnClick", function()
+        ProfessionTrackerUI.selectedCharacter = charKey
+        ProfessionTrackerUI.viewMode = "detail"
+        ProfessionTrackerUI:Refresh()
+    end)
+    
+    -- Profession Info Section
+    local profInfoFrame = CreateFrame("Frame", nil, card)
+    profInfoFrame:SetSize(460, 80)
+    profInfoFrame:SetPoint("TOP", 0, -40)
+    
+    local yPos = -5
+
+    if charData.professions then
+    local count = 0
+        for profName, profData in pairs(charData.professions) do
+            count = count + 1
+            if count <= 2 then -- Show first 2 professions
+                local _, newY = AddProfessionObjectives(profInfoFrame, profName, profData, yPos)
+                yPos = newY
+            end
+        end
+    end
+
+    
+    return card
+end
+
+
 
 
 local function CreateExpansionDisplay(parent, profData, expansionName, expansionData, yOffset)
