@@ -121,24 +121,29 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
     })
     card:SetBackdropColor(0, 0, 0, 0.6)
 
+    -- Collect and sort expansions (most recent first)
     local expansionNames = {}
-    for expName, expData in pairs(profData.expansions or {}) do
+    for expName, _ in pairs(profData.expansions or {}) do
         table.insert(expansionNames, expName)
     end
     table.sort(expansionNames, function(a, b)
         local aID = (ProfessionTracker.ExpansionIndex and ProfessionTracker.ExpansionIndex[a]) or 0
         local bID = (ProfessionTracker.ExpansionIndex and ProfessionTracker.ExpansionIndex[b]) or 0
-        return aID > bID -- sort descending (most recent first)
+        return aID > bID -- descending: newest → oldest
     end)
 
     local currentIndex = 1
 
-    -- Header (profession name)
+    ----------------------------------------------------
+    -- Profession Name
+    ----------------------------------------------------
     local profTitle = card:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     profTitle:SetPoint("TOP", 0, -10)
     profTitle:SetText(profName)
 
-    -- Expansion header with arrows
+    ----------------------------------------------------
+    -- Expansion Header + Arrows
+    ----------------------------------------------------
     local leftButton = CreateFrame("Button", nil, card, "UIPanelButtonTemplate")
     leftButton:SetSize(25, 25)
     leftButton:SetPoint("TOPLEFT", 10, -40)
@@ -152,50 +157,63 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
     local expansionLabel = card:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
     expansionLabel:SetPoint("TOP", 0, -45)
 
-    -- Skill and KP display
+    ----------------------------------------------------
+    -- Skill / Knowledge Info
+    ----------------------------------------------------
     local skillText = card:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     skillText:SetPoint("TOP", expansionLabel, "BOTTOM", 0, -10)
 
     local knowledgeText = card:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     knowledgeText:SetPoint("TOP", skillText, "BOTTOM", 0, -5)
 
+    ----------------------------------------------------
+    -- Update Display
+    ----------------------------------------------------
     local function UpdateDisplay()
+        if #expansionNames == 0 then
+            expansionLabel:SetText("No expansion data")
+            skillText:SetText("")
+            knowledgeText:SetText("")
+            return
+        end
+
         local expName = expansionNames[currentIndex]
         local expData = profData.expansions[expName]
-        if not expName or not expData then return end
+        if not expData then return end
 
         expansionLabel:SetText(expName)
-        skillText:SetText(string.format("Skill: %d / %d", expData.skillLevel or 0, expData.maxSkillLevel or 0))
+        skillText:SetText(string.format("Skill: %d / %d",
+            expData.skillLevel or 0, expData.maxSkillLevel or 0))
 
-        if expData.pointsUntilMaxKnowledge then
+        if expData.pointsUntilMaxKnowledge ~= nil then
             knowledgeText:SetText(string.format("Knowledge Points: %d remaining", expData.pointsUntilMaxKnowledge))
             knowledgeText:Show()
         else
             knowledgeText:Hide()
         end
-
-        -- Disable arrows at bounds
-        leftButton:SetEnabled(currentIndex > 1)
-        rightButton:SetEnabled(currentIndex < #expansionNames)
     end
 
+    ----------------------------------------------------
+    -- Arrow Logic (with Looping)
+    ----------------------------------------------------
     leftButton:SetScript("OnClick", function()
-        if currentIndex > 1 then
-            currentIndex = currentIndex - 1
-            UpdateDisplay()
-        end
+        if #expansionNames == 0 then return end
+        currentIndex = currentIndex - 1
+        if currentIndex < 1 then currentIndex = #expansionNames end -- loop to end
+        UpdateDisplay()
     end)
 
     rightButton:SetScript("OnClick", function()
-        if currentIndex < #expansionNames then
-            currentIndex = currentIndex + 1
-            UpdateDisplay()
-        end
+        if #expansionNames == 0 then return end
+        currentIndex = currentIndex + 1
+        if currentIndex > #expansionNames then currentIndex = 1 end -- loop to start
+        UpdateDisplay()
     end)
 
     UpdateDisplay()
     return card
 end
+
 
 --------------------------------------------------------
 -- Helper Functions
