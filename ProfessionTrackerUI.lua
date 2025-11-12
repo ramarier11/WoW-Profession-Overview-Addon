@@ -323,73 +323,83 @@ local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
     return container, yOffset - 55
 end
 
+--------------------------------------------------------
+-- Updated: CreateCharacterCard (Dynamic Height + Objectives)
+--------------------------------------------------------
 local function CreateCharacterCard(parent, charKey, charData, yOffset)
-    local card = CreateFrame("Frame", nil, parent)
-    card:SetSize(460, 120)
+    local card = CreateFrame("Frame", nil, parent, "BackdropTemplate")
     card:SetPoint("TOP", 0, yOffset)
+    card:SetWidth(460)
     
     -- Background
     card.bg = card:CreateTexture(nil, "BACKGROUND")
     card.bg:SetAllPoints()
     card.bg:SetColorTexture(0.1, 0.1, 0.1, 0.5)
-    
-    -- Character Header (clickable for detail view)
+
+    ----------------------------------------------------
+    -- Character Header
+    ----------------------------------------------------
     local header = CreateFrame("Button", nil, card)
     header:SetSize(460, 40)
     header:SetPoint("TOP", 0, 0)
     
     local nameText = header:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     nameText:SetPoint("TOPLEFT", 10, -10)
-    nameText:SetText(string.format("%s - Lv%d %s", charData.name or "Unknown", charData.level or 0, charData.class or ""))
-    
-    local readyCount = 0
-    local cooldownCount = 0
-    
-    -- Count ready/cooldown tasks (simplified for now)
-    if charData.professions then
-        for _, prof in pairs(charData.professions) do
-            readyCount = readyCount + 1 -- Placeholder
-            cooldownCount = cooldownCount + 1 -- Placeholder
-        end
-    end
-    
+    nameText:SetText(string.format("%s - Lv%d %s",
+        charData.name or "Unknown",
+        charData.level or 0,
+        charData.class or ""))
+
+    -- Placeholder for task counts (optional)
     local statusText = header:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     statusText:SetPoint("TOPLEFT", nameText, "BOTTOMLEFT", 0, -5)
     statusText:SetTextColor(0, 1, 0)
-    statusText:SetText(string.format("✓ %d Ready  ", readyCount))
-    
-    local cooldownText = header:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    cooldownText:SetPoint("LEFT", statusText, "RIGHT", 5, 0)
-    cooldownText:SetTextColor(1, 0.5, 0)
-    cooldownText:SetText(string.format("⏱ %d On Cooldown", cooldownCount))
-    
+    statusText:SetText("Professions:")
+
+    -- Click header to open detail view
     header:SetScript("OnClick", function()
         ProfessionTrackerUI.selectedCharacter = charKey
         ProfessionTrackerUI.viewMode = "detail"
         ProfessionTrackerUI:Refresh()
     end)
-    
-    -- Profession Info Section
+
+    ----------------------------------------------------
+    -- Profession Info Section (Dynamic Height)
+    ----------------------------------------------------
     local profInfoFrame = CreateFrame("Frame", nil, card)
-    profInfoFrame:SetSize(460, 80)
-    profInfoFrame:SetPoint("TOP", 0, -40)
-    
-    local yPos = -5
+    profInfoFrame:SetWidth(440)
+    profInfoFrame:SetPoint("TOP", 0, -50)
+
+    local yPos = 0
+    local profCount = 0
+    local totalHeight = 50 -- initial offset for header
 
     if charData.professions then
-    local count = 0
         for profName, profData in pairs(charData.professions) do
-            count = count + 1
-            if count <= 2 then -- Show first 2 professions
+            profCount = profCount + 1
+            if profCount <= 2 then -- Show first 2 professions
                 local _, newY = AddProfessionObjectives(profInfoFrame, profName, profData, yPos)
+                local usedHeight = math.abs(newY - yPos)
                 yPos = newY
+                totalHeight = totalHeight + usedHeight + 5
             end
         end
+    else
+        local noProfText = profInfoFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        noProfText:SetPoint("TOPLEFT", 10, yPos)
+        noProfText:SetText("No profession data found.")
+        totalHeight = totalHeight + 20
     end
 
-    
+    ----------------------------------------------------
+    -- Adjust Card + Prof Frame Height
+    ----------------------------------------------------
+    profInfoFrame:SetHeight(math.abs(yPos))
+    card:SetHeight(totalHeight + 20)
+
     return card
 end
+
 
 
 
