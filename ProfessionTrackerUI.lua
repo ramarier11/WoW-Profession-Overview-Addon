@@ -276,8 +276,12 @@ local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
     profText:SetPoint("TOPLEFT", 0, 0)
 
     local isMaxed = latestData and latestData.skillLevel == latestData.maxSkillLevel
-    local checkSymbol = isMaxed and "✓" or "✗"
-    profText:SetText(string.format("%s %s", profName, checkSymbol))
+    local checkTexture = isMaxed
+        and "|TInterface\\RaidFrame\\ReadyCheck-Ready:16:16|t"
+        or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:16:16|t"
+
+    profText:SetText(string.format("%s %s", checkTexture, profName))
+
 
     ----------------------------------------------------
     -- Weekly Knowledge Checkboxes (Placeholders)
