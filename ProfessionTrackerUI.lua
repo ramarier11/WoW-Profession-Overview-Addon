@@ -106,7 +106,96 @@ function ProfessionTrackerUI:ClearScrollChild()
     end
 end
 
+-- ########################################################
+-- ## Expansion Carousel for Detail View
+-- ########################################################
+local function CreateProfessionExpansionCard(parent, profName, profData, yOffset)
+    local card = CreateFrame("Frame", nil, parent, "BackdropTemplate")
+    card:SetSize(440, 150)
+    card:SetPoint("TOP", 0, yOffset)
+    card:SetBackdrop({
+        bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+        edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+        tile = true, tileSize = 16, edgeSize = 16,
+        insets = { left = 4, right = 4, top = 4, bottom = 4 }
+    })
+    card:SetBackdropColor(0, 0, 0, 0.6)
 
+    local expansionNames = {}
+    for expName, expData in pairs(profData.expansions or {}) do
+        table.insert(expansionNames, expName)
+    end
+    table.sort(expansionNames, function(a, b)
+        local aID = (ProfessionTracker.ExpansionIndex and ProfessionTracker.ExpansionIndex[a]) or 0
+        local bID = (ProfessionTracker.ExpansionIndex and ProfessionTracker.ExpansionIndex[b]) or 0
+        return aID > bID -- sort descending (most recent first)
+    end)
+
+    local currentIndex = 1
+
+    -- Header (profession name)
+    local profTitle = card:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    profTitle:SetPoint("TOP", 0, -10)
+    profTitle:SetText(profName)
+
+    -- Expansion header with arrows
+    local leftButton = CreateFrame("Button", nil, card, "UIPanelButtonTemplate")
+    leftButton:SetSize(25, 25)
+    leftButton:SetPoint("TOPLEFT", 10, -40)
+    leftButton:SetText("<")
+
+    local rightButton = CreateFrame("Button", nil, card, "UIPanelButtonTemplate")
+    rightButton:SetSize(25, 25)
+    rightButton:SetPoint("TOPRIGHT", -10, -40)
+    rightButton:SetText(">")
+
+    local expansionLabel = card:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
+    expansionLabel:SetPoint("TOP", 0, -45)
+
+    -- Skill and KP display
+    local skillText = card:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    skillText:SetPoint("TOP", expansionLabel, "BOTTOM", 0, -10)
+
+    local knowledgeText = card:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    knowledgeText:SetPoint("TOP", skillText, "BOTTOM", 0, -5)
+
+    local function UpdateDisplay()
+        local expName = expansionNames[currentIndex]
+        local expData = profData.expansions[expName]
+        if not expName or not expData then return end
+
+        expansionLabel:SetText(expName)
+        skillText:SetText(string.format("Skill: %d / %d", expData.skillLevel or 0, expData.maxSkillLevel or 0))
+
+        if expData.pointsUntilMaxKnowledge then
+            knowledgeText:SetText(string.format("Knowledge Points: %d remaining", expData.pointsUntilMaxKnowledge))
+            knowledgeText:Show()
+        else
+            knowledgeText:Hide()
+        end
+
+        -- Disable arrows at bounds
+        leftButton:SetEnabled(currentIndex > 1)
+        rightButton:SetEnabled(currentIndex < #expansionNames)
+    end
+
+    leftButton:SetScript("OnClick", function()
+        if currentIndex > 1 then
+            currentIndex = currentIndex - 1
+            UpdateDisplay()
+        end
+    end)
+
+    rightButton:SetScript("OnClick", function()
+        if currentIndex < #expansionNames then
+            currentIndex = currentIndex + 1
+            UpdateDisplay()
+        end
+    end)
+
+    UpdateDisplay()
+    return card
+end
 
 --------------------------------------------------------
 -- Helper Functions
@@ -425,96 +514,7 @@ function ProfessionTrackerUI:ShowDetailView()
 
 end
 
--- ########################################################
--- ## Expansion Carousel for Detail View
--- ########################################################
-local function CreateProfessionExpansionCard(parent, profName, profData, yOffset)
-    local card = CreateFrame("Frame", nil, parent, "BackdropTemplate")
-    card:SetSize(440, 150)
-    card:SetPoint("TOP", 0, yOffset)
-    card:SetBackdrop({
-        bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-        edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-        tile = true, tileSize = 16, edgeSize = 16,
-        insets = { left = 4, right = 4, top = 4, bottom = 4 }
-    })
-    card:SetBackdropColor(0, 0, 0, 0.6)
 
-    local expansionNames = {}
-    for expName, expData in pairs(profData.expansions or {}) do
-        table.insert(expansionNames, expName)
-    end
-    table.sort(expansionNames, function(a, b)
-        local aID = (ProfessionTracker.ExpansionIndex and ProfessionTracker.ExpansionIndex[a]) or 0
-        local bID = (ProfessionTracker.ExpansionIndex and ProfessionTracker.ExpansionIndex[b]) or 0
-        return aID > bID -- sort descending (most recent first)
-    end)
-
-    local currentIndex = 1
-
-    -- Header (profession name)
-    local profTitle = card:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    profTitle:SetPoint("TOP", 0, -10)
-    profTitle:SetText(profName)
-
-    -- Expansion header with arrows
-    local leftButton = CreateFrame("Button", nil, card, "UIPanelButtonTemplate")
-    leftButton:SetSize(25, 25)
-    leftButton:SetPoint("TOPLEFT", 10, -40)
-    leftButton:SetText("<")
-
-    local rightButton = CreateFrame("Button", nil, card, "UIPanelButtonTemplate")
-    rightButton:SetSize(25, 25)
-    rightButton:SetPoint("TOPRIGHT", -10, -40)
-    rightButton:SetText(">")
-
-    local expansionLabel = card:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
-    expansionLabel:SetPoint("TOP", 0, -45)
-
-    -- Skill and KP display
-    local skillText = card:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    skillText:SetPoint("TOP", expansionLabel, "BOTTOM", 0, -10)
-
-    local knowledgeText = card:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    knowledgeText:SetPoint("TOP", skillText, "BOTTOM", 0, -5)
-
-    local function UpdateDisplay()
-        local expName = expansionNames[currentIndex]
-        local expData = profData.expansions[expName]
-        if not expName or not expData then return end
-
-        expansionLabel:SetText(expName)
-        skillText:SetText(string.format("Skill: %d / %d", expData.skillLevel or 0, expData.maxSkillLevel or 0))
-
-        if expData.pointsUntilMaxKnowledge then
-            knowledgeText:SetText(string.format("Knowledge Points: %d remaining", expData.pointsUntilMaxKnowledge))
-            knowledgeText:Show()
-        else
-            knowledgeText:Hide()
-        end
-
-        -- Disable arrows at bounds
-        leftButton:SetEnabled(currentIndex > 1)
-        rightButton:SetEnabled(currentIndex < #expansionNames)
-    end
-
-    leftButton:SetScript("OnClick", function()
-        if currentIndex > 1 then
-            currentIndex = currentIndex - 1
-            UpdateDisplay()
-        end
-    end)
-
-    rightButton:SetScript("OnClick", function()
-        if currentIndex < #expansionNames then
-            currentIndex = currentIndex + 1
-            UpdateDisplay()
-        end
-    end)
-
-    UpdateDisplay()
-    return card
-end
 
 --------------------------------------------------------
 -- Main Refresh Function
