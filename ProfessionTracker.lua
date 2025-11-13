@@ -358,9 +358,7 @@ local function UpdateCharacterProfessionData()
     -- ✅ Auto-refresh UI if open
     if ProfessionTracker.UI and ProfessionTracker.UI:IsShown() then
         C_Timer.After(0.25, function()
-            if ProfessionTracker.UI.selectedProfession then
-                ProfessionTracker.UI:Refresh()
-            end
+            ProfessionTracker.UI:Refresh()           
         end)
     end
 
