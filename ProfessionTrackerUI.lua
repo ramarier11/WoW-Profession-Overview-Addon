@@ -340,27 +340,39 @@ local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
     profText:SetText(string.format("%s %s", checkTexture, profName))
 
 
+   ----------------------------------------------------
+    -- Weekly Knowledge Objectives (Conditional Textures)
     ----------------------------------------------------
-    -- Weekly Knowledge Checkboxes (Placeholders)
-    ----------------------------------------------------
-    local checkboxFrame = CreateFrame("Frame", nil, container)
-    checkboxFrame:SetSize(300, 20)
-    checkboxFrame:SetPoint("TOPLEFT", profText, "BOTTOMLEFT", 15, -3)
+    local objectiveFrame = CreateFrame("Frame", nil, container)
+    objectiveFrame:SetPoint("TOPLEFT", profText, "BOTTOMLEFT", 15, -5)
 
     local objectives = {
-        { key = "quest", label = "KP Quest" },
+        { key = "craftingOrderQuest", label = "KP Quest" },
         { key = "treasures", label = "KP Treasures" },
         { key = "treatise", label = "KP Treatise" },
     }
 
     local xOffset = 0
     for _, obj in ipairs(objectives) do
-        local cb = CreateFrame("CheckButton", nil, checkboxFrame, "ChatConfigCheckButtonTemplate")
-        cb:SetPoint("LEFT", xOffset, 0)
-        cb:SetChecked(false) -- placeholder
-        cb.Text:SetText(obj.label)
-        xOffset = xOffset + 100
+        -- Determine completion (fallback to false if missing)
+        local completed = false
+        if latestData and latestData.weeklyKnowledgePoints then
+            completed = latestData.weeklyKnowledgePoints[obj.key] or false
+        end
+
+        -- Choose texture
+        local tex = completed and
+            "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t" or
+            "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
+
+        -- Create a fontstring (icon + text)
+        local fs = objectiveFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        fs:SetPoint("LEFT", xOffset, 0)
+        fs:SetText(string.format("%s %s", tex, obj.label))
+
+        xOffset = xOffset + fs:GetStringWidth() + 25
     end
+
 
     ----------------------------------------------------
     -- Concentration Display
