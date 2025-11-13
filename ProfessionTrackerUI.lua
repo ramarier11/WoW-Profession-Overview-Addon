@@ -380,7 +380,7 @@ local function CreateCharacterCard(parent, charKey, charData, yOffset)
             profCount = profCount + 1
             if profCount <= 2 then -- Show first 2 professions
                 local _, profHeight = AddProfessionObjectives(profInfoFrame, profName, profData, yPos)
-                yPos = yPos - profHeight - 10 -- Add spacing between professions
+                yPos = yPos - profHeight - 15 -- Add spacing between professions
             end
         end
     else
