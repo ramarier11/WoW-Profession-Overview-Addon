@@ -324,8 +324,23 @@ local function UpdateCharacterProfessionData()
                                     if concentrationCurrencyID then
                                         local currencyInfo = C_CurrencyInfo.GetCurrencyInfo(concentrationCurrencyID)
                                         if currencyInfo then
-                                            expData.concentration = currencyInfo.quantity or 0
-                                            expData.maxConcentration = currencyInfo.maxQuantity or 1000
+                                            local currentConc = currencyInfo.quantity or 0
+                                            local maxConc = currencyInfo.maxQuantity or 1000
+                                            
+                                            expData.concentration = currentConc
+                                            expData.maxConcentration = maxConc
+                                            expData.concentrationLastUpdated = time()
+                                            
+                                            -- Calculate time until max concentration
+                                            -- Concentration regenerates at 250 per 24 hours (10.41667 per hour)
+                                            if currentConc < maxConc then
+                                                local missingConc = maxConc - currentConc
+                                                local hoursToMax = missingConc / 10.41667 -- 250 / 24 hours
+                                                local secondsToMax = hoursToMax * 3600
+                                                expData.concentrationMaxAt = time() + secondsToMax
+                                            else
+                                                expData.concentrationMaxAt = nil -- Already at max
+                                            end
                                         end
                                     end
                                 end
