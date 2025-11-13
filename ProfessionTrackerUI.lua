@@ -374,7 +374,7 @@ local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
     
     if latestData and latestData.concentration then
         -- Calculate current concentration with regeneration
-        concValue = ProfessionTrackerUI:GetCurrentConcentration(
+        concValue = GetCurrentConcentration(
             latestData.concentration,
             latestData.maxConcentration,
             latestData.concentrationLastUpdated            
@@ -383,7 +383,7 @@ local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
         
         -- Get time until max if not already at max
         if concValue < maxConc then
-            timeRemaining = " - Full in: " .. ProfessionTrackerUI:GetTimeUntilMax(concValue, maxConc)
+            timeRemaining = " - Full in: " .. GetTimeUntilMax(concValue, maxConc)
         end
     end
     
