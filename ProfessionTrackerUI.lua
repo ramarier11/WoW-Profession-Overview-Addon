@@ -314,21 +314,9 @@ local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
     -- Get actual concentration value from latest expansion data
     local concValue = 0
     local maxConc = 1000
-    local timeRemaining = ""
-    
     if latestData and latestData.concentration then
-        -- Calculate current concentration with regeneration
-        concValue = ProfessionTracker:GetCurrentConcentration(
-            latestData.concentration,
-            latestData.concentrationLastUpdated,
-            latestData.maxConcentration
-        )
+        concValue = latestData.concentration
         maxConc = latestData.maxConcentration or 1000
-        
-        -- Get time until max if not already at max
-        if concValue < maxConc then
-            timeRemaining = " - Full in: " .. ProfessionTracker:GetTimeUntilMax(concValue, maxConc)
-        end
     end
     
     -- Color coding based on percentage
@@ -341,7 +329,7 @@ local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
     end
 
     concText:SetTextColor(unpack(color))
-    concText:SetText(string.format("Concentration: %d / %d (%.0f%%)%s", concValue, maxConc, concPercent, timeRemaining))
+    concText:SetText(string.format("Concentration: %d / %d (%.0f%%)", concValue, maxConc, concPercent))
 
     -- Return the container height so parent can calculate properly
     return container, 45
