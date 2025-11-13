@@ -446,7 +446,8 @@ ProfessionTracker:SetScript("OnEvent", function(self, event, ...)
         C_Timer.After(2, function()
             UpdateCharacterProfessionData()
         end)
-    elseif event == "TRADE_SKILL_SHOW" then
+    elseif event == "TRADE_SKILL_SHOW" or
+           event == "TRADE_SKILL_LIST_UPDATE" then
 
         -- Update data on profession-related events
         UpdateCharacterProfessionData()
