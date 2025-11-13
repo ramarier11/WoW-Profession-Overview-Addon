@@ -258,15 +258,15 @@ end
 --------------------------------------------------------
 local CONCENTRATION_REGEN_RATE = 10.41667 -- 250 per 24 hours = 10.41667 per hour
 
-local function CalculateCurrentConcentration(lastConcentration, lastUpdated, maxConcentration)
-    if not lastConcentration or not lastUpdated then
-        return lastConcentration or 0
+local function GetCurrentConcentration(currentConcenctration, maxConcentration, lastUpdated)
+    if not currentConcenctration or not lastUpdated then
+        return currentConcenctration or 0
     end
     
     maxConcentration = maxConcentration or 1000
     
     -- If already at max, no need to calculate
-    if lastConcentration >= maxConcentration then
+    if currentConcenctration >= maxConcentration then
         return maxConcentration
     end
     
@@ -275,7 +275,7 @@ local function CalculateCurrentConcentration(lastConcentration, lastUpdated, max
     local hoursElapsed = timeElapsed / 3600
     local concentrationGained = hoursElapsed * CONCENTRATION_REGEN_RATE
     
-    local currentConcentration = lastConcentration + concentrationGained
+    local currentConcentration = currentConcenctration + concentrationGained
     
     -- Cap at max
     if currentConcentration > maxConcentration then
@@ -285,7 +285,7 @@ local function CalculateCurrentConcentration(lastConcentration, lastUpdated, max
     return math.floor(currentConcentration)
 end
 
-local function FormatTimeUntilMax(currentConcentration, maxConcentration)
+local function GetTimeUntilMax(currentConcentration, maxConcentration)
     maxConcentration = maxConcentration or 1000
     
     if currentConcentration >= maxConcentration then
@@ -376,8 +376,8 @@ local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
         -- Calculate current concentration with regeneration
         concValue = ProfessionTracker:GetCurrentConcentration(
             latestData.concentration,
-            latestData.concentrationLastUpdated,
-            latestData.maxConcentration
+            latestData.maxConcentration,
+            latestData.concentrationLastUpdated            
         )
         maxConc = latestData.maxConcentration or 1000
         
