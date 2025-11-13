@@ -306,19 +306,30 @@ local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
     end
 
     ----------------------------------------------------
-    -- Concentration Display (Placeholder)
+    -- Concentration Display
     ----------------------------------------------------
     local concText = container:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     concText:SetPoint("TOPLEFT", checkboxFrame, "BOTTOMLEFT", 0, -5)
 
-    -- Placeholder logic: random concentration value if not yet tracked
-    local concValue = latestData and latestData.concentration or math.random(0, 100)
+    -- Get actual concentration value from latest expansion data
+    local concValue = 0
+    local maxConc = 1000
+    if latestData and latestData.concentration then
+        concValue = latestData.concentration
+        maxConc = latestData.maxConcentration or 1000
+    end
+    
+    -- Color coding based on percentage
+    local concPercent = (concValue / maxConc) * 100
     local color = {1, 0, 0} -- default red
-    if concValue >= 75 then color = {0, 1, 0}      -- green
-    elseif concValue >= 40 then color = {1, 0.8, 0} end -- yellow
+    if concPercent >= 75 then 
+        color = {0, 1, 0}      -- green
+    elseif concPercent >= 40 then 
+        color = {1, 0.8, 0}    -- yellow
+    end
 
     concText:SetTextColor(unpack(color))
-    concText:SetText(string.format("Concentration: %d%%", concValue))
+    concText:SetText(string.format("Concentration: %d / %d (%.0f%%)", concValue, maxConc, concPercent))
 
     -- Return the container height so parent can calculate properly
     return container, 45
