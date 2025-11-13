@@ -254,6 +254,62 @@ local function GetCharacterKey()
 end
 
 --------------------------------------------------------
+-- Concentration Calculation Helpers
+--------------------------------------------------------
+local CONCENTRATION_REGEN_RATE = 10.41667 -- 250 per 24 hours = 10.41667 per hour
+
+local function CalculateCurrentConcentration(lastConcentration, lastUpdated, maxConcentration)
+    if not lastConcentration or not lastUpdated then
+        return lastConcentration or 0
+    end
+    
+    maxConcentration = maxConcentration or 1000
+    
+    -- If already at max, no need to calculate
+    if lastConcentration >= maxConcentration then
+        return maxConcentration
+    end
+    
+    local currentTime = time()
+    local timeElapsed = currentTime - lastUpdated
+    local hoursElapsed = timeElapsed / 3600
+    local concentrationGained = hoursElapsed * CONCENTRATION_REGEN_RATE
+    
+    local currentConcentration = lastConcentration + concentrationGained
+    
+    -- Cap at max
+    if currentConcentration > maxConcentration then
+        return maxConcentration
+    end
+    
+    return math.floor(currentConcentration)
+end
+
+local function FormatTimeUntilMax(currentConcentration, maxConcentration)
+    maxConcentration = maxConcentration or 1000
+    
+    if currentConcentration >= maxConcentration then
+        return ""
+    end
+    
+    local missingConc = maxConcentration - currentConcentration
+    local hoursToMax = missingConc / CONCENTRATION_REGEN_RATE
+    local secondsToMax = hoursToMax * 3600
+    
+    local days = math.floor(secondsToMax / 86400)
+    local hours = math.floor((secondsToMax % 86400) / 3600)
+    local minutes = math.floor((secondsToMax % 3600) / 60)
+    
+    if days > 0 then
+        return string.format(" - Full in: %dd %dh", days, hours)
+    elseif hours > 0 then
+        return string.format(" - Full in: %dh %dm", hours, minutes)
+    else
+        return string.format(" - Full in: %dm", minutes)
+    end
+end
+
+--------------------------------------------------------
 -- Modular: Add Profession Objectives to Dashboard Card
 --------------------------------------------------------
 local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
@@ -314,9 +370,21 @@ local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
     -- Get actual concentration value from latest expansion data
     local concValue = 0
     local maxConc = 1000
+    local timeRemaining = ""
+    
     if latestData and latestData.concentration then
-        concValue = latestData.concentration
+        -- Calculate current concentration with regeneration
+        concValue = ProfessionTracker:GetCurrentConcentration(
+            latestData.concentration,
+            latestData.concentrationLastUpdated,
+            latestData.maxConcentration
+        )
         maxConc = latestData.maxConcentration or 1000
+        
+        -- Get time until max if not already at max
+        if concValue < maxConc then
+            timeRemaining = " - Full in: " .. ProfessionTracker:GetTimeUntilMax(concValue, maxConc)
+        end
     end
     
     -- Color coding based on percentage
@@ -329,7 +397,7 @@ local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
     end
 
     concText:SetTextColor(unpack(color))
-    concText:SetText(string.format("Concentration: %d / %d (%.0f%%)", concValue, maxConc, concPercent))
+    concText:SetText(string.format("Concentration: %d / %d (%.0f%%)%s", concValue, maxConc, concPercent, timeRemaining))
 
     -- Return the container height so parent can calculate properly
     return container, 45
