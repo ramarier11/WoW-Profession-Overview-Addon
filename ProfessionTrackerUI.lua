@@ -258,15 +258,15 @@ end
 --------------------------------------------------------
 local CONCENTRATION_REGEN_RATE = 10.41667 -- 250 per 24 hours = 10.41667 per hour
 
-local function GetCurrentConcentration(currentConcenctration, maxConcentration, lastUpdated)
-    if not currentConcenctration or not lastUpdated then
-        return currentConcenctration or 0
+local function GetCurrentConcentration(currentConcentration, maxConcentration, lastUpdated)
+    if not currentConcentration or not lastUpdated then
+        return currentConcentration or 0
     end
     
     maxConcentration = maxConcentration or 1000
     
     -- If already at max, no need to calculate
-    if currentConcenctration >= maxConcentration then
+    if currentConcentration >= maxConcentration then
         return maxConcentration
     end
     
@@ -275,7 +275,7 @@ local function GetCurrentConcentration(currentConcenctration, maxConcentration, 
     local hoursElapsed = timeElapsed / 3600
     local concentrationGained = hoursElapsed * CONCENTRATION_REGEN_RATE
     
-    local currentConcentration = currentConcenctration + concentrationGained
+    local currentConcentration = currentConcentration + concentrationGained
     
     -- Cap at max
     if currentConcentration > maxConcentration then
