@@ -258,7 +258,7 @@ end
 --------------------------------------------------------
 local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
     local container = CreateFrame("Frame", nil, parentFrame)
-    container:SetSize(440, 60)
+    container:SetSize(440, 80)
     container:SetPoint("TOPLEFT", 10, yOffset)
 
     -- Find the most recent expansion (highest ID)
@@ -320,7 +320,8 @@ local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
     concText:SetTextColor(unpack(color))
     concText:SetText(string.format("Concentration: %d%%", concValue))
 
-    return container, yOffset - 55
+    -- Return the container height so parent can calculate properly
+    return container, 80
 end
 
 --------------------------------------------------------
