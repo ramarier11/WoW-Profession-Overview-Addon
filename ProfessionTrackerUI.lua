@@ -327,6 +327,7 @@ end
 --------------------------------------------------------
 -- Updated: CreateCharacterCard (Dynamic Height + Objectives)
 --------------------------------------------------------
+
 local function CreateCharacterCard(parent, charKey, charData, yOffset)
     local card = CreateFrame("Frame", nil, parent, "BackdropTemplate")
     card:SetPoint("TOP", 0, yOffset)
@@ -373,30 +374,31 @@ local function CreateCharacterCard(parent, charKey, charData, yOffset)
 
     local yPos = 0
     local profCount = 0
-    local totalHeight = 50 -- initial offset for header
 
     if charData.professions then
         for profName, profData in pairs(charData.professions) do
             profCount = profCount + 1
             if profCount <= 2 then -- Show first 2 professions
-                local _, newY = AddProfessionObjectives(profInfoFrame, profName, profData, yPos)
-                local usedHeight = math.abs(newY - yPos)
-                yPos = newY
-                totalHeight = totalHeight + usedHeight + 5
+                local _, profHeight = AddProfessionObjectives(profInfoFrame, profName, profData, yPos)
+                yPos = yPos - profHeight - 10 -- Add spacing between professions
             end
         end
     else
         local noProfText = profInfoFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         noProfText:SetPoint("TOPLEFT", 10, yPos)
         noProfText:SetText("No profession data found.")
-        totalHeight = totalHeight + 20
+        yPos = yPos - 20
     end
 
     ----------------------------------------------------
     -- Adjust Card + Prof Frame Height
     ----------------------------------------------------
-    profInfoFrame:SetHeight(math.abs(yPos))
-    card:SetHeight(totalHeight + 20)
+    local profFrameHeight = math.abs(yPos)
+    profInfoFrame:SetHeight(profFrameHeight)
+    
+    -- Total card height = header (50) + profession content + bottom padding (20)
+    local totalHeight = 50 + profFrameHeight + 20
+    card:SetHeight(totalHeight)
 
     return card
 end
@@ -525,8 +527,9 @@ end)
 -- Create cards in sorted order
 for _, charKey in ipairs(sortedKeys) do
     local charData = allChars[charKey]
-    CreateCharacterCard(self.scrollChild, charKey, charData, yOffset)
-    yOffset = yOffset - 130
+    local card = CreateCharacterCard(self.scrollChild, charKey, charData, yOffset)
+    -- Use the actual card height + spacing for next card
+    yOffset = yOffset - card:GetHeight() - 15
 end
 
     
