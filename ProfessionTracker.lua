@@ -296,7 +296,7 @@ local function UpdateCharacterProfessionData()
                     -- ✅ Skip if the table is empty or nil
                     if expansionList and #expansionList > 0 then --checks if expansionList is not nil and length is > 0 
                         for _, exp in ipairs(expansionList) do
-                            if not expansions[exp.expansionName] then 
+                            
                                 local expName = exp.expansionName or "Unknown"
                                 local expID = ExpansionIndex[expName] or 0
                                 local hasKnowledgeSystem = expID >= KNOWLEDGE_SYSTEM_START
@@ -336,7 +336,7 @@ local function UpdateCharacterProfessionData()
 
                             -- ✅ Save back to DB
                             expansions[expName] = expData
-                            end
+                            
                         end
                     else
                     -- ✅ Optionally log for debugging
