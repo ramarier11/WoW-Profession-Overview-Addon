@@ -383,7 +383,7 @@ local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
         
         -- Get time until max if not already at max
         if concValue < maxConc then
-            timeRemaining = " - Full in: " .. GetTimeUntilMax(concValue, maxConc)
+            timeRemaining = GetTimeUntilMax(concValue, maxConc)
         end
     end
     
