@@ -321,7 +321,7 @@ local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
     concText:SetText(string.format("Concentration: %d%%", concValue))
 
     -- Return the container height so parent can calculate properly
-    return container, 65
+    return container, 45
 end
 
 --------------------------------------------------------
