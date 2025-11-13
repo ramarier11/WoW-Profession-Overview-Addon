@@ -326,6 +326,7 @@ local function UpdateCharacterProfessionData()
                                         if currencyInfo then
                                             expData.concentration = currencyInfo.quantity or 0
                                             expData.maxConcentration = currencyInfo.maxQuantity or 1000
+                                            expData.concentrationLastUpdated = time()
                                         end
                                     end
                                 end
