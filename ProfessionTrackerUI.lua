@@ -397,7 +397,7 @@ local function CreateCharacterCard(parent, charKey, charData, yOffset)
     profInfoFrame:SetHeight(profFrameHeight)
     
     -- Total card height = header (50) + profession content + bottom padding (20)
-    local totalHeight = 50 + profFrameHeight + 20
+    local totalHeight = 50 + profFrameHeight + 10
     card:SetHeight(totalHeight)
 
     return card
