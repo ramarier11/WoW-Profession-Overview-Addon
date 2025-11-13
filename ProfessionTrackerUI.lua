@@ -210,6 +210,9 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
         if expData.pointsUntilMaxKnowledge ~= nil then
             knowledgeText:SetText(string.format("Knowledge Points: %d remaining", expData.pointsUntilMaxKnowledge))
             knowledgeText:Show()
+        elseif expData.pointsUntilMaxKnowledge <= 0 then
+            knowledgeText:SetText(string("Knowledge Points: 0 remaining"))
+            knowledgeText:Show()
         else
             knowledgeText:Hide()
         end
