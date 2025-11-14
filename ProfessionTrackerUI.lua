@@ -420,8 +420,7 @@ local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
         concValue, maxConc, concPercent, timeRemaining
     ))
 
-    local totalHeight = profText:GetStringHeight()
-totalHeight = totalHeight + objectiveRowHeight + concText:GetStringHeight() + 15
+    local totalHeight = concText:GetBottom() * -1 + 10
 
 
     ----------------------------------------------------
