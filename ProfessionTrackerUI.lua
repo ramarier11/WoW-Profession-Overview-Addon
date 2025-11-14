@@ -310,13 +310,11 @@ local function GetTimeUntilMax(currentConcentration, maxConcentration)
     end
 end
 
-
---------------------------------------------------------
--- Modular: Add Profession Objectives to Dashboard Card
--- (Auto-sizing, stable anchors, checkboxes using .Text)
---------------------------------------------------------
+    --------------------------------------------------------
+    -- Modular: Add Profession Objectives to Dashboard Card
+    -- Texture-based KP indicators + auto height
+    --------------------------------------------------------
 local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
-    -- container anchored to the scroll child so CreateCharacterCard can stack cards using returned height
     local container = CreateFrame("Frame", nil, parentFrame)
     container:SetWidth(parentFrame:GetWidth() - 20)
     container:SetPoint("TOPLEFT", parentFrame, "TOPLEFT", 10, yOffset)
@@ -324,7 +322,9 @@ local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
     local totalHeight = 0
     local padding = 6
 
-    -- Find the most recent expansion (highest ID)
+    ----------------------------------------------------
+    -- Find latest expansion
+    ----------------------------------------------------
     local latestExp, latestData
     for expName, expData in pairs(profData.expansions or {}) do
         if not latestData or (expData.id or 0) > (latestData.id or 0) then
@@ -332,38 +332,33 @@ local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
         end
     end
 
-    -- If no expansion data, show a small placeholder and return its height
     if not latestData then
         local noData = container:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         noData:SetPoint("TOPLEFT", 0, 0)
-        noData:SetText(profName .. " — no expansion data")
-        totalHeight = noData:GetStringHeight() + (padding * 2)
-        container:SetHeight(totalHeight)
-        return container, totalHeight
+        noData:SetText(profName .. " — no data")
+        container:SetHeight(noData:GetStringHeight() + padding)
+        return container, noData:GetStringHeight() + padding
     end
 
     ----------------------------------------------------
-    -- Profession Name + Maxed Checkmark (texture)
+    -- Profession title + max-level checkmark
     ----------------------------------------------------
     local profText = container:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    profText:SetPoint("TOPLEFT", 0, 0)
 
-    local isMaxed = (latestData.skillLevel or 0) == (latestData.maxSkillLevel or 0)
-    local checkTexture = isMaxed
+    local isMaxed = (latestData.skillLevel == latestData.maxSkillLevel)
+    local maxTex = isMaxed
         and "|TInterface\\RaidFrame\\ReadyCheck-Ready:16:16|t"
         or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:16:16|t"
 
-    -- Put icon first so localization lengths don't break layout
-    profText:SetText(string.format("%s %s", checkTexture, profName))
+    profText:SetText(string.format("%s %s", maxTex, profName))
+    profText:SetPoint("TOPLEFT", 0, 0)
     totalHeight = totalHeight + profText:GetStringHeight() + padding
 
     ----------------------------------------------------
-    -- Weekly Knowledge Checkboxes (classic CheckButtons)
+    -- Weekly KP Indicators (using checkmark textures)
     ----------------------------------------------------
-    -- container for the row
-    local checkboxFrame = CreateFrame("Frame", nil, container)
-    checkboxFrame:SetPoint("TOPLEFT", profText, "BOTTOMLEFT", 15, -padding)
-    checkboxFrame:SetHeight(22) -- will be adjusted if needed
+    local kpFrame = CreateFrame("Frame", nil, container)
+    kpFrame:SetPoint("TOPLEFT", profText, "BOTTOMLEFT", 15, -padding)
 
     local objectives = {
         { key = "craftingOrderQuest", label = "KP Quest" },
@@ -371,82 +366,70 @@ local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
         { key = "treatise",           label = "KP Treatise" },
     }
 
-    local xOffset = 0
-    local maxRowHeight = 0
-    for i, obj in ipairs(objectives) do
-        -- create a checkbutton using ChatConfig template (it has a Text region)
-        local cb = CreateFrame("CheckButton", nil, checkboxFrame, "ChatConfigCheckButtonTemplate")
-        cb:SetPoint("LEFT", xOffset, 0)
-        cb:SetChecked(false) -- placeholder default; we'll set real state below
+    local x = 0
+    local kpRowHeight = 0
 
-        -- safe label set (avoids _G name issues)
-        if cb.Text then
-            cb.Text:SetText(obj.label)
+    for _, obj in ipairs(objectives) do
+        local done = false
+        if latestData.weeklyKnowledgePoints then
+            done = latestData.weeklyKnowledgePoints[obj.key] == true
         end
 
-        -- determine completed state from data (safely)
-        local completed = false
-        if latestData.weeklyKnowledgePoints and type(latestData.weeklyKnowledgePoints) == "table" then
-            completed = latestData.weeklyKnowledgePoints[obj.key] or false
-        end
-        cb:SetChecked(completed)
+        local tex = done
+            and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t"
+            or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
 
-        -- optionally disable the checkbox (visual only) so it cannot be toggled from dashboard
-        cb:Disable()
+        local fs = kpFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        fs:SetPoint("LEFT", x, 0)
+        fs:SetText(string.format("%s %s", tex, obj.label))
 
-        -- track dimensions
-        maxRowHeight = math.max(maxRowHeight, cb:GetHeight() or 16)
-        xOffset = xOffset + (cb:GetWidth() or 80) + 8
+        x = x + fs:GetStringWidth() + 20
+        kpRowHeight = math.max(kpRowHeight, fs:GetStringHeight())
     end
 
-    checkboxFrame:SetWidth(xOffset)
-    checkboxFrame:SetHeight(maxRowHeight)
-    totalHeight = totalHeight + maxRowHeight + padding
+    kpFrame:SetSize(x, kpRowHeight)
+    totalHeight = totalHeight + kpRowHeight + padding
 
     ----------------------------------------------------
-    -- Concentration Display (anchored to checkboxFrame)
+    -- Concentration
     ----------------------------------------------------
     local concText = container:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    concText:SetPoint("TOPLEFT", checkboxFrame, "BOTTOMLEFT", 0, -padding)
+    concText:SetPoint("TOPLEFT", kpFrame, "BOTTOMLEFT", 0, -padding)
 
-    -- Calculate concentration values (use helper functions if available)
     local concValue = 0
     local maxConc = latestData.maxConcentration or 1000
-    local timeRemainingStr = ""
+    local timeRemaining = ""
 
     if latestData.concentration then
         if type(GetCurrentConcentration) == "function" then
-            concValue = GetCurrentConcentration(latestData.concentration, latestData.maxConcentration, latestData.concentrationLastUpdated)
+            concValue = GetCurrentConcentration(latestData.concentration, maxConc, latestData.concentrationLastUpdated)
         else
-            concValue = latestData.concentration or 0
+            concValue = latestData.concentration
         end
 
         if concValue < maxConc and type(GetTimeUntilMax) == "function" then
-            timeRemainingStr = GetTimeUntilMax(concValue, maxConc)
+            timeRemaining = GetTimeUntilMax(concValue, maxConc)
         end
     end
 
-    concValue = concValue or 0
-    maxConc = maxConc or 1000
-    local concPercent = (maxConc > 0) and ((concValue / maxConc) * 100) or 0
-
+    local pct = (concValue / maxConc) * 100
     local color = {1, 0, 0}
-    if concPercent >= 75 then
-        color = {0, 1, 0}
-    elseif concPercent >= 40 then
-        color = {1, 0.8, 0}
-    end
+    if pct >= 75 then color = {0, 1, 0}
+    elseif pct >= 40 then color = {1, 0.8, 0} end
 
     concText:SetTextColor(unpack(color))
-    concText:SetText(string.format("Concentration: %d / %d (%.0f%%)%s", concValue, maxConc, concPercent, timeRemainingStr))
+    concText:SetText(string.format("Concentration: %d / %d (%.0f%%)%s",
+        concValue, maxConc, pct, timeRemaining))
+
     totalHeight = totalHeight + concText:GetStringHeight() + padding
 
     ----------------------------------------------------
-    -- Finalize container height and return positive height
+    -- Finalize container
     ----------------------------------------------------
     container:SetHeight(totalHeight)
     return container, totalHeight
 end
+
 
 --------------------------------------------------------
 -- Updated: CreateCharacterCard (Dynamic Height + Objectives)
