@@ -310,13 +310,15 @@ local function GetTimeUntilMax(currentConcentration, maxConcentration)
     end
 end
 
---------------------------------------------------------
--- Modular: Add Profession Objectives to Dashboard Card
---------------------------------------------------------
+    --------------------------------------------------------
+    -- Modular: Add Profession Objectives to Dashboard Card
+    --------------------------------------------------------
 local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
     local container = CreateFrame("Frame", nil, parentFrame)
-    container:SetSize(440, 80)
+    container:SetWidth(440)
     container:SetPoint("TOPLEFT", 10, yOffset)
+
+    local totalHeight = 0
 
     -- Find the most recent expansion (highest ID)
     local latestExp, latestData
@@ -326,95 +328,109 @@ local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
         end
     end
 
+    if not latestData then
+        local noData = container:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        noData:SetPoint("TOPLEFT", 0, 0)
+        noData:SetText("No data")
+        container:SetHeight(20)
+        return container, 20
+    end
+
     ----------------------------------------------------
-    -- Profession Name + Checkmark if Maxed
+    -- Profession Name + Maxed Checkmark
     ----------------------------------------------------
     local profText = container:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     profText:SetPoint("TOPLEFT", 0, 0)
 
-    local isMaxed = latestData and latestData.skillLevel == latestData.maxSkillLevel
+    local isMaxed = latestData.skillLevel == latestData.maxSkillLevel
     local checkTexture = isMaxed
         and "|TInterface\\RaidFrame\\ReadyCheck-Ready:16:16|t"
         or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:16:16|t"
 
     profText:SetText(string.format("%s %s", checkTexture, profName))
+    totalHeight = totalHeight + profText:GetStringHeight() + 5
 
 
-   ----------------------------------------------------
+    ----------------------------------------------------
     -- Weekly Knowledge Objectives (Conditional Textures)
     ----------------------------------------------------
     local objectiveFrame = CreateFrame("Frame", nil, container)
-    objectiveFrame:SetPoint("TOPLEFT", profText, "BOTTOMLEFT", 15, -5)
+    objectiveFrame:SetPoint("TOPLEFT", profText, "BOTTOMLEFT", 15, -3)
 
     local objectives = {
         { key = "craftingOrderQuest", label = "KP Quest" },
-        { key = "treasures", label = "KP Treasures" },
-        { key = "treatise", label = "KP Treatise" },
+        { key = "treasures",          label = "KP Treasures" },
+        { key = "treatise",           label = "KP Treatise" },
     }
 
     local xOffset = 0
+    local rowHeight = 0
+
     for _, obj in ipairs(objectives) do
-        -- Determine completion (fallback to false if missing)
         local completed = false
-        if latestData and latestData.weeklyKnowledgePoints then
+        if latestData.weeklyKnowledgePoints then
             completed = latestData.weeklyKnowledgePoints[obj.key] or false
         end
 
-        -- Choose texture
-        local tex = completed and
-            "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t" or
-            "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
+        local tex = completed
+            and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t"
+            or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
 
-        -- Create a fontstring (icon + text)
         local fs = objectiveFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
         fs:SetPoint("LEFT", xOffset, 0)
         fs:SetText(string.format("%s %s", tex, obj.label))
 
         xOffset = xOffset + fs:GetStringWidth() + 25
+        rowHeight = math.max(rowHeight, fs:GetStringHeight())
     end
+
+    totalHeight = totalHeight + rowHeight + 5
 
 
     ----------------------------------------------------
     -- Concentration Display
     ----------------------------------------------------
     local concText = container:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    concText:SetPoint("TOPLEFT", checkboxFrame, "BOTTOMLEFT", 0, -5)
+    concText:SetPoint("TOPLEFT", objectiveFrame, "BOTTOMLEFT", 0, -5)
 
-    -- Get actual concentration value from latest expansion data
     local concValue = 0
-    local maxConc = 1000
+    local maxConc = latestData.maxConcentration or 1000
     local timeRemaining = ""
-    
-    if latestData and latestData.concentration then
-        -- Calculate current concentration with regeneration
+
+    if latestData.concentration then
         concValue = GetCurrentConcentration(
             latestData.concentration,
             latestData.maxConcentration,
-            latestData.concentrationLastUpdated            
+            latestData.concentrationLastUpdated
         )
-        maxConc = latestData.maxConcentration or 1000
         
-        -- Get time until max if not already at max
         if concValue < maxConc then
             timeRemaining = GetTimeUntilMax(concValue, maxConc)
         end
     end
-    
-    -- Color coding based on percentage
+
     local concPercent = (concValue / maxConc) * 100
-    local color = {1, 0, 0} -- default red
-    if concPercent >= 75 then 
-        color = {0, 1, 0}      -- green
-    elseif concPercent >= 40 then 
-        color = {1, 0.8, 0}    -- yellow
-    end
+    local color = {1, 0, 0}
+    if concPercent >= 75 then color = {0, 1, 0}
+    elseif concPercent >= 40 then color = {1, 0.8, 0} end
 
     concText:SetTextColor(unpack(color))
-    concText:SetText(string.format("Concentration: %d / %d (%.0f%%)%s", concValue, maxConc, concPercent, timeRemaining))
+    concText:SetText(string.format(
+        "Concentration: %d / %d (%.0f%%)%s",
+        concValue, maxConc, concPercent, timeRemaining
+    ))
 
-    -- Return the container height so parent can calculate properly
-    return container, 45
+    totalHeight = totalHeight + concText:GetStringHeight() + 8
+
+
+    ----------------------------------------------------
+    -- Finalize dynamic height
+    ----------------------------------------------------
+    container:SetHeight(totalHeight)
+
+    return container, totalHeight + 10
 end
+
 
 --------------------------------------------------------
 -- Updated: CreateCharacterCard (Dynamic Height + Objectives)
