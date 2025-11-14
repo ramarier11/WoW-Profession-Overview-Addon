@@ -352,40 +352,29 @@ local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
 
 
     ----------------------------------------------------
-    -- Weekly Knowledge Objectives (Conditional Textures)
+    -- Weekly Knowledge Checkboxes (Placeholders)
     ----------------------------------------------------
-    local objectiveFrame = CreateFrame("Frame", nil, container)
-    objectiveFrame:SetPoint("TOPLEFT", profText, "BOTTOMLEFT", 15, -3)
+    local checkboxFrame = CreateFrame("Frame", nil, container)
+    checkboxFrame:SetSize(300, 20)
+    checkboxFrame:SetPoint("TOPLEFT", profText, "BOTTOMLEFT", 15, -3)
 
     local objectives = {
-        { key = "craftingOrderQuest", label = "KP Quest" },
-        { key = "treasures",          label = "KP Treasures" },
-        { key = "treatise",           label = "KP Treatise" },
+        { key = "quest", label = "KP Quest" },
+        { key = "treasures", label = "KP Treasures" },
+        { key = "treatise", label = "KP Treatise" },
     }
 
     local xOffset = 0
     local rowHeight = 0
 
     for _, obj in ipairs(objectives) do
-        local completed = false
-        if latestData.weeklyKnowledgePoints then
-            completed = latestData.weeklyKnowledgePoints[obj.key] or false
-        end
 
-        local tex = completed
-            and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t"
-            or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
-
-        local fs = objectiveFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-        fs:SetPoint("LEFT", xOffset, 0)
-        fs:SetText(string.format("%s %s", tex, obj.label))
-
-        xOffset = xOffset + fs:GetStringWidth() + 25
-        rowHeight = math.max(rowHeight, fs:GetStringHeight())
+        local cb = CreateFrame("CheckButton", nil, checkboxFrame, "ChatConfigCheckButtonTemplate")
+        cb:SetPoint("LEFT", xOffset, 0)
+        cb:SetChecked(false) -- placeholder
+        cb.Text:SetText(obj.label)
+        xOffset = xOffset + 100
     end
-
-    totalHeight = totalHeight + rowHeight + 5
-
 
     ----------------------------------------------------
     -- Concentration Display
