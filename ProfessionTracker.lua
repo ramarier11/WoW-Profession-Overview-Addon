@@ -678,7 +678,7 @@ KPReference = {
                     locations = {
                         { mapID = 2339, x = 36.6, y = 79.3, name = "Dornogal Chisel", questID = 83907 },
                         { mapID = 2248, x = 58.2, y = 62.0, name = "Earthen Miner's Gavel", questID = 83906 },
-                        { mapID = 2214, x = 49.4, y = 27.5, name = "Earthen Excavator's Shovel", questID = 83908 },
+                        { mapID = 2214, x = 45.2, y = 27.5, name = "Earthen Excavator's Shovel", questID = 83908 },
                         { mapID = 2214, x = 66.2, y = 66.2, name = "Regenerating Ore", questID = 83909 },
                         { mapID = 2215, x = 46.1, y = 64.4, name = "Arathi Precision Drill", questID = 83910 },
                         { mapID = 2215, x = 43.1, y = 56.8, name = "Devout Archaeologist's Excavator", questID = 83911 },
