@@ -166,60 +166,63 @@ function ProfessionTrackerUI:ShowMissingTreasureWindow(missingList, profName, ex
 
     -- Helper: attempt to place a waypoint (works on retail if API exists)
     local function PlaceWaypoint(mapID, x, y)
-        -- Normalize inputs
-        mapID = tonumber(mapID)
-        x = tonumber(x)
-        y = tonumber(y)
-        if not mapID or not x or not y then
-            print("|cffffaa00[Profession Tracker]|r Invalid coordinates for waypoint.")
-            return
-        end
+    mapID = tonumber(mapID)
+    x = tonumber(x)
+    y = tonumber(y)
 
-        -- Preferred: C_Map.SetUserWaypoint (Retail). Use if available.
-        if C_Map and C_Map.SetUserWaypoint then
-            -- Clear any existing user waypoint then set a new one.
+    if not mapID or not x or not y then
+        print("|cffffaa00[Profession Tracker]|r Invalid waypoint data.")
+        return
+    end
+
+    -- Convert % coords → normalized 0-1
+    local nx = x / 100
+    local ny = y / 100
+
+    -- Retail API check
+    if C_Map and C_Map.CanSetUserWaypointOnMap and C_Map.SetUserWaypoint then
+        if C_Map.CanSetUserWaypointOnMap(mapID) then
+
+            -- Create a UiMapPoint at the treasure's location
+            local point = UiMapPoint.CreateFromCoordinates(mapID, nx, ny)
+
+            -- Clear previous waypoint if API exists
             if C_Map.ClearUserWaypoint then
                 C_Map.ClearUserWaypoint()
             end
-            -- Create a new waypoint at the given position
-            -- C_Map.SetUserWaypoint expects normalized [0..1] coordinates
-            local success, err = pcall(function()
-                C_Map.SetUserWaypoint(mapID, CreateVector2D(x / 100, y / 100))
-            end)
-            if not success then
-                print("|cffffaa00[Profession Tracker]|r Failed to set user waypoint:", err)
-            else
-                -- Open the world map to show the pin if available
-                if not WorldMapFrame or not WorldMapFrame:IsShown() then
-                    if SetMapByID then
-                        SetMapByID(mapID)
-                    end
-                    if ToggleWorldMap then
-                        ToggleWorldMap()
-                    end
+
+            local ok = C_Map.SetUserWaypoint(point)
+
+            if ok then
+                print(string.format(
+                    "|cff00ff00[Profession Tracker]|r Waypoint set: (%.1f, %.1f) on map %d",
+                    x, y, mapID
+                ))
+
+                -- Ping the World Map to focus on the correct map
+                if WorldMapFrame and not WorldMapFrame:IsShown() then
+                    ToggleWorldMap()
                 end
-                print(string.format("|cff00ff00[Profession Tracker]|r Waypoint set: %s (%.1f, %.1f)", mapID, x, y))
+                if WorldMapFrame and WorldMapFrame.SetMapID then
+                    WorldMapFrame:SetMapID(mapID)
+                end
+            else
+                print("|cffff0000[Profession Tracker]|r Failed to set waypoint.")
             end
-            return
-        end
 
-        -- Fallback: try C_Map.SetPlayerWaypoint (older variants) or print coords
-        if C_Map and C_Map.SetPlayerWaypoint then
-            pcall(function()
-                C_Map.SetPlayerWaypoint(mapID, CreateVector2D(x / 100, y / 100))
-            end)
-            print(string.format("|cff00ff00[Profession Tracker]|r Waypoint set: %s (%.1f, %.1f)", mapID, x, y))
             return
-        end
-
-        -- Last resort: open world map to that map and print the coords for manual /way entry
-        if SetMapByID then
-            pcall(SetMapByID, mapID)
-            print(string.format("|cff00ff00[Profession Tracker]|r World map opened for mapID %d. Coordinates: %.1f, %.1f", mapID, x, y))
         else
-            print(string.format("|cff00ff00[Profession Tracker]|r Coordinates: %.1f, %.1f (mapID %s)", x, y, tostring(mapID)))
+            print("|cffffaa00[Profession Tracker]|r Cannot set waypoint on this map.")
         end
     end
+
+    -- Fallback for older clients or failed API
+    print(string.format(
+        "|cffffaa00[Profession Tracker]|r Coordinates: %.1f, %.1f (mapID: %d)",
+        x, y, mapID
+    ))
+end
+
 
     -- Clear user waypoint button
     local clearBtn = CreateFrame("Button", nil, win, "UIPanelButtonTemplate")
