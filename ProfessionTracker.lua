@@ -1211,21 +1211,9 @@ ProfessionTracker:SetScript("OnEvent", function()
         event == "SKILL_LINES_CHANGED" or
         event == "BAG_UPDATE_DELAYED" or
         event == "TRADE_SKILL_LIST_UPDATE" then
-        if UpdateCharacterProfessionData then
+
             UpdateCharacterProfessionData()
-        elseif ProfessionTracker and ProfessionTracker.UpdateCharacterProfessionData then
-            ProfessionTracker:UpdateCharacterProfessionData()
-        end
-
-        -- Notify UI to refresh if it's open
-        if ProfessionTrackerUI and ProfessionTrackerUI.RedrawCharacterDetail then
-            ProfessionTrackerUI:RedrawCharacterDetail()
-        end
-
-        -- Close the missing treasure window to prevent stale data
-        if ProfessionTrackerUI and ProfessionTrackerUI.missingTreasureWindow then
-            ProfessionTrackerUI.missingTreasureWindow:Hide()
-        end
+        
     end
 end)
 
