@@ -894,7 +894,7 @@ local function EvaluateOneTimeTreasures(charKey, profID, expIndex)
 
     local expData = profData.expansions and profData.expansions[expIndex]
     if not expData then return end
-    
+    print("running")
     local ref = KPReference[profID] 
                 and KPReference[profID][expIndex] 
                 and KPReference[profID][expIndex].oneTime
