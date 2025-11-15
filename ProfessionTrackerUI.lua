@@ -106,6 +106,16 @@ function ProfessionTrackerUI:ClearScrollChild()
     end
 end
 
+-- ============================================================
+-- Redraw character detail when data changes
+-- ============================================================
+function ProfessionTrackerUI:RedrawCharacterDetail()
+    if self.currentCharacterKey then
+        -- Rebuild the detail view entirely
+        self:ShowCharacterDetail(self.currentCharacterKey)
+    end
+end
+
 -- ========================================================
 -- Opens a standalone window listing missing one-time treasures
 -- Each entry is clickable and will attempt to place a map waypoint

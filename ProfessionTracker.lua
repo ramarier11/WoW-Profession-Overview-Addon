@@ -921,7 +921,7 @@ local function EvaluateOneTimeTreasures(charKey, profID, expIndex, profName, exp
             })
         end
     end
-
+    print("|cff00ff00ProfessionTracker:|r Updated treasure data.")
     expData.oneTimeCollectedAll = allCollected
     expData.missingOneTimeTreasures = missing
 end
@@ -1203,19 +1203,34 @@ ProfessionTracker:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
 ProfessionTracker:RegisterEvent("PLAYER_LOGIN")
 ProfessionTracker:RegisterEvent("BAG_UPDATE_DELAYED")
 
-ProfessionTracker:SetScript("OnEvent", function(self, event, ...)
-    if event == "PLAYER_LOGIN" then
-        -- Initialize database on login
-        C_Timer.After(2, function()
-            UpdateCharacterProfessionData()
-        end)
-    elseif event == "TRADE_SKILL_SHOW" or
-           event == "SKILL_LINES_CHANGED" or
-           event == "BAG_UPDATE_DELAYED" or
-           event == "TRADE_SKILL_LIST_UPDATE" then
+ProfessionTracker:SetScript("OnEvent", function()
+    local now = GetTime()
 
-        -- Update data on profession-related events
-        UpdateCharacterProfessionData()
+    -- Only refresh once per second to avoid UI spam
+    if now - lastRefresh < 1 then return end
+    lastRefresh = now
+
+    -- Run DB update
+    if  event == "TRADE_SKILL_SHOW" or
+        event == "PLAYER_LOGIN" or
+        event == "SKILL_LINES_CHANGED" or
+        event == "BAG_UPDATE_DELAYED" or
+        event == "TRADE_SKILL_LIST_UPDATE" then
+        if UpdateCharacterProfessionData then
+            UpdateCharacterProfessionData()
+        elseif ProfessionTracker and ProfessionTracker.UpdateCharacterProfessionData then
+            ProfessionTracker:UpdateCharacterProfessionData()
+        end
+
+        -- Notify UI to refresh if it's open
+        if ProfessionTrackerUI and ProfessionTrackerUI.RedrawCharacterDetail then
+            ProfessionTrackerUI:RedrawCharacterDetail()
+        end
+
+        -- Close the missing treasure window to prevent stale data
+        if ProfessionTrackerUI and ProfessionTrackerUI.missingTreasureWindow then
+            ProfessionTrackerUI.missingTreasureWindow:Hide()
+        end
     end
 end)
 
