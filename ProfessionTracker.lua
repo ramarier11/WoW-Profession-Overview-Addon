@@ -1440,7 +1440,7 @@ ProfessionTracker:SetScript("OnEvent", function(self, event, ...)
             end)
         end
             print("|cffff00ff[DEBUG]|r Condition failed, not setting timer")
-        end
+        
     end
 end)
 
