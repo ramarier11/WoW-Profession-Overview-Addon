@@ -419,7 +419,7 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
         -- Ensure we have a profName -> profID lookup (create once per card)
         if not card._profNameToID then
             card._profNameToID = {}
-            for _, p in ipairs(ProfessionTracker:ProfessionData) do
+            for _, p in ipairs(ProfessionData) do
                 card._profNameToID[p.name] = p.id
             end
         end

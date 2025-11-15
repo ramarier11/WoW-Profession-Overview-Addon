@@ -749,7 +749,7 @@ local ExpansionIndex = {
 
 local KNOWLEDGE_SYSTEM_START = 10 -- Dragon Isles and later
 
-local ProfessionData = {
+ProfessionData = {
     {
         name = "Alchemy",
         id = 171,
