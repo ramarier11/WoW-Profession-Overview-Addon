@@ -960,15 +960,15 @@ local function RecalculateOneTimeTreasures(charKey)
         if profID then
             -- Now process each expansion under this profession
             for expName, expData in pairs(profData.expansions or {}) do
-                print(expName)
+
                 local expIndex = expData and expData.id
-                print(expIndex)
+                print("prof id - " .. profID .. " exp index - " expIndex)
                 local hasRef =
                     expIndex and
                     KPReference[profID] and
                     KPReference[profID][expIndex] and
                     KPReference[profID][expIndex].oneTime
-
+                print(hasRef)
                 if hasRef then
                     local ref = KPReference[profID][expIndex].oneTime
                     local missing = {}
