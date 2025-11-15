@@ -884,47 +884,125 @@ end
 -- ============================================================
 -- Check One-Time Treasures for a Character's Profession
 -- ============================================================
-local function EvaluateOneTimeTreasures(charKey, profID, expIndex, profName, expName)
+-- local function EvaluateOneTimeTreasures(charKey, profID, expIndex, profName, expName)
     
-    local charData = ProfessionTrackerDB.characters[charKey]
+--     local charData = ProfessionTrackerDB.characters[charKey]
+--     if not charData or not charData.professions then return end
+
+--     local profData = charData.professions[profName]
+--     if not profData then return end
+    
+--     local expData = profData.expansions and profData.expansions[expName]
+--     if not expData then return end
+
+--     local ref = KPReference[profID] 
+--                 and KPReference[profID][expIndex] 
+--                 and KPReference[profID][expIndex].oneTime
+--                 and KPReference[profID][expIndex].oneTime.treasures
+
+--     if not ref or not ref.locations then
+--         expData.oneTimeCollectedAll = true
+--         expData.missingOneTimeTreasures = {}
+--         return
+--     end
+
+--     local missing = {}
+--     local allCollected = true
+
+--     for _, treasure in ipairs(ref.locations) do
+--         if treasure.questID and not C_QuestLog.IsQuestFlaggedCompleted(treasure.questID) then
+--             allCollected = false
+--             table.insert(missing, {
+--                 name = treasure.name,
+--                 mapID = treasure.mapID,
+--                 x = treasure.x,
+--                 y = treasure.y,
+--                 questID = treasure.questID
+--             })
+--         end
+--     end
+--     print("|cff00ff00ProfessionTracker:|r Updated treasure data.")
+--     expData.oneTimeCollectedAll = allCollected
+--     expData.missingOneTimeTreasures = missing
+-- end
+
+-- ============================================================
+-- Recalculate one-time treasure completion for a character
+-- Runs independent of TradeSkill UI. Uses KPReference table only.
+-- ============================================================
+local function RecalculateOneTimeTreasures(charKey)
+    if not ProfessionTrackerDB or not ProfessionTrackerDB.characters then return end
+    local charData = ProfessionTrackerDB.characters[charKey or GetCharacterKey()]
     if not charData or not charData.professions then return end
 
-    local profData = charData.professions[profName]
-    if not profData then return end
-    
-    local expData = profData.expansions and profData.expansions[expName]
-    if not expData then return end
-
-    local ref = KPReference[profID] 
-                and KPReference[profID][expIndex] 
-                and KPReference[profID][expIndex].oneTime
-                and KPReference[profID][expIndex].oneTime.treasures
-
-    if not ref or not ref.locations then
-        expData.oneTimeCollectedAll = true
-        expData.missingOneTimeTreasures = {}
-        return
+    -- Helper: map profession name -> professionID (from ProfessionData)
+    local profNameToID = {}
+    for _, p in ipairs(ProfessionData) do
+        profNameToID[p.name] = p.id
     end
 
-    local missing = {}
-    local allCollected = true
-
-    for _, treasure in ipairs(ref.locations) do
-        if treasure.questID and not C_QuestLog.IsQuestFlaggedCompleted(treasure.questID) then
-            allCollected = false
-            table.insert(missing, {
-                name = treasure.name,
-                mapID = treasure.mapID,
-                x = treasure.x,
-                y = treasure.y,
-                questID = treasure.questID
-            })
+    for profName, profData in pairs(charData.professions) do
+        -- find numeric profession ID (e.g. 171 for Alchemy)
+        local profID = profNameToID[profName]
+        if not profID then
+            -- fallback: maybe skillLineID stored on an expansion - try to deduce
+            for _, exp in pairs(profData.expansions or {}) do
+                if exp and exp.skillLineID then
+                    profID = exp.skillLineID
+                    break
+                end
+            end
         end
+
+        -- If still no profID, skip
+        if not profID then
+            -- debug: print("|cffffaa00[Profession Tracker]|r Unable to determine profID for ", profName)
+            goto continue_prof_loop
+        end
+
+        for expName, expData in pairs(profData.expansions or {}) do
+            -- expData.id is expected to be expansion index (10, 11, etc.)
+            local expIndex = expData and expData.id
+            if expIndex and KPReference[profID] and KPReference[profID][expIndex] and KPReference[profID][expIndex].oneTime then
+                local ref = KPReference[profID][expIndex].oneTime
+                local missing = {}
+                local allCollected = true
+
+                if ref.locations and type(ref.locations) == "table" then
+                    for _, loc in ipairs(ref.locations) do
+                        if loc and loc.questID then
+                            local completed = false
+                            -- safe pcall in case API not ready (shouldn't happen, but defensive)
+                            local ok, res = pcall(function() return C_QuestLog.IsQuestFlaggedCompleted(loc.questID) end)
+                            if ok and res then completed = true end
+
+                            if not completed then
+                                allCollected = false
+                                table.insert(missing, {
+                                    name = loc.name,
+                                    mapID = loc.mapID,
+                                    x = loc.x,
+                                    y = loc.y,
+                                    questID = loc.questID,
+                                })
+                            end
+                        end
+                    end
+                end
+
+                expData.oneTimeCollectedAll = allCollected
+                expData.missingOneTimeTreasures = missing
+            else
+                -- If there's no KPReference data for this expansion, ensure fields exist
+                expData.oneTimeCollectedAll = expData.oneTimeCollectedAll or true
+                expData.missingOneTimeTreasures = expData.missingOneTimeTreasures or {}
+            end
+        end
+
+        ::continue_prof_loop::
     end
-    print("|cff00ff00ProfessionTracker:|r Updated treasure data.")
-    expData.oneTimeCollectedAll = allCollected
-    expData.missingOneTimeTreasures = missing
 end
+
 
 -- ========================================================
 -- Knowledge Point Calculations
@@ -1010,6 +1088,128 @@ end
 -- Data Initialization & Update
 -- ========================================================
 
+-- local function UpdateCharacterProfessionData()
+--     if not ProfessionTrackerDB then
+--         ProfessionTrackerDB = {
+--             version = "1.0.0",
+--             characters = {},
+--         }
+--     end
+
+--     local charKey = GetCharacterKey() -- returns Charname - RealmName as String
+--     local charData = EnsureTable(ProfessionTrackerDB.characters, charKey) -- checks if table key "characters"[charKey] exists and if not creates it
+
+--     -- ✅ Initialize metadata if not set yet
+--     if not charData.name then -- if "characters"[charKey].name doesn't exist -> create a new entry
+--         local name, realm = UnitFullName("player")
+--         charData.name = name or UnitName("player") or "Unknown"
+--         charData.realm = realm or GetRealmName() or "UnknownRealm"
+--         charData.class = select(2, UnitClass("player"))
+--         charData.level = UnitLevel("player")
+--         charData.faction = UnitFactionGroup("player")
+--     end
+
+--     charData.lastLogin = time() -- save last login time
+
+--     local professions = EnsureTable(charData, "professions") -- checks if table key "characters"["UnitName-RealmName"]["professions"] exists and if not creates it
+--     local currentProfs = {} -- creates empty table called currentProfs
+--     local profIndices = { GetProfessions() } -- creates table of current characters professions
+--     for _, profIndex in ipairs(profIndices) do -- loops through current characters professions
+        
+--         if profIndex then -- checks if profIndex exists (always true if you have a profession)
+--             local name, _, skillLevel, maxSkillLevel, _, _, skillLine = GetProfessionInfo(profIndex) -- sets local vars equal to associated data
+--             if name then -- always true
+                
+
+--                 -- Exclude secondary professions for now
+--                 local excludedProfs = {
+--                     ["Cooking"] = true,
+--                     ["Fishing"] = true,
+--                     ["Archaeology"] = true,
+--                     ["First Aid"] = true,
+--                 }
+--                 if not excludedProfs[name] then
+--                     currentProfs[name] = true
+--                     local profession = EnsureTable(professions, name) -- checks if "professions"["ProfessionName"] exists and creates if not
+--                     profession.lastUpdated = time()
+--                     local expansions = EnsureTable(profession, "expansions") -- checks if "professionName"["expansions"] exists and creates if not
+
+--                     local expansionList = GetCharacterProfessionExpansions(name) -- calls GetCharacterProfessionExpansions(professionName) and returns value stored in expansionList var
+--                     -- ✅ Skip if the table is empty or nil
+--                     if expansionList and #expansionList > 0 then --checks if expansionList is not nil and length is > 0 
+--                         for _, exp in ipairs(expansionList) do
+                            
+--                                 local expName = exp.expansionName or "Unknown"
+--                                 local expID = ExpansionIndex[expName] or 0
+--                                 local hasKnowledgeSystem = expID >= KNOWLEDGE_SYSTEM_START
+
+--                                 -- ✅ Merge rather than replace existing data
+--                                 local expData = expansions[expName] or {}
+--                                 expData.name = expName
+--                                 expData.id = expID
+--                                 expData.skillLineID = exp.skillLineID or expData.skillLineID
+--                                 expData.skillLevel = exp.skillLevel or expData.skillLevel or 0
+--                                 expData.maxSkillLevel = exp.maxSkillLevel or expData.maxSkillLevel or 0
+
+--                                 if hasKnowledgeSystem then
+--                                     local missing = CalculateMissingKnowledgePoints(exp.skillLineID)
+--                                     expData.pointsUntilMaxKnowledge = missing or expData.pointsUntilMaxKnowledge or 0
+--                                     expData.knowledgePoints = expData.knowledgePoints or 0
+--                                     expData.weeklyKnowledgePoints = expData.weeklyKnowledgePoints or {
+--                                         treatise = false,
+--                                         treasures = false,
+--                                         craftingOrderQuest = false,
+--                                     }
+--                                     EvaluateOneTimeTreasures(charKey, skillLine, expID, name, expName)
+--                                     -- Get concentration currency info
+--                                     local concentrationCurrencyID = C_TradeSkillUI.GetConcentrationCurrencyID and C_TradeSkillUI.GetConcentrationCurrencyID(exp.skillLineID)
+--                                     if concentrationCurrencyID then
+--                                         local currencyInfo = C_CurrencyInfo.GetCurrencyInfo(concentrationCurrencyID)
+--                                         if currencyInfo then
+--                                             expData.concentration = currencyInfo.quantity or 0
+--                                             expData.maxConcentration = currencyInfo.maxQuantity or 1000
+--                                             expData.concentrationLastUpdated = time()
+--                                         end
+--                                     end
+--                                 end
+
+--                                 -- ✅ Clean out legacy or unused fields
+--                                 expData.maxKnowledgePoints = nil
+
+--                             -- ✅ Save back to DB
+--                             expansions[expName] = expData
+                            
+--                         end
+--                     else
+--                     -- ✅ Optionally log for debugging
+--                     print(string.format("|cffff0000[Profession Tracker]|r Skipped empty expansion data for %s", name))
+--                 end
+--             end
+--             end
+--         end
+--     end
+
+--     -- Remove unlearned professions
+--     for savedName in pairs(professions) do
+--         if not currentProfs[savedName] then
+--             print("|cffff0000[Profession Tracker]|r Removed profession:", savedName)
+--             professions[savedName] = nil
+--         end
+--     end
+
+--     -- ✅ Auto-refresh UI if open
+--     if ProfessionTracker.UI and ProfessionTracker.UI:IsShown() then
+--         C_Timer.After(0.25, function()
+--             ProfessionTracker.UI:Refresh()           
+--         end)
+--     end
+
+--     print("|cff00ff00[Profession Tracker]|r Data updated for:", charKey)
+-- end
+
+-- ========================================================
+-- Data Initialization & Update (patched merged version)
+-- ========================================================
 local function UpdateCharacterProfessionData()
     if not ProfessionTrackerDB then
         ProfessionTrackerDB = {
@@ -1018,11 +1218,11 @@ local function UpdateCharacterProfessionData()
         }
     end
 
-    local charKey = GetCharacterKey() -- returns Charname - RealmName as String
-    local charData = EnsureTable(ProfessionTrackerDB.characters, charKey) -- checks if table key "characters"[charKey] exists and if not creates it
+    local charKey = GetCharacterKey()
+    local charData = EnsureTable(ProfessionTrackerDB.characters, charKey)
 
-    -- ✅ Initialize metadata if not set yet
-    if not charData.name then -- if "characters"[charKey].name doesn't exist -> create a new entry
+    -- Initialize metadata if not set yet
+    if not charData.name then
         local name, realm = UnitFullName("player")
         charData.name = name or UnitName("player") or "Unknown"
         charData.realm = realm or GetRealmName() or "UnknownRealm"
@@ -1031,103 +1231,102 @@ local function UpdateCharacterProfessionData()
         charData.faction = UnitFactionGroup("player")
     end
 
-    charData.lastLogin = time() -- save last login time
+    charData.lastLogin = time()
 
-    local professions = EnsureTable(charData, "professions") -- checks if table key "characters"["UnitName-RealmName"]["professions"] exists and if not creates it
-    local currentProfs = {} -- creates empty table called currentProfs
-    local profIndices = { GetProfessions() } -- creates table of current characters professions
-    for _, profIndex in ipairs(profIndices) do -- loops through current characters professions
-        
-        if profIndex then -- checks if profIndex exists (always true if you have a profession)
-            local name, _, skillLevel, maxSkillLevel, _, _, skillLine = GetProfessionInfo(profIndex) -- sets local vars equal to associated data
-            if name then -- always true
-                
+    local professions = EnsureTable(charData, "professions")
+    local currentProfs = {}
 
-                -- Exclude secondary professions for now
+    local profIndices = { GetProfessions() }
+    for _, profIndex in ipairs(profIndices) do
+        if profIndex then
+            local name, _, skillLevel, maxSkillLevel, _, _, skillLine = GetProfessionInfo(profIndex)
+            if name then
                 local excludedProfs = {
                     ["Cooking"] = true,
                     ["Fishing"] = true,
                     ["Archaeology"] = true,
                     ["First Aid"] = true,
                 }
+
                 if not excludedProfs[name] then
                     currentProfs[name] = true
-                    local profession = EnsureTable(professions, name) -- checks if "professions"["ProfessionName"] exists and creates if not
+                    local profession = EnsureTable(professions, name)
                     profession.lastUpdated = time()
-                    local expansions = EnsureTable(profession, "expansions") -- checks if "professionName"["expansions"] exists and creates if not
+                    profession.name = name
 
-                    local expansionList = GetCharacterProfessionExpansions(name) -- calls GetCharacterProfessionExpansions(professionName) and returns value stored in expansionList var
-                    -- ✅ Skip if the table is empty or nil
-                    if expansionList and #expansionList > 0 then --checks if expansionList is not nil and length is > 0 
+                    -- Ensure expansions table exists (may have been populated by previous full-scan)
+                    local expansions = EnsureTable(profession, "expansions")
+
+                    -- ===== Attempt to get detailed expansion info from TradeSkill UI (only available when tradeskill is open) =====
+                    local expansionList = GetCharacterProfessionExpansions(name)
+                    if expansionList and #expansionList > 0 then
+                        -- Merge the fresh expansion data into saved expansions
                         for _, exp in ipairs(expansionList) do
-                            
-                                local expName = exp.expansionName or "Unknown"
-                                local expID = ExpansionIndex[expName] or 0
-                                local hasKnowledgeSystem = expID >= KNOWLEDGE_SYSTEM_START
+                            local expName = exp.expansionName or "Unknown"
+                            local expID = ExpansionIndex[expName] or 0
+                            local hasKnowledgeSystem = expID >= KNOWLEDGE_SYSTEM_START
 
-                                -- ✅ Merge rather than replace existing data
-                                local expData = expansions[expName] or {}
-                                expData.name = expName
-                                expData.id = expID
-                                expData.skillLineID = exp.skillLineID or expData.skillLineID
-                                expData.skillLevel = exp.skillLevel or expData.skillLevel or 0
-                                expData.maxSkillLevel = exp.maxSkillLevel or expData.maxSkillLevel or 0
+                            local expData = expansions[expName] or {}
+                            expData.name = expName
+                            expData.id = expID
+                            expData.skillLineID = exp.skillLineID or expData.skillLineID
+                            expData.skillLevel = exp.skillLevel or expData.skillLevel or 0
+                            expData.maxSkillLevel = exp.maxSkillLevel or expData.maxSkillLevel or 0
 
-                                if hasKnowledgeSystem then
-                                    local missing = CalculateMissingKnowledgePoints(exp.skillLineID)
-                                    expData.pointsUntilMaxKnowledge = missing or expData.pointsUntilMaxKnowledge or 0
-                                    expData.knowledgePoints = expData.knowledgePoints or 0
-                                    expData.weeklyKnowledgePoints = expData.weeklyKnowledgePoints or {
-                                        treatise = false,
-                                        treasures = false,
-                                        craftingOrderQuest = false,
-                                    }
-                                    EvaluateOneTimeTreasures(charKey, skillLine, expID, name, expName)
-                                    -- Get concentration currency info
-                                    local concentrationCurrencyID = C_TradeSkillUI.GetConcentrationCurrencyID and C_TradeSkillUI.GetConcentrationCurrencyID(exp.skillLineID)
-                                    if concentrationCurrencyID then
-                                        local currencyInfo = C_CurrencyInfo.GetCurrencyInfo(concentrationCurrencyID)
-                                        if currencyInfo then
-                                            expData.concentration = currencyInfo.quantity or 0
-                                            expData.maxConcentration = currencyInfo.maxQuantity or 1000
-                                            expData.concentrationLastUpdated = time()
-                                        end
-                                    end
-                                end
+                            if hasKnowledgeSystem and exp.skillLineID then
+                                local missing = CalculateMissingKnowledgePoints(exp.skillLineID)
+                                expData.pointsUntilMaxKnowledge = missing or expData.pointsUntilMaxKnowledge or 0
+                                expData.knowledgePoints = expData.knowledgePoints or 0
+                                expData.weeklyKnowledgePoints = expData.weeklyKnowledgePoints or {
+                                    treatise = false,
+                                    treasures = false,
+                                    craftingOrderQuest = false,
+                                }
+                            end
 
-                                -- ✅ Clean out legacy or unused fields
-                                expData.maxKnowledgePoints = nil
-
-                            -- ✅ Save back to DB
                             expansions[expName] = expData
-                            
                         end
                     else
-                    -- ✅ Optionally log for debugging
-                    print(string.format("|cffff0000[Profession Tracker]|r Skipped empty expansion data for %s", name))
+                        -- If TradeSkill UI isn't open, we don't touch expansion list structure here.
+                        -- This preserves previously stored expansion entries so RecalculateOneTimeTreasures can still work.
+                        -- (No-op)
+                    end
                 end
-            end
             end
         end
     end
 
-    -- Remove unlearned professions
+    -- Remove unlearned professions from saved DB
     for savedName in pairs(professions) do
         if not currentProfs[savedName] then
-            print("|cffff0000[Profession Tracker]|r Removed profession:", savedName)
             professions[savedName] = nil
         end
     end
 
-    -- ✅ Auto-refresh UI if open
+    -- ===== ALWAYS re-evaluate one-time treasures AFTER we've merged/kept expansion structure =====
+    -- This is the key: RecalculateOneTimeTreasures doesn't require TradeSkill UI.
+    RecalculateOneTimeTreasures(charKey)
+
+    -- Auto-refresh UI if open (small delay to avoid racing other events)
     if ProfessionTracker.UI and ProfessionTracker.UI:IsShown() then
         C_Timer.After(0.25, function()
-            ProfessionTracker.UI:Refresh()           
+            -- If your UI object uses :Refresh() use that; otherwise call the redraw helper
+            if ProfessionTracker.UI.Refresh then
+                ProfessionTracker.UI:Refresh()
+            elseif ProfessionTracker.UI.RedrawCharacterDetail then
+                ProfessionTracker.UI:RedrawCharacterDetail()
+            end
         end)
+    end
+
+    -- Close stale missing treasure window if present (prevents stale list)
+    if ProfessionTrackerUI and ProfessionTrackerUI.missingTreasureWindow and ProfessionTrackerUI.missingTreasureWindow:IsShown() then
+        ProfessionTrackerUI.missingTreasureWindow:Hide()
     end
 
     print("|cff00ff00[Profession Tracker]|r Data updated for:", charKey)
 end
+
 
 
 -- ========================================================
