@@ -938,6 +938,7 @@ local function RecalculateOneTimeTreasures(charKey)
     -- Build name → professionID lookup
     local profNameToID = {}
     for _, p in ipairs(ProfessionData) do
+        print(p.name .. " - " .. p.id)
         profNameToID[p.name] = p.id
     end
 
@@ -1170,7 +1171,9 @@ end
 --                                         treasures = false,
 --                                         craftingOrderQuest = false,
 --                                     }
---                                     EvaluateOneTimeTreasures(charKey, skillLine, expID, name, expName)
+--                                     expData.oneTimeCollectedAll = false
+--                                     expData.missingOneTimeTreasures = {}
+--                                     --EvaluateOneTimeTreasures(charKey, skillLine, expID, name, expName)
 --                                     -- Get concentration currency info
 --                                     local concentrationCurrencyID = C_TradeSkillUI.GetConcentrationCurrencyID and C_TradeSkillUI.GetConcentrationCurrencyID(exp.skillLineID)
 --                                     if concentrationCurrencyID then
