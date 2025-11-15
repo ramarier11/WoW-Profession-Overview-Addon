@@ -881,6 +881,50 @@ local function GetCharacterProfessionExpansions(professionName)
     return expansions
 end
 
+-- ============================================================
+-- Check One-Time Treasures for a Character's Profession
+-- ============================================================
+function ProfessionTracker:EvaluateOneTimeTreasures(charKey, profID, expIndex)
+    local charData = ProfessionTrackerDB.characters[charKey]
+    if not charData or not charData.professions then return end
+
+    local profData = charData.professions[profID]
+    if not profData then return end
+
+    local expData = profData.expansions and profData.expansions[expIndex]
+    if not expData then return end
+    
+    local ref = KPReference[profID] 
+                and KPReference[profID][expIndex] 
+                and KPReference[profID][expIndex].oneTime
+                and KPReference[profID][expIndex].oneTime.treasures
+
+    if not ref or not ref.locations then
+        expData.oneTimeCollectedAll = true
+        expData.missingOneTimeTreasures = {}
+        return
+    end
+
+    local missing = {}
+    local allCollected = true
+
+    for _, treasure in ipairs(ref.locations) do
+        if treasure.questID and not C_QuestLog.IsQuestFlaggedCompleted(treasure.questID) then
+            allCollected = false
+            table.insert(missing, {
+                name = treasure.name,
+                mapID = treasure.mapID,
+                x = treasure.x,
+                y = treasure.y,
+                questID = treasure.questID
+            })
+        end
+    end
+
+    expData.oneTimeCollectedAll = allCollected
+    expData.missingOneTimeTreasures = missing
+end
+
 -- ========================================================
 -- Knowledge Point Calculations
 -- ========================================================
@@ -1037,7 +1081,7 @@ local function UpdateCharacterProfessionData()
                                         treasures = false,
                                         craftingOrderQuest = false,
                                     }
-
+                                    ProfessionTracker:EvaluateOneTimeTreasures(charKey, profID, expIndex)
                                     -- Get concentration currency info
                                     local concentrationCurrencyID = C_TradeSkillUI.GetConcentrationCurrencyID and C_TradeSkillUI.GetConcentrationCurrencyID(exp.skillLineID)
                                     if concentrationCurrencyID then
