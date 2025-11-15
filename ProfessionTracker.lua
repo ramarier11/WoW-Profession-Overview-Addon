@@ -1001,10 +1001,6 @@ local function RecalculateOneTimeTreasures(charKey)
                     expData.oneTimeCollectedAll = allCollected
                     expData.missingOneTimeTreasures = missing
 
-                else
-                    -- If no reference, ensure fields exist
-                    expData.oneTimeCollectedAll = expData.oneTimeCollectedAll or true
-                    expData.missingOneTimeTreasures = expData.missingOneTimeTreasures or {}
                 end
             end
         end
