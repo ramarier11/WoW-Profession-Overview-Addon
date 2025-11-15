@@ -884,17 +884,17 @@ end
 -- ============================================================
 -- Check One-Time Treasures for a Character's Profession
 -- ============================================================
-local function EvaluateOneTimeTreasures(charKey, profID, expIndex, name)
+local function EvaluateOneTimeTreasures(charKey, profID, expIndex, profName, expName)
     
     local charData = ProfessionTrackerDB.characters[charKey]
     if not charData or not charData.professions then return end
 
-    local profData = charData.professions[name]
+    local profData = charData.professions[profName]
     if not profData then return end
-    print("running")
-    local expData = profData.expansions and profData.expansions[expIndex]
-    if not expData then return end
     
+    local expData = profData.expansions and profData.expansions[expName]
+    if not expData then return end
+    print("running")
     local ref = KPReference[profID] 
                 and KPReference[profID][expIndex] 
                 and KPReference[profID][expIndex].oneTime
@@ -1082,7 +1082,7 @@ local function UpdateCharacterProfessionData()
                                         treasures = false,
                                         craftingOrderQuest = false,
                                     }
-                                    EvaluateOneTimeTreasures(charKey, skillLine, expID, name)
+                                    EvaluateOneTimeTreasures(charKey, skillLine, expID, name, expName)
                                     -- Get concentration currency info
                                     local concentrationCurrencyID = C_TradeSkillUI.GetConcentrationCurrencyID and C_TradeSkillUI.GetConcentrationCurrencyID(exp.skillLineID)
                                     if concentrationCurrencyID then
