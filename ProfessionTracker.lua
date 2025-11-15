@@ -1203,14 +1203,7 @@ ProfessionTracker:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
 ProfessionTracker:RegisterEvent("PLAYER_LOGIN")
 ProfessionTracker:RegisterEvent("BAG_UPDATE_DELAYED")
 
--- Throttle to prevent repeated refreshes within the same second
-local lastRefresh = 0
 ProfessionTracker:SetScript("OnEvent", function()
-    local now = GetTime()
-
-    -- Only refresh once per second to avoid UI spam
-    if now - lastRefresh < 1 then return end
-    lastRefresh = now
 
     -- Run DB update
     if  event == "TRADE_SKILL_SHOW" or
