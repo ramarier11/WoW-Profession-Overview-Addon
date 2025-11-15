@@ -1426,15 +1426,20 @@ ProfessionTracker:SetScript("OnEvent", function(self, event, ...)
             ProfessionTracker:UpdateCharacterProfessionData()
         end
 
-        -- Notify UI to refresh if it's open
-        if ProfessionTrackerUI and ProfessionTrackerUI.RedrawCharacterDetail then
-            ProfessionTrackerUI:RedrawCharacterDetail()
-        end
-                -- Close the missing treasure window to prevent stale data
+        -- Close the missing treasure window to prevent stale data
+        print("|cffff00ff[DEBUG]|r Checking window refresh condition")
+        print("|cffff00ff[DEBUG]|r ProfessionTrackerUI exists?", ProfessionTrackerUI ~= nil)
+        print("|cffff00ff[DEBUG]|r missingTreasureWindow exists?", ProfessionTrackerUI and ProfessionTrackerUI.missingTreasureWindow ~= nil or false)
+        print("|cffff00ff[DEBUG]|r Window shown?", ProfessionTrackerUI and ProfessionTrackerUI.missingTreasureWindow and ProfessionTrackerUI.missingTreasureWindow:IsShown() or false)
+        
         if ProfessionTrackerUI and ProfessionTrackerUI.missingTreasureWindow then
+            print("|cffff00ff[DEBUG]|r Setting timer...")
             C_Timer.After(1.0, function()
+                print("|cffff00ff[DEBUG]|r Timer fired, calling refresh")
                 ProfessionTrackerUI:RefreshMissingTreasureWindow()
             end)
+        else
+            print("|cffff00ff[DEBUG]|r Condition failed, not setting timer")
         end
     end
 end)
