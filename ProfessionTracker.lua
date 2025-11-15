@@ -935,73 +935,83 @@ local function RecalculateOneTimeTreasures(charKey)
     local charData = ProfessionTrackerDB.characters[charKey or GetCharacterKey()]
     if not charData or not charData.professions then return end
 
-    -- Helper: map profession name -> professionID (from ProfessionData)
+    -- Build name → professionID lookup
     local profNameToID = {}
     for _, p in ipairs(ProfessionData) do
         profNameToID[p.name] = p.id
     end
 
+    -- Loop professions
     for profName, profData in pairs(charData.professions) do
-        -- find numeric profession ID (e.g. 171 for Alchemy)
+
+        -- Try direct lookup
         local profID = profNameToID[profName]
-        if not profID then
-            -- fallback: maybe skillLineID stored on an expansion - try to deduce
-            for _, exp in pairs(profData.expansions or {}) do
-                if exp and exp.skillLineID then
+
+        -- If not found, try to deduce from existing expansions
+        if not profID and profData.expansions then
+            for _, exp in pairs(profData.expansions) do
+                if exp.skillLineID then
                     profID = exp.skillLineID
                     break
                 end
             end
         end
 
-        -- If still no profID, skip
-        if not profID then
-            -- debug: print("|cffffaa00[Profession Tracker]|r Unable to determine profID for ", profName)
-            goto continue_prof_loop
-        end
+        if profID then
+            -- Now process each expansion under this profession
+            for expName, expData in pairs(profData.expansions or {}) do
+                local expIndex = expData and expData.id
 
-        for expName, expData in pairs(profData.expansions or {}) do
-            -- expData.id is expected to be expansion index (10, 11, etc.)
-            local expIndex = expData and expData.id
-            if expIndex and KPReference[profID] and KPReference[profID][expIndex] and KPReference[profID][expIndex].oneTime then
-                local ref = KPReference[profID][expIndex].oneTime
-                local missing = {}
-                local allCollected = true
+                local hasRef =
+                    expIndex and
+                    KPReference[profID] and
+                    KPReference[profID][expIndex] and
+                    KPReference[profID][expIndex].oneTime
 
-                if ref.locations and type(ref.locations) == "table" then
-                    for _, loc in ipairs(ref.locations) do
-                        if loc and loc.questID then
-                            local completed = false
-                            -- safe pcall in case API not ready (shouldn't happen, but defensive)
-                            local ok, res = pcall(function() return C_QuestLog.IsQuestFlaggedCompleted(loc.questID) end)
-                            if ok and res then completed = true end
+                if hasRef then
+                    local ref = KPReference[profID][expIndex].oneTime
+                    local missing = {}
+                    local allCollected = true
 
-                            if not completed then
-                                allCollected = false
-                                table.insert(missing, {
-                                    name = loc.name,
-                                    mapID = loc.mapID,
-                                    x = loc.x,
-                                    y = loc.y,
-                                    questID = loc.questID,
-                                })
+                    if ref.locations then
+                        for _, loc in ipairs(ref.locations) do
+                            if loc.questID then
+                                local completed = false
+                                local ok, res = pcall(function()
+                                    return C_QuestLog.IsQuestFlaggedCompleted(loc.questID)
+                                end)
+
+                                if ok and res then
+                                    completed = true
+                                end
+
+                                if not completed then
+                                    allCollected = false
+                                    table.insert(missing, {
+                                        name = loc.name,
+                                        mapID = loc.mapID,
+                                        x = loc.x,
+                                        y = loc.y,
+                                        questID = loc.questID,
+                                    })
+                                end
                             end
                         end
                     end
-                end
 
-                expData.oneTimeCollectedAll = allCollected
-                expData.missingOneTimeTreasures = missing
-            else
-                -- If there's no KPReference data for this expansion, ensure fields exist
-                expData.oneTimeCollectedAll = expData.oneTimeCollectedAll or true
-                expData.missingOneTimeTreasures = expData.missingOneTimeTreasures or {}
+                    expData.oneTimeCollectedAll = allCollected
+                    expData.missingOneTimeTreasures = missing
+
+                else
+                    -- If no reference, ensure fields exist
+                    expData.oneTimeCollectedAll = expData.oneTimeCollectedAll or true
+                    expData.missingOneTimeTreasures = expData.missingOneTimeTreasures or {}
+                end
             end
         end
-
-        ::continue_prof_loop::
     end
 end
+
 
 
 -- ========================================================
