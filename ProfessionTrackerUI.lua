@@ -166,62 +166,67 @@ function ProfessionTrackerUI:ShowMissingTreasureWindow(missingList, profName, ex
 
     -- Helper: attempt to place a waypoint (works on retail if API exists)
     local function PlaceWaypoint(mapID, x, y)
-    mapID = tonumber(mapID)
-    x = tonumber(x)
-    y = tonumber(y)
+        mapID = tonumber(mapID)
+        x = tonumber(x)
+        y = tonumber(y)
 
-    if not mapID or not x or not y then
-        print("|cffffaa00[Profession Tracker]|r Invalid waypoint data.")
-        return
-    end
-
-    -- Convert % coords → normalized 0-1
-    local nx = x / 100
-    local ny = y / 100
-
-    -- Retail API check
-    if C_Map and C_Map.CanSetUserWaypointOnMap and C_Map.SetUserWaypoint then
-        if C_Map.CanSetUserWaypointOnMap(mapID) then
-
-            -- Create a UiMapPoint at the treasure's location
-            local point = UiMapPoint.CreateFromCoordinates(mapID, nx, ny)
-
-            -- Clear previous waypoint if API exists
-            if C_Map.ClearUserWaypoint then
-                C_Map.ClearUserWaypoint()
-            end
-
-            local ok = C_Map.SetUserWaypoint(point)
-
-            if ok then
-                print(string.format(
-                    "|cff00ff00[Profession Tracker]|r Waypoint set: (%.1f, %.1f) on map %d",
-                    x, y, mapID
-                ))
-
-                -- Ping the World Map to focus on the correct map
-                if WorldMapFrame and not WorldMapFrame:IsShown() then
-                    ToggleWorldMap()
-                end
-                if WorldMapFrame and WorldMapFrame.SetMapID then
-                    WorldMapFrame:SetMapID(mapID)
-                end
-            else
-                print("|cffff0000[Profession Tracker]|r Failed to set waypoint.")
-            end
-
+        if not mapID or not x or not y then
+            print("|cffffaa00[Profession Tracker]|r Invalid waypoint data.")
             return
-        else
-            print("|cffffaa00[Profession Tracker]|r Cannot set waypoint on this map.")
         end
-    end
 
-    -- Fallback for older clients or failed API
-    print(string.format(
-        "|cffffaa00[Profession Tracker]|r Coordinates: %.1f, %.1f (mapID: %d)",
-        x, y, mapID
-    ))
-end
+        -- Convert % coords → normalized 0-1
+        local nx = x / 100
+        local ny = y / 100
+
+        -- Retail API check
+        if C_Map and C_Map.CanSetUserWaypointOnMap and C_Map.SetUserWaypoint then
+            if C_Map.CanSetUserWaypointOnMap(mapID) then
+
+                -- Create a UiMapPoint at the treasure's location
+                local point = UiMapPoint.CreateFromCoordinates(mapID, nx, ny)
+
+                -- Clear previous waypoint if API exists
+                if C_Map.ClearUserWaypoint then
+                    C_Map.ClearUserWaypoint()
+                end
+
+                local success = pcall(function()
+                    C_Map.SetUserWaypoint(point)
+                end)
+
+                if success then
+                    print(string.format(
+                        "|cff00ff00[Profession Tracker]|r Waypoint set: (%.1f, %.1f) on map %d",
+                        x, y, mapID
+                    ))
+
+                    -- Open world map if closed
+                    if WorldMapFrame and not WorldMapFrame:IsShown() then
+                        ToggleWorldMap()
+                    end
+
+                    -- Try to focus map on correct zone
+                    if WorldMapFrame and WorldMapFrame.SetMapID then
+                        WorldMapFrame:SetMapID(mapID)
+                    end
+                else
+                    print("|cffff0000[Profession Tracker]|r Failed to set waypoint (lua error).")
+                end
+
+
+                return
+            else
+                print("|cffffaa00[Profession Tracker]|r Cannot set waypoint on this map.")
+            end
+        end
+
+        -- Fallback for older clients or failed API
+        print(string.format(
+            "|cffffaa00[Profession Tracker]|r Coordinates: %.1f, %.1f (mapID: %d)",
+            x, y, mapID
+        ))
+    end
 
 
     -- Clear user waypoint button
