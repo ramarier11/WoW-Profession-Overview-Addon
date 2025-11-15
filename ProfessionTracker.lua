@@ -1039,9 +1039,9 @@ local function UpdateCharacterProfessionData()
     for _, profIndex in ipairs(profIndices) do -- loops through current characters professions
         
         if profIndex then -- checks if profIndex exists (always true if you have a profession)
-            local name, _, skillLevel, maxSkillLevel = GetProfessionInfo(profIndex) -- sets local vars equal to associated data
+            local name, _, skillLevel, maxSkillLevel, _, _, skillLine = GetProfessionInfo(profIndex) -- sets local vars equal to associated data
             if name then -- always true
-                print(profIndex)
+                print(skillLine)
 
                 -- Exclude secondary professions for now
                 local excludedProfs = {
