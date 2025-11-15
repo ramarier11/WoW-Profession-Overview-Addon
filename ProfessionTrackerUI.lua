@@ -219,7 +219,7 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
         -- One-Time Treasure Completion
         ----------------------------------------------------
         if expData.oneTimeCollectedAll ~= nil then
-            local treasureStatus = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+            local treasureStatus = card:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
             treasureStatus:SetPoint("TOPLEFT", skillText, "BOTTOMLEFT", 0, -25)
 
             local tex = expData.oneTimeCollectedAll
