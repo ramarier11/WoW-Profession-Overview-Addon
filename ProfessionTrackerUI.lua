@@ -411,31 +411,34 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
             knowledgeText:Hide()
         end
 
-        ----------------------------------------------------
-        -- One-Time Treasure Completion
-        ----------------------------------------------------
-        if expData.oneTimeCollectedAll ~= nil then
-            local treasureStatus = card:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-            treasureStatus:SetPoint("TOPLEFT", skillText, "BOTTOMLEFT", 0, -25)
+        -- Create once (if not already created)
+        if not card.treasureStatus then
+            card.treasureStatus = card:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+            card.treasureStatus:SetPoint("TOPLEFT", skillText, "BOTTOMLEFT", 0, -25)
 
-            local tex = expData.oneTimeCollectedAll
-                and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t"
-                or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
-
-            treasureStatus:SetText(string.format("%s One-Time Treasures", tex))
-
-            -- NEW: show a button (only if missing) that opens a dedicated window
-            if not expData.oneTimeCollectedAll and expData.missingOneTimeTreasures and #expData.missingOneTimeTreasures > 0 then
-                local openBtn = CreateFrame("Button", nil, card, "UIPanelButtonTemplate")
-                openBtn:SetSize(110, 20)
-                openBtn:SetPoint("LEFT", treasureStatus, "RIGHT", 8, 0)
-                openBtn:SetText("Show Missing")
-                openBtn:SetScript("OnClick", function()
-                    ProfessionTrackerUI:ShowMissingTreasureWindow(expData.missingOneTimeTreasures, profName, expName)
-                end)
-            end
-
+            card.openTreasureBtn = CreateFrame("Button", nil, card, "UIPanelButtonTemplate")
+            card.openTreasureBtn:SetSize(110, 20)
+            card.openTreasureBtn:SetPoint("LEFT", card.treasureStatus, "RIGHT", 8, 0)
+            card.openTreasureBtn:SetText("Show Missing")
         end
+
+        -- Update text
+        local tex = expData.oneTimeCollectedAll
+            and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t"
+            or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
+
+        card.treasureStatus:SetText(string.format("%s One-Time Treasures", tex))
+
+        -- Button visibility
+        if not expData.oneTimeCollectedAll and expData.missingOneTimeTreasures and #expData.missingOneTimeTreasures > 0 then
+            card.openTreasureBtn:Show()
+            card.openTreasureBtn:SetScript("OnClick", function()
+                ProfessionTrackerUI:ShowMissingTreasureWindow(expData.missingOneTimeTreasures, profName, expName)
+            end)
+        else
+            card.openTreasureBtn:Hide()
+        end
+
     end
 
 
