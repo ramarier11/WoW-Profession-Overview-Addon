@@ -967,7 +967,6 @@ local function RecalculateOneTimeTreasures(charKey)
                     KPReference[profID] and
                     KPReference[profID][expIndex] and
                     KPReference[profID][expIndex].oneTime
-                if expIndex < 10 then return end
                 if hasRef then
                     local ref = KPReference[profID][expIndex].oneTime.treasures
                     local missing = {}
