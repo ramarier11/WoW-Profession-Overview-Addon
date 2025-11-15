@@ -938,7 +938,6 @@ local function RecalculateOneTimeTreasures(charKey)
     -- Build name → professionID lookup
     local profNameToID = {}
     for _, p in ipairs(ProfessionData) do
-        print(p.name .. " - " .. p.id)
         profNameToID[p.name] = p.id
     end
 
@@ -947,7 +946,7 @@ local function RecalculateOneTimeTreasures(charKey)
 
         -- Try direct lookup
         local profID = profNameToID[profName]
-
+        print(profID)
         -- If not found, try to deduce from existing expansions
         if not profID and profData.expansions then
             for _, exp in pairs(profData.expansions) do
