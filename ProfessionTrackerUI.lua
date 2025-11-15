@@ -547,7 +547,60 @@ local function CreateExpansionDisplay(parent, profData, expansionName, expansion
             missingText:SetText(string.format("📚 %d KP remaining to collect", missing))
         end
     end
-    
+    ----------------------------------------------------
+    -- One-Time Treasure Completion
+    ----------------------------------------------------
+    if expansionData.oneTimeCollectedAll ~= nil then
+        local treasureStatus = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+        treasureStatus:SetPoint("TOPLEFT", skillText, "BOTTOMLEFT", 0, -25)
+
+        local tex = expansionData.oneTimeCollectedAll
+            and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t"
+            or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
+
+        treasureStatus:SetText(string.format("%s One-Time Treasures", tex))
+
+        -- If any treasures are missing, display collapsible list
+        if not expansionData.oneTimeCollectedAll and expansionData.missingOneTimeTreasures then
+            local toggleButton = CreateFrame("Button", nil, frame)
+            toggleButton:SetPoint("LEFT", treasureStatus, "RIGHT", 10, 0)
+            toggleButton:SetSize(16, 16)
+            toggleButton:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-Up")
+            toggleButton:SetPushedTexture("Interface\\Buttons\\UI-PlusButton-Down")
+
+            local listShown = false
+            local listFrame = CreateFrame("Frame", nil, frame)
+            listFrame:SetPoint("TOPLEFT", treasureStatus, "BOTTOMLEFT", 10, -5)
+            listFrame:Hide()
+
+            local y = 0
+            for _, t in ipairs(expansionData.missingOneTimeTreasures) do
+                local line = listFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+                line:SetPoint("TOPLEFT", 0, -y)
+                line:SetText(string.format(
+                    "- %s (%.1f, %.1f)",
+                    t.name or "Unknown",
+                    t.x or 0,
+                    t.y or 0
+                ))
+                y = y + 15
+            end
+            listFrame:SetHeight(y)
+            listFrame:SetWidth(300)
+
+            toggleButton:SetScript("OnClick", function()
+                listShown = not listShown
+                if listShown then
+                    toggleButton:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up")
+                    listFrame:Show()
+                else
+                    toggleButton:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-Up")
+                    listFrame:Hide()
+                end
+            end)
+        end
+    end
+
     
     return frame
 end
