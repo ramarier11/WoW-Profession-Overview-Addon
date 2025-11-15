@@ -416,15 +416,61 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
 
         card.treasureStatus:SetText(string.format("%s One-Time Treasures", tex))
 
-        -- Button visibility
-        if not expData.oneTimeCollectedAll and expData.missingOneTimeTreasures and #expData.missingOneTimeTreasures > 0 then
-            card.openTreasureBtn:Show()
-            card.openTreasureBtn:SetScript("OnClick", function()
-                ProfessionTrackerUI:ShowMissingTreasureWindow(expData.missingOneTimeTreasures, profName, expName)
-            end)
-        else
-            card.openTreasureBtn:Hide()
+        -- Ensure we have a profName -> profID lookup (create once per card)
+        if not card._profNameToID then
+            card._profNameToID = {}
+            for _, p in ipairs(ProfessionData) do
+                card._profNameToID[p.name] = p.id
+            end
         end
+
+        local profID = card._profNameToID[profName]
+        local expIndex = expData and expData.id
+
+        -- Determine whether this expansion actually has one-time treasures in KPReference
+        local hasOneTimeRef = false
+        if profID and expIndex and KPReference[profID] and KPReference[profID][expIndex] and KPReference[profID][expIndex].oneTime then
+            local oneTime = KPReference[profID][expIndex].oneTime
+            -- Guard: some of your KPReference entries use .treasures nested
+            if (type(oneTime) == "table" and (oneTime.treasures or next(oneTime))) then
+                hasOneTimeRef = true
+            end
+        end
+
+        -- Create persistent widgets if not present (created once)
+        if not card.treasureStatus then
+            card.treasureStatus = card:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+            card.treasureStatus:SetPoint("TOPLEFT", skillText, "BOTTOMLEFT", 0, -25)
+
+            card.openTreasureBtn = CreateFrame("Button", nil, card, "UIPanelButtonTemplate")
+            card.openTreasureBtn:SetSize(110, 20)
+            card.openTreasureBtn:SetPoint("LEFT", card.treasureStatus, "RIGHT", 8, 0)
+            card.openTreasureBtn:SetText("Show Missing")
+        end
+
+        -- If expansion doesn't have any one-time treasures defined, hide both widgets entirely
+        if not hasOneTimeRef then
+            card.treasureStatus:Hide()
+            card.openTreasureBtn:Hide()
+        else
+            -- There is a one-time reference — update the text and button visibility according to data
+            local tex = expData.oneTimeCollectedAll
+                and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t"
+                or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
+
+            card.treasureStatus:SetText(string.format("%s One-Time Treasures", tex))
+            card.treasureStatus:Show()
+
+            if not expData.oneTimeCollectedAll and expData.missingOneTimeTreasures and #expData.missingOneTimeTreasures > 0 then
+                card.openTreasureBtn:Show()
+                card.openTreasureBtn:SetScript("OnClick", function()
+                    ProfessionTrackerUI:ShowMissingTreasureWindow(expData.missingOneTimeTreasures, profName, expName)
+                end)
+            else
+                card.openTreasureBtn:Hide()
+            end
+        end
+
 
     end
 
