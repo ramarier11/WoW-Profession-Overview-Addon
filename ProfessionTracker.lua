@@ -885,10 +885,10 @@ end
 -- Check One-Time Treasures for a Character's Profession
 -- ============================================================
 local function EvaluateOneTimeTreasures(charKey, profID, expIndex)
-    print("One Time Treasure - running")
+    
     local charData = ProfessionTrackerDB.characters[charKey]
     if not charData or not charData.professions then return end
-
+    print("One Time Treasure - running")
     local profData = charData.professions[profID]
     if not profData then return end
 
