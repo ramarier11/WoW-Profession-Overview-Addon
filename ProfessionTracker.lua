@@ -1203,7 +1203,14 @@ ProfessionTracker:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
 ProfessionTracker:RegisterEvent("PLAYER_LOGIN")
 ProfessionTracker:RegisterEvent("BAG_UPDATE_DELAYED")
 
+-- Throttle to prevent repeated refreshes within the same second
+local lastRefresh = 0
 ProfessionTracker:SetScript("OnEvent", function(self, event, ...)
+    local now = GetTime()
+
+    -- Only refresh once per second to avoid UI spam
+    if now - lastRefresh < 1 then return end
+    lastRefresh = now
 
     -- Run DB update
     if  event == "TRADE_SKILL_SHOW" or
@@ -1211,9 +1218,20 @@ ProfessionTracker:SetScript("OnEvent", function(self, event, ...)
         event == "SKILL_LINES_CHANGED" or
         event == "BAG_UPDATE_DELAYED" or
         event == "TRADE_SKILL_LIST_UPDATE" then
-
+        if UpdateCharacterProfessionData then
             UpdateCharacterProfessionData()
-        
+        elseif ProfessionTracker and ProfessionTracker.UpdateCharacterProfessionData then
+            ProfessionTracker:UpdateCharacterProfessionData()
+        end
+
+        -- Notify UI to refresh if it's open
+        if ProfessionTrackerUI and ProfessionTrackerUI.RedrawCharacterDetail then
+            ProfessionTrackerUI:RedrawCharacterDetail()
+        end
+                -- Close the missing treasure window to prevent stale data
+        if ProfessionTrackerUI and ProfessionTrackerUI.missingTreasureWindow then
+            ProfessionTrackerUI.missingTreasureWindow:Hide()
+        end
     end
 end)
 
