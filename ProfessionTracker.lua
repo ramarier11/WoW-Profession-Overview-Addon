@@ -1041,7 +1041,7 @@ local function UpdateCharacterProfessionData()
         if profIndex then -- checks if profIndex exists (always true if you have a profession)
             local name, _, skillLevel, maxSkillLevel = GetProfessionInfo(profIndex) -- sets local vars equal to associated data
             if name then -- always true
-                
+                print(profIndex)
 
                 -- Exclude secondary professions for now
                 local excludedProfs = {
