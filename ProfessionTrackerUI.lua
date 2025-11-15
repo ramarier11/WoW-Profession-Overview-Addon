@@ -215,6 +215,59 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
             knowledgeText:Hide()
         end
     end
+        ----------------------------------------------------
+    -- One-Time Treasure Completion
+    ----------------------------------------------------
+    if expansionData.oneTimeCollectedAll ~= nil then
+        local treasureStatus = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+        treasureStatus:SetPoint("TOPLEFT", skillText, "BOTTOMLEFT", 0, -25)
+
+        local tex = expansionData.oneTimeCollectedAll
+            and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t"
+            or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
+
+        treasureStatus:SetText(string.format("%s One-Time Treasures", tex))
+
+        -- If any treasures are missing, display collapsible list
+        if not expansionData.oneTimeCollectedAll and expansionData.missingOneTimeTreasures then
+            local toggleButton = CreateFrame("Button", nil, frame)
+            toggleButton:SetPoint("LEFT", treasureStatus, "RIGHT", 10, 0)
+            toggleButton:SetSize(16, 16)
+            toggleButton:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-Up")
+            toggleButton:SetPushedTexture("Interface\\Buttons\\UI-PlusButton-Down")
+
+            local listShown = false
+            local listFrame = CreateFrame("Frame", nil, frame)
+            listFrame:SetPoint("TOPLEFT", treasureStatus, "BOTTOMLEFT", 10, -5)
+            listFrame:Hide()
+
+            local y = 0
+            for _, t in ipairs(expansionData.missingOneTimeTreasures) do
+                local line = listFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+                line:SetPoint("TOPLEFT", 0, -y)
+                line:SetText(string.format(
+                    "- %s (%.1f, %.1f)",
+                    t.name or "Unknown",
+                    t.x or 0,
+                    t.y or 0
+                ))
+                y = y + 15
+            end
+            listFrame:SetHeight(y)
+            listFrame:SetWidth(300)
+
+            toggleButton:SetScript("OnClick", function()
+                listShown = not listShown
+                if listShown then
+                    toggleButton:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up")
+                    listFrame:Show()
+                else
+                    toggleButton:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-Up")
+                    listFrame:Hide()
+                end
+            end)
+        end
+    end
 
     ----------------------------------------------------
     -- Arrow Logic (with Looping)
@@ -507,103 +560,51 @@ end
 
 
 
-local function CreateExpansionDisplay(parent, profData, expansionName, expansionData, yOffset)
-    local frame = CreateFrame("Frame", nil, parent)
-    frame:SetSize(440, 120)
-    frame:SetPoint("TOP", 0, yOffset)
+-- local function CreateExpansionDisplay(parent, profData, expansionName, expansionData, yOffset)
+--     local frame = CreateFrame("Frame", nil, parent)
+--     frame:SetSize(440, 120)
+--     frame:SetPoint("TOP", 0, yOffset)
     
-    -- Background
-    frame.bg = frame:CreateTexture(nil, "BACKGROUND")
-    frame.bg:SetAllPoints()
-    frame.bg:SetColorTexture(0.15, 0.15, 0.15, 0.5)
+--     -- Background
+--     frame.bg = frame:CreateTexture(nil, "BACKGROUND")
+--     frame.bg:SetAllPoints()
+--     frame.bg:SetColorTexture(0.15, 0.15, 0.15, 0.5)
     
-    -- Expansion Name
-    local titleText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    titleText:SetPoint("TOPLEFT", 10, -10)
-    titleText:SetText(expansionName)
+--     -- Expansion Name
+--     local titleText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+--     titleText:SetPoint("TOPLEFT", 10, -10)
+--     titleText:SetText(expansionName)
     
-    -- Skill Level
-    local skillText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    skillText:SetPoint("TOPLEFT", titleText, "BOTTOMLEFT", 0, -5)
+--     -- Skill Level
+--     local skillText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+--     skillText:SetPoint("TOPLEFT", titleText, "BOTTOMLEFT", 0, -5)
     
-    local skillColor = (expansionData.skillLevel == expansionData.maxSkillLevel) and {0, 1, 0} or {1, 0.5, 0}
-    skillText:SetTextColor(unpack(skillColor))
-    skillText:SetText(string.format("Skill: %d / %d", expansionData.skillLevel or 0, expansionData.maxSkillLevel or 0))
+--     local skillColor = (expansionData.skillLevel == expansionData.maxSkillLevel) and {0, 1, 0} or {1, 0.5, 0}
+--     skillText:SetTextColor(unpack(skillColor))
+--     skillText:SetText(string.format("Skill: %d / %d", expansionData.skillLevel or 0, expansionData.maxSkillLevel or 0))
     
-    -- Knowledge Points (if exists)
-    if expansionData.knowledgePoints or expansionData.pointsUntilMaxKnowledge then
-        local knowledgeText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        knowledgeText:SetPoint("TOPLEFT", skillText, "BOTTOMLEFT", 0, -5)
-        knowledgeText:SetTextColor(0.3, 0.7, 1)
-        -- knowledgeText:SetText(string.format("Knowledge: %d, 
-        --     (expansionData.knowledgePoints or 0)
-        --))
+--     -- Knowledge Points (if exists)
+--     if expansionData.knowledgePoints or expansionData.pointsUntilMaxKnowledge then
+--         local knowledgeText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+--         knowledgeText:SetPoint("TOPLEFT", skillText, "BOTTOMLEFT", 0, -5)
+--         knowledgeText:SetTextColor(0.3, 0.7, 1)
+--         -- knowledgeText:SetText(string.format("Knowledge: %d, 
+--         --     (expansionData.knowledgePoints or 0)
+--         --))
     
-        local missing = expansionData.pointsUntilMaxKnowledge or 0
-        if missing > 0 then
-            local missingText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-            missingText:SetPoint("TOPLEFT", knowledgeText, "BOTTOMLEFT", 0, -3)
-            missingText:SetTextColor(1, 0.2, 0.2)
-            missingText:SetText(string.format("📚 %d KP remaining to collect", missing))
-        end
-    end
-    ----------------------------------------------------
-    -- One-Time Treasure Completion
-    ----------------------------------------------------
-    if expansionData.oneTimeCollectedAll ~= nil then
-        local treasureStatus = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        treasureStatus:SetPoint("TOPLEFT", skillText, "BOTTOMLEFT", 0, -25)
+--         local missing = expansionData.pointsUntilMaxKnowledge or 0
+--         if missing > 0 then
+--             local missingText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+--             missingText:SetPoint("TOPLEFT", knowledgeText, "BOTTOMLEFT", 0, -3)
+--             missingText:SetTextColor(1, 0.2, 0.2)
+--             missingText:SetText(string.format("📚 %d KP remaining to collect", missing))
+--         end
+--     end
 
-        local tex = expansionData.oneTimeCollectedAll
-            and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t"
-            or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
-
-        treasureStatus:SetText(string.format("%s One-Time Treasures", tex))
-
-        -- If any treasures are missing, display collapsible list
-        if not expansionData.oneTimeCollectedAll and expansionData.missingOneTimeTreasures then
-            local toggleButton = CreateFrame("Button", nil, frame)
-            toggleButton:SetPoint("LEFT", treasureStatus, "RIGHT", 10, 0)
-            toggleButton:SetSize(16, 16)
-            toggleButton:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-Up")
-            toggleButton:SetPushedTexture("Interface\\Buttons\\UI-PlusButton-Down")
-
-            local listShown = false
-            local listFrame = CreateFrame("Frame", nil, frame)
-            listFrame:SetPoint("TOPLEFT", treasureStatus, "BOTTOMLEFT", 10, -5)
-            listFrame:Hide()
-
-            local y = 0
-            for _, t in ipairs(expansionData.missingOneTimeTreasures) do
-                local line = listFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-                line:SetPoint("TOPLEFT", 0, -y)
-                line:SetText(string.format(
-                    "- %s (%.1f, %.1f)",
-                    t.name or "Unknown",
-                    t.x or 0,
-                    t.y or 0
-                ))
-                y = y + 15
-            end
-            listFrame:SetHeight(y)
-            listFrame:SetWidth(300)
-
-            toggleButton:SetScript("OnClick", function()
-                listShown = not listShown
-                if listShown then
-                    toggleButton:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up")
-                    listFrame:Show()
-                else
-                    toggleButton:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-Up")
-                    listFrame:Hide()
-                end
-            end)
-        end
-    end
 
     
-    return frame
-end
+--     return frame
+-- end
 
 --------------------------------------------------------
 -- Dashboard View
