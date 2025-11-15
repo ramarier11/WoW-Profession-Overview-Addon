@@ -1201,7 +1201,7 @@ ProfessionTracker:RegisterEvent("TRADE_SKILL_LIST_UPDATE")
 ProfessionTracker:RegisterEvent("LEARNED_SPELL_IN_SKILL_LINE")
 ProfessionTracker:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
 ProfessionTracker:RegisterEvent("PLAYER_LOGIN")
-ProfessionTracker:RegisterEvent("QUEST_LOG_UPDATE")
+ProfessionTracker:RegisterEvent("BAG_UPDATE_DELAYED")
 
 ProfessionTracker:SetScript("OnEvent", function(self, event, ...)
     if event == "PLAYER_LOGIN" then
@@ -1211,7 +1211,7 @@ ProfessionTracker:SetScript("OnEvent", function(self, event, ...)
         end)
     elseif event == "TRADE_SKILL_SHOW" or
            event == "SKILL_LINES_CHANGED" or
-           event == "QUEST_LOG_UPDATE" or
+           event == "BAG_UPDATE_DELAYED" or
            event == "TRADE_SKILL_LIST_UPDATE" then
 
         -- Update data on profession-related events
