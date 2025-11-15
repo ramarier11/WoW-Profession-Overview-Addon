@@ -1432,7 +1432,7 @@ ProfessionTracker:SetScript("OnEvent", function(self, event, ...)
         end
                 -- Close the missing treasure window to prevent stale data
         if ProfessionTrackerUI and ProfessionTrackerUI.missingTreasureWindow then
-            C_Timer.After(0.1, function()
+            C_Timer.After(1.0, function()
                 ProfessionTrackerUI:RefreshMissingTreasureWindow()
             end)
         end
