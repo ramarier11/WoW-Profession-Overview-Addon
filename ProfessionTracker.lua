@@ -631,7 +631,7 @@ KPReference = {
                     label = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
-                        { mapID = 2339, x = 60.6, y = 29.2, name = "Dornogal Gardening Scythe", questID = 83875 },
+                        { mapID = 2339, x = 59.1, y = 23.7, name = "Dornogal Gardening Scythe", questID = 83875 },
                         { mapID = 2248, x = 57.5, y = 61.5, name = "Ancient Flower", questID = 83874 },
                         { mapID = 2214, x = 52.8, y = 65.8, name = "Fungarian Slicer's Knife", questID = 83877 },
                         { mapID = 2214, x = 48.3, y = 34.9, name = "Earthen Digging Fork", questID = 83876 },

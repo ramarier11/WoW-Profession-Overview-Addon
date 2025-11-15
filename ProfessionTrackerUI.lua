@@ -513,12 +513,55 @@ local function GetCharacterKey()
     return string.format("%s-%s", name, realm)
 end
 
+-- function ProfessionTrackerUI:RefreshMissingTreasureWindow()
+--     local win = self.missingTreasureWindow
+--     if not win or not win:IsShown() then return end
+--     if not win.profName or not win.expName then return end
+
+--     local charKey = ProfessionTracker.UI.currentCharacterKey
+--     local charData = ProfessionTrackerDB.characters[charKey]
+--     if not charData then return end
+
+--     local profData = charData.professions[win.profName]
+--     if not profData then
+--         win:Hide()
+--         return
+--     end
+
+--     local expData = profData.expansions[win.expName]
+--     if not expData then
+--         win:Hide()
+--         return
+--     end
+
+--     -- If all treasures collected, close the window
+--     if expData.oneTimeCollectedAll then
+--         win:Hide()
+--         return
+--     end
+
+--     -- Rebuild using the updated missing treasures list
+--     local missing = expData.missingOneTimeTreasures or {}
+--     self:ShowMissingTreasureWindow(missing, win.profName, win.expName)
+-- end
 function ProfessionTrackerUI:RefreshMissingTreasureWindow()
     local win = self.missingTreasureWindow
     if not win or not win:IsShown() then return end
     if not win.profName or not win.expName then return end
 
-    local charKey = ProfessionTracker.UI.currentCharacterKey
+    -- Get current character key properly
+    local function GetCharacterKey()
+        local name, realm = UnitFullName("player")
+        if not realm or realm == "" then
+            realm = GetRealmName() or "UnknownRealm"
+        end
+        if not name then
+            name = UnitName("player") or "UnknownPlayer"
+        end
+        return string.format("%s-%s", name, realm)
+    end
+    
+    local charKey = GetCharacterKey()
     local charData = ProfessionTrackerDB.characters[charKey]
     if not charData then return end
 
