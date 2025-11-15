@@ -1209,6 +1209,7 @@ ProfessionTracker:SetScript("OnEvent", function(self, event, ...)
             UpdateCharacterProfessionData()
         end)
     elseif event == "TRADE_SKILL_SHOW" or
+           event == "SKILL_LINES_CHANGED" or
            event == "TRADE_SKILL_LIST_UPDATE" then
 
         -- Update data on profession-related events
