@@ -545,16 +545,8 @@ end
 --     self:ShowMissingTreasureWindow(missing, win.profName, win.expName)
 -- end
 function ProfessionTrackerUI:RefreshMissingTreasureWindow()
-    print("|cffff00ff[DEBUG]|r RefreshMissingTreasureWindow called")
     
     local win = self.missingTreasureWindow
-    if not win or not win:IsShown() then 
-        print("|cffff00ff[DEBUG]|r Window not shown or doesn't exist")
-        return 
-    end
-    
-    print("|cffff00ff[DEBUG]|r Window is shown")
-    print("|cffff00ff[DEBUG]|r profName:", win.profName, "expName:", win.expName)
     
     if not win.profName or not win.expName then return end
 
@@ -571,41 +563,33 @@ function ProfessionTrackerUI:RefreshMissingTreasureWindow()
     end
     
     local charKey = GetCharacterKey()
-    print("|cffff00ff[DEBUG]|r charKey:", charKey)
     
     local charData = ProfessionTrackerDB.characters[charKey]
     if not charData then 
-        print("|cffff00ff[DEBUG]|r No character data")
         return 
     end
 
     local profData = charData.professions[win.profName]
     if not profData then
-        print("|cffff00ff[DEBUG]|r No profession data")
         win:Hide()
         return
     end
 
     local expData = profData.expansions[win.expName]
     if not expData then
-        print("|cffff00ff[DEBUG]|r No expansion data")
         win:Hide()
         return
     end
 
-    print("|cffff00ff[DEBUG]|r oneTimeCollectedAll:", expData.oneTimeCollectedAll)
-    print("|cffff00ff[DEBUG]|r Missing count:", expData.missingOneTimeTreasures and #expData.missingOneTimeTreasures or 0)
 
     -- If all treasures collected, close the window
     if expData.oneTimeCollectedAll then
-        print("|cffff00ff[DEBUG]|r All collected, hiding window")
         win:Hide()
         return
     end
 
     -- Rebuild using the updated missing treasures list
     local missing = expData.missingOneTimeTreasures or {}
-    print("|cffff00ff[DEBUG]|r Calling ShowMissingTreasureWindow with", #missing, "items")
     self:ShowMissingTreasureWindow(missing, win.profName, win.expName)
 end
 
