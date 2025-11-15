@@ -946,7 +946,7 @@ local function RecalculateOneTimeTreasures(charKey)
 
         -- Try direct lookup
         local profID = profNameToID[profName]
-        print(profID)
+
         -- If not found, try to deduce from existing expansions
         if not profID and profData.expansions then
             for _, exp in pairs(profData.expansions) do
@@ -960,8 +960,9 @@ local function RecalculateOneTimeTreasures(charKey)
         if profID then
             -- Now process each expansion under this profession
             for expName, expData in pairs(profData.expansions or {}) do
+                print(expName)
                 local expIndex = expData and expData.id
-
+                print(expIndex)
                 local hasRef =
                     expIndex and
                     KPReference[profID] and
