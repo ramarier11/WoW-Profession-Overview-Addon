@@ -1432,13 +1432,13 @@ ProfessionTracker:SetScript("OnEvent", function(self, event, ...)
         print("|cffff00ff[DEBUG]|r missingTreasureWindow exists?", ProfessionTrackerUI and ProfessionTrackerUI.missingTreasureWindow ~= nil or false)
         print("|cffff00ff[DEBUG]|r Window shown?", ProfessionTrackerUI and ProfessionTrackerUI.missingTreasureWindow and ProfessionTrackerUI.missingTreasureWindow:IsShown() or false)
         
-        if ProfessionTrackerUI and ProfessionTrackerUI.missingTreasureWindow then
-            print("|cffff00ff[DEBUG]|r Setting timer...")
+        -- Refresh the missing treasure window if it exists
+        if self.UI and self.UI.RefreshMissingTreasureWindow then
             C_Timer.After(1.0, function()
                 print("|cffff00ff[DEBUG]|r Timer fired, calling refresh")
-                ProfessionTrackerUI:RefreshMissingTreasureWindow()
+                self.UI:RefreshMissingTreasureWindow()
             end)
-        else
+        end
             print("|cffff00ff[DEBUG]|r Condition failed, not setting timer")
         end
     end
