@@ -962,7 +962,7 @@ local function RecalculateOneTimeTreasures(charKey)
             for expName, expData in pairs(profData.expansions or {}) do
 
                 local expIndex = expData and expData.id
-                print("prof id - " .. profID .. " exp index - " expIndex)
+                print("prof id - " .. profID .. " exp index - " .. expIndex)
                 local hasRef =
                     expIndex and
                     KPReference[profID] and
