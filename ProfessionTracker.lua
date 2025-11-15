@@ -1203,7 +1203,7 @@ ProfessionTracker:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
 ProfessionTracker:RegisterEvent("PLAYER_LOGIN")
 ProfessionTracker:RegisterEvent("BAG_UPDATE_DELAYED")
 
-ProfessionTracker:SetScript("OnEvent", function()
+ProfessionTracker:SetScript("OnEvent", function(self, event, ...)
 
     -- Run DB update
     if  event == "TRADE_SKILL_SHOW" or
