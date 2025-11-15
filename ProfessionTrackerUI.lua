@@ -112,7 +112,7 @@ end
 -- Usage: ProfessionTrackerUI:ShowMissingTreasureWindow(missingList, profName, expName)
 -- missingList = { {name=..., mapID=..., x=..., y=..., questID=...}, ... }
 -- ========================================================
-local function ShowMissingTreasureWindow(missingList, profName, expName)
+function ProfessionTrackerUI:ShowMissingTreasureWindow(missingList, profName, expName)
     if not missingList or #missingList == 0 then
         return
     end
@@ -413,7 +413,7 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
                 openBtn:SetPoint("LEFT", treasureStatus, "RIGHT", 8, 0)
                 openBtn:SetText("Show Missing")
                 openBtn:SetScript("OnClick", function()
-                    ShowMissingTreasureWindow(expData.missingOneTimeTreasures, profName, expName)
+                    ProfessionTrackerUI:ShowMissingTreasureWindow(expData.missingOneTimeTreasures, profName, expName)
                 end)
             end
 
