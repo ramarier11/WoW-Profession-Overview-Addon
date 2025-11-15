@@ -117,64 +117,89 @@ function ProfessionTrackerUI:RedrawCharacterDetail()
 end
 
 -- ========================================================
--- Opens a standalone window listing missing one-time treasures
--- Each entry is clickable and will attempt to place a map waypoint
--- Usage: ProfessionTrackerUI:ShowMissingTreasureWindow(missingList, profName, expName)
--- missingList = { {name=..., mapID=..., x=..., y=..., questID=...}, ... }
+-- Opens or refreshes the standalone window showing missing one-time treasures
+-- Automatically updates when treasure progress changes
 -- ========================================================
 function ProfessionTrackerUI:ShowMissingTreasureWindow(missingList, profName, expName)
     if not missingList or #missingList == 0 then
+        if self.missingTreasureWindow then
+            self.missingTreasureWindow:Hide()
+        end
         return
     end
 
-    -- If a window already exists, reuse it (clear contents)
-    if self.missingTreasureWindow and self.missingTreasureWindow:IsShown() then
-        self.missingTreasureWindow:Hide()
-    end
+    -- Create the window if it doesn't exist
+    local win = self.missingTreasureWindow
+    if not win then
+        win = CreateFrame("Frame", "ProfTracker_MissingTreasureWindow", UIParent, "BackdropTemplate")
+        win:SetSize(360, 220)
+        win:SetPoint("CENTER")
+        win:SetBackdrop({
+            bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+            edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+            tile = true, tileSize = 16, edgeSize = 16,
+            insets = { left = 6, right = 6, top = 6, bottom = 6 }
+        })
+        win:SetBackdropColor(0, 0, 0, 0.9)
+        win:EnableMouse(true)
+        win:SetMovable(true)
+        win:RegisterForDrag("LeftButton")
+        win:SetScript("OnDragStart", win.StartMoving)
+        win:SetScript("OnDragStop", win.StopMovingOrSizing)
 
-    local win = CreateFrame("Frame", "ProfTracker_MissingTreasureWindow", UIParent, "BackdropTemplate")
-    win:SetSize(360, 220)
-    win:SetPoint("CENTER")
-    win:SetBackdrop({
-        bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-        edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-        tile = true, tileSize = 16, edgeSize = 16,
-        insets = { left = 6, right = 6, top = 6, bottom = 6 }
-    })
-    win:SetBackdropColor(0, 0, 0, 0.9)
-    win:EnableMouse(true)
-    win:SetMovable(true)
-    win:RegisterForDrag("LeftButton")
-    win:SetScript("OnDragStart", win.StartMoving)
-    win:SetScript("OnDragStop", win.StopMovingOrSizing)
+        -- Title
+        win.title = win:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
+        win.title:SetPoint("TOP", 0, -8)
 
-    -- Title
-    win.title = win:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
-    win.title:SetPoint("TOP", 0, -8)
-    win.title:SetText(string.format("%s — Missing Treasures", profName or "Profession"))
-
-    -- Subtitle (expansion name)
-    if expName then
+        -- Subtitle
         win.sub = win:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
         win.sub:SetPoint("TOP", win.title, "BOTTOM", 0, -2)
-        win.sub:SetText(expName)
+
+        -- Close button (top right)
+        local close = CreateFrame("Button", nil, win, "UIPanelCloseButton")
+        close:SetPoint("TOPRIGHT", -6, -6)
+        close:SetScript("OnClick", function() win:Hide() end)
+
+        -- Scrollframe
+        win.scroll = CreateFrame("ScrollFrame", nil, win, "UIPanelScrollFrameTemplate")
+        win.scroll:SetPoint("TOPLEFT", 12, -48)
+        win.scroll:SetPoint("BOTTOMRIGHT", -12, 40)
+
+        win.content = CreateFrame("Frame", nil, win.scroll)
+        win.content:SetSize(320, 1)
+        win.scroll:SetScrollChild(win.content)
+
+        -- Clear waypoint button
+        win.clearBtn = CreateFrame("Button", nil, win, "UIPanelButtonTemplate")
+        win.clearBtn:SetSize(120, 20)
+        win.clearBtn:SetPoint("BOTTOMLEFT", 12, 8)
+        win.clearBtn:SetText("Clear Waypoint")
+        win.clearBtn:SetScript("OnClick", function()
+            if C_Map and C_Map.ClearUserWaypoint then
+                C_Map.ClearUserWaypoint()
+            end
+        end)
+
+        -- Close window button
+        win.closeBtn = CreateFrame("Button", nil, win, "UIPanelButtonTemplate")
+        win.closeBtn:SetSize(120, 20)
+        win.closeBtn:SetPoint("BOTTOMRIGHT", -12, 8)
+        win.closeBtn:SetText("Close")
+        win.closeBtn:SetScript("OnClick", function() win:Hide() end)
+
+        self.missingTreasureWindow = win
     end
 
-    -- Close button
-    local close = CreateFrame("Button", nil, win, "UIPanelCloseButton")
-    close:SetPoint("TOPRIGHT", -6, -6)
-    close:SetScript("OnClick", function() win:Hide() end)
+    -- Store state for auto-refresh logic
+    win.profName = profName
+    win.expName = expName
+    win.isActive = true
 
-    -- Scrollframe for list
-    local scroll = CreateFrame("ScrollFrame", nil, win, "UIPanelScrollFrameTemplate")
-    scroll:SetPoint("TOPLEFT", 12, -48)
-    scroll:SetPoint("BOTTOMRIGHT", -12, 40)
+    -- Update title/subtitle
+    win.title:SetText(string.format("%s — Missing Treasures", profName or "Profession"))
+    win.sub:SetText(expName or "")
 
-    local content = CreateFrame("Frame", nil, scroll)
-    content:SetSize(320, 1)
-    scroll:SetScrollChild(content)
-
-    -- Helper: attempt to place a waypoint (works on retail if API exists)
+    -- Helper: Attempt to place a waypoint
     local function PlaceWaypoint(mapID, x, y)
         mapID = tonumber(mapID)
         x = tonumber(x)
@@ -185,121 +210,83 @@ function ProfessionTrackerUI:ShowMissingTreasureWindow(missingList, profName, ex
             return
         end
 
-        -- Convert % coords → normalized 0-1
-        local nx = x / 100
-        local ny = y / 100
+        local nx, ny = x / 100, y / 100
 
-        -- Retail API check
         if C_Map and C_Map.CanSetUserWaypointOnMap and C_Map.SetUserWaypoint then
             if C_Map.CanSetUserWaypointOnMap(mapID) then
 
-                -- Create a UiMapPoint at the treasure's location
                 local point = UiMapPoint.CreateFromCoordinates(mapID, nx, ny)
 
-                -- Clear previous waypoint if API exists
                 if C_Map.ClearUserWaypoint then
                     C_Map.ClearUserWaypoint()
                 end
 
-                local success = pcall(function()
+                local ok = pcall(function()
                     C_Map.SetUserWaypoint(point)
                 end)
 
-                if success then
-                    print(string.format(
-                        "|cff00ff00[Profession Tracker]|r Waypoint set: (%.1f, %.1f) on map %d",
-                        x, y, mapID
-                    ))
-
-                    -- Open world map if closed
+                if ok then
+                    print(string.format("|cff00ff00[Profession Tracker]|r Waypoint set: (%.1f, %.1f) on map %d", x, y, mapID))
                     if WorldMapFrame and not WorldMapFrame:IsShown() then
                         ToggleWorldMap()
                     end
-
-                    -- Try to focus map on correct zone
                     if WorldMapFrame and WorldMapFrame.SetMapID then
                         WorldMapFrame:SetMapID(mapID)
                     end
                 else
-                    print("|cffff0000[Profession Tracker]|r Failed to set waypoint (lua error).")
+                    print("|cffff0000[Profession Tracker]|r Failed to set waypoint.")
                 end
-
-
                 return
             else
                 print("|cffffaa00[Profession Tracker]|r Cannot set waypoint on this map.")
             end
         end
 
-        -- Fallback for older clients or failed API
-        print(string.format(
-            "|cffffaa00[Profession Tracker]|r Coordinates: %.1f, %.1f (mapID: %d)",
-            x, y, mapID
-        ))
+        print(string.format("|cffffaa00[Profession Tracker]|r Coordinates: %.1f, %.1f (map %d)", x, y, mapID))
     end
 
+    -- Clear old rows
+    local content = win.content
+    for _, child in ipairs({ content:GetChildren() }) do
+        child:Hide()
+        child:SetParent(nil)
+    end
 
-    -- Clear user waypoint button
-    local clearBtn = CreateFrame("Button", nil, win, "UIPanelButtonTemplate")
-    clearBtn:SetSize(120, 20)
-    clearBtn:SetPoint("BOTTOMLEFT", 12, 8)
-    clearBtn:SetText("Clear Waypoint")
-    clearBtn:SetScript("OnClick", function()
-        if C_Map and C_Map.ClearUserWaypoint then
-            C_Map.ClearUserWaypoint()
-        else
-            print("|cffffaa00[Profession Tracker]|r No API to clear waypoints; clear manually if using another addon.")
-        end
-    end)
-
-    -- Close button bottom
-    local closeBtn = CreateFrame("Button", nil, win, "UIPanelButtonTemplate")
-    closeBtn:SetSize(120, 20)
-    closeBtn:SetPoint("BOTTOMRIGHT", -12, 8)
-    closeBtn:SetText("Close")
-    closeBtn:SetScript("OnClick", function() win:Hide() end)
-
-    -- Populate the list with clickable entries
-    local y = 0
+    -- Populate rows
+    local yOffset = 0
     for i, t in ipairs(missingList) do
         local row = CreateFrame("Button", nil, content)
         row:SetSize(300, 18)
-        row:SetPoint("TOPLEFT", 0, -y)
+        row:SetPoint("TOPLEFT", 0, -yOffset)
 
         local label = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
         label:SetPoint("LEFT", 2, 0)
         label:SetJustifyH("LEFT")
         label:SetText(string.format("%d) %s (%.1f, %.1f)", i, t.name or "Unknown", t.x or 0, t.y or 0))
 
-        -- Tooltip on hover
         row:SetScript("OnEnter", function(self)
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
             GameTooltip:AddLine(t.name or "Unknown")
-            if t.mapID then GameTooltip:AddLine("Map ID: "..tostring(t.mapID)) end
-            if t.questID then GameTooltip:AddLine("QuestID: "..tostring(t.questID)) end
-            GameTooltip:AddLine("Click to place a waypoint.", 0.8, 0.8, 0.8)
+            if t.mapID then GameTooltip:AddLine("Map ID: " .. t.mapID) end
+            if t.questID then GameTooltip:AddLine("Quest ID: " .. t.questID) end
+            GameTooltip:AddLine("Click to place waypoint.", 0.8, 0.8, 0.8)
             GameTooltip:Show()
         end)
         row:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
-        -- Click behavior: place waypoint
         row:SetScript("OnClick", function()
             if t.mapID and t.x and t.y then
                 PlaceWaypoint(t.mapID, t.x, t.y)
-            else
-                print("|cffffaa00[Profession Tracker]|r Coordinates unavailable for this treasure.")
             end
         end)
 
-        y = y + 20
+        yOffset = yOffset + 20
     end
 
-    -- Adjust content height
-    content:SetHeight(math.max(y, 1))
-
-    self.missingTreasureWindow = win
+    content:SetHeight(math.max(yOffset, 1))
     win:Show()
 end
+
 
 
 -- ########################################################
@@ -478,6 +465,38 @@ local function GetCharacterKey()
         name = UnitName("player") or "UnknownPlayer"
     end
     return string.format("%s-%s", name, realm)
+end
+
+function ProfessionTrackerUI:RefreshMissingTreasureWindow()
+    local win = self.missingTreasureWindow
+    if not win or not win:IsShown() then return end
+    if not win.profName or not win.expName then return end
+
+    local charKey = ProfessionTracker.UI.currentCharacterKey
+    local charData = ProfessionTrackerDB.characters[charKey]
+    if not charData then return end
+
+    local profData = charData.professions[win.profName]
+    if not profData then
+        win:Hide()
+        return
+    end
+
+    local expData = profData.expansions[win.expName]
+    if not expData then
+        win:Hide()
+        return
+    end
+
+    -- If all treasures collected, close the window
+    if expData.oneTimeCollectedAll then
+        win:Hide()
+        return
+    end
+
+    -- Rebuild using the updated missing treasures list
+    local missing = expData.missingOneTimeTreasures or {}
+    self:ShowMissingTreasureWindow(missing, win.profName, win.expName)
 end
 
 --------------------------------------------------------
