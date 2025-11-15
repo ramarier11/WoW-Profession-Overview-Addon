@@ -1412,8 +1412,7 @@ ProfessionTracker:RegisterEvent("QUEST_TURNED_IN")
 
 
 ProfessionTracker:SetScript("OnEvent", function(self, event, ...)
-
-
+    print("|cffff00ff[DEBUG]|r Event fired:", event)
     -- Run DB update
     if  event == "TRADE_SKILL_SHOW" or
         event == "PLAYER_LOGIN" or
