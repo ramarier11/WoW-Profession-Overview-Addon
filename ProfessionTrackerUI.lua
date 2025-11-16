@@ -547,7 +547,7 @@ end
 function ProfessionTrackerUI:RefreshMissingTreasureWindow()
     
     local win = self.missingTreasureWindow
-    
+    if not win or not win:IsShown() then return end
     if not win.profName or not win.expName then return end
 
     -- Get current character key properly
