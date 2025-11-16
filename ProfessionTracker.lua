@@ -1092,7 +1092,7 @@ end
 -- ========================================================
 -- Data Initialization & Update
 -- ========================================================
-
+-- Depracated Update -- Saving for future reference
 -- local function UpdateCharacterProfessionData()
 --     if not ProfessionTrackerDB then
 --         ProfessionTrackerDB = {
@@ -1289,6 +1289,16 @@ local function UpdateCharacterProfessionData()
                                     treasures = false,
                                     craftingOrderQuest = false,
                                 }
+                                -- Get concentration currency info
+                                local concentrationCurrencyID = C_TradeSkillUI.GetConcentrationCurrencyID and C_TradeSkillUI.GetConcentrationCurrencyID(exp.skillLineID)
+                                if concentrationCurrencyID then
+                                    local currencyInfo = C_CurrencyInfo.GetCurrencyInfo(concentrationCurrencyID)
+                                    if currencyInfo then
+                                        expData.concentration = currencyInfo.quantity or 0
+                                        expData.maxConcentration = currencyInfo.maxQuantity or 1000
+                                        expData.concentrationLastUpdated = time()
+                                    end
+                                end
                             end
 
                             expansions[expName] = expData
