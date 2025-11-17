@@ -65,9 +65,9 @@ KPReference = {
              -- The War Within / Khaz Algar
             weekly = {
                 treatise = {
-                    questID = 12345,  
+                    questID = 83725,  
                     label = "Treatise: Alchemy",
-                    icon = "Interface\\Icons\\inv_inscription_treatise",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_alchemy",
                 },
                 craftingOrder = {
                     questID = 12346,
@@ -152,6 +152,23 @@ KPReference = {
             },
         },
         [11] = {  -- The War Within / Khaz Algar
+            weekly = {
+                treatise = {
+                    questID = 83726,  
+                    label = "Treatise: Blacksmithing",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_blacksmithing",
+                },
+                craftingOrder = {
+                    questID = 12346,
+                    label = "Weekly Alchemy Profession Quest",
+                    icon = "Interface\\Icons\\inv_crafting_orders",
+                },
+                treasures = {
+                    label = "Alchemy Knowledge Treasures",
+                    icon = "Interface\\Icons\\inv_misc_book_07",
+                    questIDs = { 11111, 11112, 11113 }, -- replace with actual one-time treasure quests
+                }
+            },
             oneTime = {
                 treasures = {
                     label = "One-Time Knowledge Treasures",
@@ -223,7 +240,25 @@ KPReference = {
                 }
             },
         },
-        [11] = {  -- The War Within / Khaz Algar
+        [11] = {            
+            -- The War Within / Khaz Algar
+            weekly = {
+                treatise = {
+                    questID = 83727,  
+                    label = "Treatise: Enchanting",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_enchanting",
+                },
+                craftingOrder = {
+                    questID = 12346,
+                    label = "Weekly Alchemy Profession Quest",
+                    icon = "Interface\\Icons\\inv_crafting_orders",
+                },
+                treasures = {
+                    label = "Alchemy Knowledge Treasures",
+                    icon = "Interface\\Icons\\inv_misc_book_07",
+                    questIDs = { 11111, 11112, 11113 }, -- replace with actual one-time treasure quests
+                }
+            },
             oneTime = {
                 treasures = {
                     label = "One-Time Knowledge Treasures",
@@ -291,7 +326,24 @@ KPReference = {
                 }
             },
         },
-        [11] = {  -- The War Within / Khaz Algar
+        [11] = { -- The War Within / Khaz Algar
+            weekly = {
+                treatise = {
+                    questID = 83728,  
+                    label = "Treatise: Engineering",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_engineering",
+                },
+                craftingOrder = {
+                    questID = 12346,
+                    label = "Weekly Alchemy Profession Quest",
+                    icon = "Interface\\Icons\\inv_crafting_orders",
+                },
+                treasures = {
+                    label = "Alchemy Knowledge Treasures",
+                    icon = "Interface\\Icons\\inv_misc_book_07",
+                    questIDs = { 11111, 11112, 11113 }, -- replace with actual one-time treasure quests
+                }
+            },
             oneTime = {
                 treasures = {
                     label = "One-Time Knowledge Treasures",
@@ -364,7 +416,24 @@ KPReference = {
                 }
             },
         },
-        [11] = {  -- The War Within / Khaz Algar
+        [11] = { -- The War Within / Khaz Algar
+            weekly = {
+                treatise = {
+                    questID = 83730,  
+                    label = "Treatise: Inscription",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_inscription",
+                },
+                craftingOrder = {
+                    questID = 12346,
+                    label = "Weekly Alchemy Profession Quest",
+                    icon = "Interface\\Icons\\inv_crafting_orders",
+                },
+                treasures = {
+                    label = "Alchemy Knowledge Treasures",
+                    icon = "Interface\\Icons\\inv_misc_book_07",
+                    questIDs = { 11111, 11112, 11113 }, -- replace with actual one-time treasure quests
+                }
+            },
             oneTime = {
                 treasures = {
                     label = "One-Time Knowledge Treasures",
@@ -442,7 +511,7 @@ KPReference = {
                 treatise = {
                     questID = 83731,  
                     label = "Treatise: Jewelcrafting",
-                    icon = "Interface\\Icons\\Inv_misc_profession_book_jewelcrafting",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_jewelcrafting",
                 },
                 craftingOrder = {
                     questID = 12346,
@@ -526,6 +595,23 @@ KPReference = {
             },
         },
         [11] = {  -- The War Within / Khaz Algar
+            weekly = {
+                treatise = {
+                    questID = 83732,  
+                    label = "Treatise: Leatherworking",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_leatherworking",
+                },
+                craftingOrder = {
+                    questID = 12346,
+                    label = "Weekly Alchemy Profession Quest",
+                    icon = "Interface\\Icons\\inv_crafting_orders",
+                },
+                treasures = {
+                    label = "Alchemy Knowledge Treasures",
+                    icon = "Interface\\Icons\\inv_misc_book_07",
+                    questIDs = { 11111, 11112, 11113 }, -- replace with actual one-time treasure quests
+                }
+            },
             oneTime = {
                 treasures = {
                     label = "One-Time Knowledge Treasures",
@@ -595,7 +681,24 @@ KPReference = {
                 }
             },
         },
-        [11] = {  -- The War Within / Khaz Algar
+        [11] = { -- The War Within / Khaz Algar
+            weekly = {
+                treatise = {
+                    questID = 83735,  
+                    label = "Treatise: Tailoring",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_tailoring",
+                },
+                craftingOrder = {
+                    questID = 12346,
+                    label = "Weekly Alchemy Profession Quest",
+                    icon = "Interface\\Icons\\inv_crafting_orders",
+                },
+                treasures = {
+                    label = "Alchemy Knowledge Treasures",
+                    icon = "Interface\\Icons\\inv_misc_book_07",
+                    questIDs = { 11111, 11112, 11113 }, -- replace with actual one-time treasure quests
+                }
+            },
             oneTime = {
                 treasures = {
                     label = "One-Time Knowledge Treasures",
@@ -646,7 +749,24 @@ KPReference = {
                     },
                 },
         },
-        [11] = {
+        [11] = { -- The War Within / Khaz Algar
+            weekly = {
+                treatise = {
+                    questID = 83729,  
+                    label = "Treatise: Herbalism",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_herbalism",
+                },
+                craftingOrder = {
+                    questID = 12346,
+                    label = "Weekly Alchemy Profession Quest",
+                    icon = "Interface\\Icons\\inv_crafting_orders",
+                },
+                treasures = {
+                    label = "Alchemy Knowledge Treasures",
+                    icon = "Interface\\Icons\\inv_misc_book_07",
+                    questIDs = { 11111, 11112, 11113 }, -- replace with actual one-time treasure quests
+                }
+            },
             oneTime = {
                 treasures = {
                     label = "One-Time Knowledge Treasures",
@@ -691,7 +811,24 @@ KPReference = {
                     },
                 },
         },
-        [11] = {
+        [11] = { -- The War Within / Khaz Algar
+            weekly = {
+                treatise = {
+                    questID = 83733,  
+                    label = "Treatise: Mining",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_mining",
+                },
+                craftingOrder = {
+                    questID = 12346,
+                    label = "Weekly Alchemy Profession Quest",
+                    icon = "Interface\\Icons\\inv_crafting_orders",
+                },
+                treasures = {
+                    label = "Alchemy Knowledge Treasures",
+                    icon = "Interface\\Icons\\inv_misc_book_07",
+                    questIDs = { 11111, 11112, 11113 }, -- replace with actual one-time treasure quests
+                }
+            },
             oneTime = {
                 treasures = {
                     label = "One-Time Knowledge Treasures",
@@ -732,6 +869,24 @@ KPReference = {
                 },
         },
         [11] = {
+            -- The War Within / Khaz Algar
+            weekly = {
+                treatise = {
+                    questID = 83734,  
+                    label = "Treatise: Skinning",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_skinning",
+                },
+                craftingOrder = {
+                    questID = 12346,
+                    label = "Weekly Alchemy Profession Quest",
+                    icon = "Interface\\Icons\\inv_crafting_orders",
+                },
+                treasures = {
+                    label = "Alchemy Knowledge Treasures",
+                    icon = "Interface\\Icons\\inv_misc_book_07",
+                    questIDs = { 11111, 11112, 11113 }, -- replace with actual one-time treasure quests
+                }
+            },
             oneTime = {
                 treasures = {
                     label = "One-Time Knowledge Treasures",
