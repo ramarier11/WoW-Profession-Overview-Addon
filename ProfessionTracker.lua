@@ -1302,8 +1302,8 @@ local function UpdateCharacterProfessionData()
                                         }
 
                                         if not noConcentrationProfs[skillLine] then
-                                            expData.concentration = currentConcentration
-                                            expData.maxConcentration = maxConcentration
+                                            expData.concentration = currencyInfo.quantity or 0
+                                            expData.maxConcentration = currencyInfo.maxQuantity or 1000
                                             expData.concentrationLastUpdated = time()
                                         else
                                             -- Make sure they're cleared so UI hides it
