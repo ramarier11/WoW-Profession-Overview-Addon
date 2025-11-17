@@ -61,7 +61,25 @@ KPReference = {
                 }
             },
         },
-        [11] = {  -- The War Within / Khaz Algar
+        [11] = { 
+             -- The War Within / Khaz Algar
+            weekly = {
+                treatise = {
+                    questID = 12345,  
+                    label = "Treatise: Alchemy",
+                    icon = "Interface\\Icons\\inv_inscription_treatise",
+                },
+                craftingOrder = {
+                    questID = 12346,
+                    label = "Weekly Alchemy Profession Quest",
+                    icon = "Interface\\Icons\\inv_crafting_orders",
+                },
+                treasures = {
+                    label = "Alchemy Knowledge Treasures",
+                    icon = "Interface\\Icons\\inv_misc_book_07",
+                    questIDs = { 11111, 11112, 11113 }, -- replace with actual one-time treasure quests
+                }
+            },
             oneTime = {
                 treasures = {
                     label = "One-Time Knowledge Treasures",
@@ -418,7 +436,25 @@ KPReference = {
                 },
             },
         },
-        [11] = {  -- The War Within / Khaz Algar
+        [11] = {
+            -- The War Within / Khaz Algar
+            weekly = {
+                treatise = {
+                    questID = 83731,  
+                    label = "Treatise: Jewelcrafting",
+                    icon = "Interface\\Icons\\Inv_misc_profession_book_jewelcrafting",
+                },
+                craftingOrder = {
+                    questID = 12346,
+                    label = "Weekly Alchemy Profession Quest",
+                    icon = "Interface\\Icons\\inv_crafting_orders",
+                },
+                treasures = {
+                    label = "Alchemy Knowledge Treasures",
+                    icon = "Interface\\Icons\\inv_misc_book_07",
+                    questIDs = { 11111, 11112, 11113 }, -- replace with actual one-time treasure quests
+                }
+            },
             oneTime = {
                 treasures = {
                     label = "One-Time Knowledge Treasures",
