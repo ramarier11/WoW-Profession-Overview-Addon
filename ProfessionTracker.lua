@@ -1294,9 +1294,24 @@ local function UpdateCharacterProfessionData()
                                 if concentrationCurrencyID then
                                     local currencyInfo = C_CurrencyInfo.GetCurrencyInfo(concentrationCurrencyID)
                                     if currencyInfo then
-                                        expData.concentration = currencyInfo.quantity or 0
-                                        expData.maxConcentration = currencyInfo.maxQuantity or 1000
-                                        expData.concentrationLastUpdated = time()
+                                        -- Skip concentration for gathering professions
+                                        local noConcentrationProfs = {
+                                            [182] = true,  -- Herbalism
+                                            [186] = true,  -- Mining
+                                            [393] = true,  -- Skinning
+                                        }
+
+                                        if not noConcentrationProfs[skillLine] then
+                                            expData.concentration = currentConcentration
+                                            expData.maxConcentration = maxConcentration
+                                            expData.concentrationLastUpdated = time()
+                                        else
+                                            -- Make sure they're cleared so UI hides it
+                                            expData.concentration = nil
+                                            expData.maxConcentration = nil
+                                            expData.concentrationLastUpdated = nil
+                                        end
+
                                     end
                                 end
                             end
