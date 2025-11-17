@@ -749,16 +749,16 @@ local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
         if concValue < maxConc and type(GetTimeUntilMax) == "function" then
             timeRemaining = GetTimeUntilMax(concValue, maxConc)
         end
+        local pct = (concValue / maxConc) * 100
+        local color = {1, 0, 0}
+        if pct >= 75 then color = {0, 1, 0}
+        elseif pct >= 40 then color = {1, 0.8, 0} end
+
+        concText:SetTextColor(unpack(color))
+        concText:SetText(string.format("Concentration: %d / %d (%.0f%%)%s",concValue, maxConc, pct, timeRemaining))
     end
 
-    local pct = (concValue / maxConc) * 100
-    local color = {1, 0, 0}
-    if pct >= 75 then color = {0, 1, 0}
-    elseif pct >= 40 then color = {1, 0.8, 0} end
 
-    concText:SetTextColor(unpack(color))
-    concText:SetText(string.format("Concentration: %d / %d (%.0f%%)%s",
-        concValue, maxConc, pct, timeRemaining))
 
     totalHeight = totalHeight + concText:GetStringHeight() + padding
 
