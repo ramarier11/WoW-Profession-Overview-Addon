@@ -618,10 +618,10 @@ KPReference = {
                 },
 
                 oneTime = {
-                    specialHerbs = {
+                    treasures = {
                         label = "Unique Herb Discoveries",
                         icon = "Interface\\Icons\\inv_misc_herb_08",
-                        questIDs = { 51001, 51002 }, -- one-time KP from special finds
+                        locations = {}
                     },
                 },
         },
@@ -663,10 +663,10 @@ KPReference = {
                     },
                 },
                 oneTime = {
-                    specialOre = {
+                    treasures = {
                         label = "Unique Ore Discoveries",
                         icon = "Interface\\Icons\\inv_ore_mithril_01",
-                        questIDs = { 61001, 61002 },
+                        locations = {}
                     },
                 },
         },
@@ -703,10 +703,10 @@ KPReference = {
                     },
                 },
                 oneTime = {
-                    rareCreatures = {
+                    treasures = {
                         label = "Rare Creature Knowledge",
                         icon = "Interface\\Icons\\inv_misc_pelt_bear_01",
-                        questIDs = { 71001, 71002 },
+                        locations = {}
                     },
                 },
         },
