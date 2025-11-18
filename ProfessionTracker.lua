@@ -779,7 +779,7 @@ KPReference = {
                 treasures = {
                     label = "Alchemy Knowledge Treasures",
                     icon = "Interface\\Icons\\inv_misc_book_07",
-                    questIDs = { 11111, 11112, 11113 }, -- replace with actual one-time treasure quests
+                    questIDs = { }, -- replace with actual one-time treasure quests
                 }
             },
             oneTime = {
@@ -841,7 +841,7 @@ KPReference = {
                 treasures = {
                     label = "Alchemy Knowledge Treasures",
                     icon = "Interface\\Icons\\inv_misc_book_07",
-                    questIDs = { 11111, 11112, 11113 }, -- replace with actual one-time treasure quests
+                    questIDs = { }, -- replace with actual one-time treasure quests
                 }
             },
             oneTime = {
@@ -879,7 +879,7 @@ KPReference = {
                     treasures = {
                         label = "Rare Creature Knowledge",
                         icon = "Interface\\Icons\\inv_misc_pelt_bear_01",
-                        locations = { 71001, 71002 },
+                        locations = {},
                     },
                 },
         },
