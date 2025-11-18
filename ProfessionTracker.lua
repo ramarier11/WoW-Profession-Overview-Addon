@@ -1050,49 +1050,56 @@ end
 local function ForEachProfessionExpansion(callback)
     if not ProfessionTrackerDB or not ProfessionTrackerDB.characters then return end
 
-    -- Build reusable name→ID map
+    -- Only operate on the currently logged-in character
+    local charKey = GetCharacterKey()
+    local charData = ProfessionTrackerDB.characters[charKey]
+    if not charData or not charData.professions then return end
+
+    -- Build reusable name → professionID lookup
     local profNameToID = {}
     for _, p in ipairs(ProfessionData) do
         profNameToID[p.name] = p.id
     end
 
-    for charKey, charData in pairs(ProfessionTrackerDB.characters) do
-        if charData.professions then
-            for profName, profData in pairs(charData.professions) do
-                
-                -- Resolve profession ID
-                local profID = profNameToID[profName]
+    -- Iterate only this character's professions
+    for profName, profData in pairs(charData.professions) do
+        
+        -- Resolve profession ID
+        local profID = profNameToID[profName]
 
-                -- Fallback: extract from stored exp skillLineID
-                if not profID and profData.expansions then
-                    for _, exp in pairs(profData.expansions) do
-                        if exp.skillLineID then
-                            profID = exp.skillLineID
-                            break
-                        end
-                    end
+        -- Fallback: infer from expansions
+        if not profID and profData.expansions then
+            for _, exp in pairs(profData.expansions) do
+                if exp.skillLineID then
+                    profID = exp.skillLineID
+                    break
                 end
-                
-                if profID and profData.expansions then
-                    for expName, expData in pairs(profData.expansions) do
-                        local expIndex = expData.id
-                        
-                        if expIndex and KPReference[profID] and KPReference[profID][expIndex] then
-                            local ref = KPReference[profID][expIndex]
-                            
-                            callback(
-                                charKey, charData,
-                                profName, profData, profID,
-                                expName, expData, expIndex,
-                                ref
-                            )
-                        end
-                    end
+            end
+        end
+
+        -- Process expansions
+        if profID and profData.expansions then
+            for expName, expData in pairs(profData.expansions) do
+                local expIndex = expData.id
+
+                if expIndex
+                    and KPReference[profID]
+                    and KPReference[profID][expIndex] then
+
+                    local ref = KPReference[profID][expIndex]
+
+                    callback(
+                        charKey, charData,
+                        profName, profData, profID,
+                        expName, expData, expIndex,
+                        ref
+                    )
                 end
             end
         end
     end
 end
+
 
 local function SafeIsQuestCompleted(qID)
     if not qID then return false end
