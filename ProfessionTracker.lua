@@ -1043,6 +1043,65 @@ local function GetCurrentWeekTimestamp()
     local midnight = tuesdayMidnight - (tuesdayMidnight % 86400)
     return midnight
 end
+-- ========================================================
+-- Helper Functions
+-- ========================================================
+
+function ProfessionTracker:ForEachProfessionExpansion(callback)
+    if not ProfessionTrackerDB or not ProfessionTrackerDB.characters then return end
+
+    -- Build reusable name→ID map
+    local profNameToID = {}
+    for _, p in ipairs(ProfessionData) do
+        profNameToID[p.name] = p.id
+    end
+
+    for charKey, charData in pairs(ProfessionTrackerDB.characters) do
+        if charData.professions then
+            for profName, profData in pairs(charData.professions) do
+                
+                -- Resolve profession ID
+                local profID = profNameToID[profName]
+
+                -- Fallback: extract from stored exp skillLineID
+                if not profID and profData.expansions then
+                    for _, exp in pairs(profData.expansions) do
+                        if exp.skillLineID then
+                            profID = exp.skillLineID
+                            break
+                        end
+                    end
+                end
+                
+                if profID and profData.expansions then
+                    for expName, expData in pairs(profData.expansions) do
+                        local expIndex = expData.id
+                        
+                        if expIndex and KPReference[profID] and KPReference[profID][expIndex] then
+                            local ref = KPReference[profID][expIndex]
+                            
+                            callback(
+                                charKey, charData,
+                                profName, profData, profID,
+                                expName, expData, expIndex,
+                                ref
+                            )
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+local function SafeIsQuestCompleted(qID)
+    if not qID then return false end
+    local ok, result = pcall(function()
+        return C_QuestLog.IsQuestFlaggedCompleted(qID)
+    end)
+    return ok and result
+end
+
 
 -- ========================================================
 -- Profession Data Retrieval
@@ -1121,82 +1180,42 @@ end
 -- Recalculate one-time treasure completion for a character
 -- Runs independent of TradeSkill UI. Uses KPReference table only.
 -- ============================================================
-local function RecalculateOneTimeTreasures(charKey)
-    if not ProfessionTrackerDB or not ProfessionTrackerDB.characters then return end
-    local charData = ProfessionTrackerDB.characters[charKey or GetCharacterKey()]
-    if not charData or not charData.professions then return end
+function ProfessionTracker:RecalculateOneTimeTreasures(charKey)
+    self:ForEachProfessionExpansion(function(
+        iterCharKey, charData,
+        profName, profData, profID,
+        expName, expData, expIndex,
+        ref
+    )
+        -- Only run for selected character if charKey provided
+        if charKey and iterCharKey ~= charKey then return end
+        if not ref.oneTime or not ref.oneTime.treasures then return end
 
-    -- Build name → professionID lookup
-    local profNameToID = {}
-    for _, p in ipairs(ProfessionData) do
-        profNameToID[p.name] = p.id
-    end
+        local treasureRef = ref.oneTime.treasures
+        local missing = {}
+        local allDone = true
 
-    -- Loop professions
-    for profName, profData in pairs(charData.professions) do
-
-        -- Try direct lookup
-        local profID = profNameToID[profName]
-
-        -- If not found, try to deduce from existing expansions
-        if not profID and profData.expansions then
-            for _, exp in pairs(profData.expansions) do
-                if exp.skillLineID then
-                    profID = exp.skillLineID
-                    break
+        if treasureRef.locations then
+            for _, loc in ipairs(treasureRef.locations) do
+                local completed = SafeIsQuestCompleted(loc.questID)
+                if not completed then
+                    allDone = false
+                    table.insert(missing, {
+                        name = loc.name,
+                        mapID = loc.mapID,
+                        x = loc.x,
+                        y = loc.y,
+                        questID = loc.questID
+                    })
                 end
             end
         end
 
-        if profID then
-            -- Now process each expansion under this profession
-            for expName, expData in pairs(profData.expansions or {}) do
-
-                local expIndex = expData and expData.id
-                local hasRef =
-                    expIndex and
-                    KPReference[profID] and
-                    KPReference[profID][expIndex] and
-                    KPReference[profID][expIndex].oneTime
-                if hasRef then
-                    local ref = KPReference[profID][expIndex].oneTime.treasures
-                    local missing = {}
-                    local allCollected = true
-
-                    if ref.locations then
-                        for _, loc in ipairs(ref.locations) do
-                            if loc.questID then
-                                local completed = false
-                                local ok, res = pcall(function()
-                                    return C_QuestLog.IsQuestFlaggedCompleted(loc.questID)
-                                end)
-
-                                if ok and res then
-                                    completed = true
-                                end
-
-                                if not completed then
-                                    allCollected = false
-                                    table.insert(missing, {
-                                        name = loc.name,
-                                        mapID = loc.mapID,
-                                        x = loc.x,
-                                        y = loc.y,
-                                        questID = loc.questID,
-                                    })
-                                end
-                            end
-                        end
-                    end
-
-                    expData.oneTimeCollectedAll = allCollected
-                    expData.missingOneTimeTreasures = missing
-
-                end
-            end
-        end
-    end
+        expData.oneTimeCollectedAll = allDone
+        expData.missingOneTimeTreasures = missing
+    end)
 end
+
 
 -- ========================================================
 -- Knowledge Point Calculations
@@ -1278,49 +1297,30 @@ local function CheckAndResetWeeklyProgress(weeklyProgress)
     end
 end
 
-local function CheckWeeklyActivityCompleted(charData, profID, expansionIndex)
-    local result = {}
-    
-    -- Grab reference table for that profession/expansion
-    local ref = KPReference[profID] 
-                 and KPReference[profID][expansionIndex] 
-                 and KPReference[profID][expansionIndex].weekly
-
-    if not ref then return result end
-
-    -- Create completed table for this expansion if needed
-    charData.weeklyKnowledgePoints = charData.weeklyKnowledgePoints or {}
-    charData.weeklyKnowledgePoints[expansionIndex] = charData.weeklyKnowledgePoints[expansionIndex] or {}
-    local wk = charData.weeklyKnowledgePoints[expansionIndex]
-
-    ---------------------------------------------------------
-    -- Loop through all weekly activities automatically
-    -- (Treatise, craftingOrder, treasures, surveying, etc.)
-    ---------------------------------------------------------
-    for key, activity in pairs(ref) do
+function ProfessionTracker:RecalculateWeeklyKnowledgePoints()
+    self:ForEachProfessionExpansion(function(
+        charKey, charData,
+        profName, profData, profID,
+        expName, expData, expIndex,
+        ref
+    )
+        if not ref.weekly then return end
         
-        -- Case: Single questID
-        if activity.questID then
-            local isDone = C_QuestLog.IsQuestFlaggedCompleted(activity.questID)
-            wk[key] = isDone
-            result[key] = isDone
+        expData.weeklyKnowledgePoints = expData.weeklyKnowledgePoints or {}
+        local wk = expData.weeklyKnowledgePoints
 
-        -- Case: Set of questIDs (rare nodes, treasures, etc.)
-        elseif activity.questIDs then
-            local allDone = true
-            for _, qID in ipairs(activity.questIDs) do
-                if not C_QuestLog.IsQuestFlaggedCompleted(qID) then
-                    allDone = false
-                    break
-                end
-            end
-            wk[key] = allDone
-            result[key] = allDone
+        -- Treatise
+        if ref.weekly.treatise and ref.weekly.treatise.questID then
+            wk.treatise = SafeIsQuestCompleted(ref.weekly.treatise.questID)
         end
-    end
 
-    return result
+        -- Future weekly types fit right here:
+        -- if ref.weekly.craftingOrderQuest then ... end
+        -- if ref.weekly.treasures then ... end
+    end)
 end
+
+
 
 
 -- ========================================================
@@ -1572,7 +1572,7 @@ local function UpdateCharacterProfessionData()
     -- ===== ALWAYS re-evaluate one-time treasures AFTER we've merged/kept expansion structure =====
     -- This is the key: RecalculateOneTimeTreasures doesn't require TradeSkill UI.
     RecalculateOneTimeTreasures(charKey)
-    local weeklyResults = CheckWeeklyActivityCompleted(expData, profID, expansionIndex)
+    RecalculateWeeklyKnowledgePoints()
 
 
     -- Auto-refresh UI if open (small delay to avoid racing other events)
