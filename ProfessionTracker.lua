@@ -1198,8 +1198,6 @@ local function RecalculateOneTimeTreasures(charKey)
     end
 end
 
-
-
 -- ========================================================
 -- Knowledge Point Calculations
 -- ========================================================
@@ -1279,6 +1277,51 @@ local function CheckAndResetWeeklyProgress(weeklyProgress)
         end
     end
 end
+
+local function CheckWeeklyActivityCompleted(charData, profID, expansionIndex)
+    local result = {}
+    
+    -- Grab reference table for that profession/expansion
+    local ref = KPReference[profID] 
+                 and KPReference[profID][expansionIndex] 
+                 and KPReference[profID][expansionIndex].weekly
+
+    if not ref then return result end
+
+    -- Create completed table for this expansion if needed
+    charData.weeklyKnowledgePoints = charData.weeklyKnowledgePoints or {}
+    charData.weeklyKnowledgePoints[expansionIndex] = charData.weeklyKnowledgePoints[expansionIndex] or {}
+    local wk = charData.weeklyKnowledgePoints[expansionIndex]
+
+    ---------------------------------------------------------
+    -- Loop through all weekly activities automatically
+    -- (Treatise, craftingOrder, treasures, surveying, etc.)
+    ---------------------------------------------------------
+    for key, activity in pairs(ref) do
+        
+        -- Case: Single questID
+        if activity.questID then
+            local isDone = C_QuestLog.IsQuestFlaggedCompleted(activity.questID)
+            wk[key] = isDone
+            result[key] = isDone
+
+        -- Case: Set of questIDs (rare nodes, treasures, etc.)
+        elseif activity.questIDs then
+            local allDone = true
+            for _, qID in ipairs(activity.questIDs) do
+                if not C_QuestLog.IsQuestFlaggedCompleted(qID) then
+                    allDone = false
+                    break
+                end
+            end
+            wk[key] = allDone
+            result[key] = allDone
+        end
+    end
+
+    return result
+end
+
 
 -- ========================================================
 -- Data Initialization & Update
@@ -1529,6 +1572,8 @@ local function UpdateCharacterProfessionData()
     -- ===== ALWAYS re-evaluate one-time treasures AFTER we've merged/kept expansion structure =====
     -- This is the key: RecalculateOneTimeTreasures doesn't require TradeSkill UI.
     RecalculateOneTimeTreasures(charKey)
+    local weeklyResults = CheckWeeklyActivityCompleted(expData, profID, expansionIndex)
+
 
     -- Auto-refresh UI if open (small delay to avoid racing other events)
     if ProfessionTracker.UI and ProfessionTracker.UI:IsShown() then
