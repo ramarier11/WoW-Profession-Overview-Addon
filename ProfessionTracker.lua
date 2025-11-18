@@ -1047,7 +1047,7 @@ end
 -- Helper Functions
 -- ========================================================
 
-function ProfessionTracker:ForEachProfessionExpansion(callback)
+local function ForEachProfessionExpansion(callback)
     if not ProfessionTrackerDB or not ProfessionTrackerDB.characters then return end
 
     -- Build reusable name→ID map
@@ -1180,8 +1180,8 @@ end
 -- Recalculate one-time treasure completion for a character
 -- Runs independent of TradeSkill UI. Uses KPReference table only.
 -- ============================================================
-function ProfessionTracker:RecalculateOneTimeTreasures(charKey)
-    self:ForEachProfessionExpansion(function(
+local function RecalculateOneTimeTreasures(charKey)
+    ForEachProfessionExpansion(function(
         iterCharKey, charData,
         profName, profData, profID,
         expName, expData, expIndex,
@@ -1297,8 +1297,8 @@ local function CheckAndResetWeeklyProgress(weeklyProgress)
     end
 end
 
-function ProfessionTracker:RecalculateWeeklyKnowledgePoints()
-    self:ForEachProfessionExpansion(function(
+local function RecalculateWeeklyKnowledgePoints()
+    ForEachProfessionExpansion(function(
         charKey, charData,
         profName, profData, profID,
         expName, expData, expIndex,
