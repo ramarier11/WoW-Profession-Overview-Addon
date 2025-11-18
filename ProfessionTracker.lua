@@ -760,7 +760,7 @@ KPReference = {
                     treasures = {
                         label = "Unique Herb Discoveries",
                         icon = "Interface\\Icons\\inv_misc_herb_08",
-                        locations = { 51001, 51002 }, -- one-time KP from special finds
+                        locations = {}, -- one-time KP from special finds
                     },
                 },
         },
@@ -779,7 +779,7 @@ KPReference = {
                 treasures = {
                     label = "Alchemy Knowledge Treasures",
                     icon = "Interface\\Icons\\inv_misc_book_07",
-                    questIDs = { }, -- replace with actual one-time treasure quests
+                    questIDs = {}, -- replace with actual one-time treasure quests
                 }
             },
             oneTime = {
@@ -822,7 +822,7 @@ KPReference = {
                     treasures = {
                         label = "Unique Ore Discoveries",
                         icon = "Interface\\Icons\\inv_ore_mithril_01",
-                        locations = { 61001, 61002 },
+                        locations = {},
                     },
                 },
         },
