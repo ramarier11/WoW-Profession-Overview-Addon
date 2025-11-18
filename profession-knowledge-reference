@@ -247,7 +247,7 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_misc_profession_book_enchanting",
                 },
                 craftingOrder = {
-                    questID = 12346,
+                    questID = {82970, 82962, 82965, 82958, 82916},
                     label = "Weekly Enchanting Profession Quest",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
