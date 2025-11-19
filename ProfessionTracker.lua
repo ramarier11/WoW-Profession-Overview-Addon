@@ -50,7 +50,7 @@ KPReference = {
                 treasures = {
                     label = "Alchemy Knowledge Treasures",
                     icon = "Interface\\Icons\\inv_misc_book_07",
-                    questIDs = { 11111, 11112, 11113 }, -- replace with actual one-time treasure quests
+                    questID = { 11111, 11112, 11113 }, -- replace with actual one-time treasure quests
                 }
             },
 
@@ -85,14 +85,13 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_misc_profession_book_alchemy",
                 },
                 craftingOrder = {
-                    questID = 12346,
-                    label = "Weekly Alchemy Profession Quest",
+                    questID = 84133,
+                    label = "Alchemy Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    label = "Alchemy Knowledge Treasures",
-                    icon = "Interface\\Icons\\inv_misc_book_07",
-                    questIDs = { 11111, 11112, 11113 }, -- replace with actual one-time treasure quests
+                    { questID = 83253, name = "Alchemical Sediment" icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
+                    { questID = 83255, name = "Deepstone Crucible" icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
                 }
             },
             oneTime = {
@@ -133,7 +132,7 @@ KPReference = {
                 treasures = {
                     label = "Blacksmithing Knowledge Treasures",
                     icon = "Interface\\Icons\\inv_misc_book_07",
-                    questIDs = { 44111, 44112, 44113 },
+                    questID = { 44111, 44112, 44113 },
                 }
             },
 
@@ -174,14 +173,13 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_misc_profession_book_blacksmithing",
                 },
                 craftingOrder = {
-                    questID = 12346,
-                    label = "Weekly Alchemy Profession Quest",
+                    questID = 84127,
+                    label = "Blacksmithing Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    label = "Alchemy Knowledge Treasures",
-                    icon = "Interface\\Icons\\inv_misc_book_07",
-                    questIDs = { 11111, 11112, 11113 }, -- replace with actual one-time treasure quests
+                    { questID = 83257, name = "Coreway Billet" icon = "Interface\\Icons\\inv_ingot_titansteel_dark"  },
+                    { questID = 83256, name = "Dense Bladestone" icon = "Interface\\Icons\\inv_stone_sharpeningstone_05"  },
                 }
             },
             oneTime = {
@@ -223,7 +221,7 @@ KPReference = {
                 treasures = {
                     label = "Enchanting Knowledge Treasures",
                     icon = "Interface\\Icons\\inv_misc_book_07",
-                    questIDs = { 44111, 44112, 44113 },
+                    questID = { 44111, 44112, 44113 },
                 }
             },
 
@@ -264,15 +262,18 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_misc_profession_book_enchanting",
                 },
                 craftingOrder = {
-                    questID = 12346,
-                    label = "Weekly Alchemy Profession Quest",
+                    questID = {84085, 84086, 84084},
+                    label = "Weekly Enchanting Profession Quest",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    label = "Alchemy Knowledge Treasures",
-                    icon = "Interface\\Icons\\inv_misc_book_07",
-                    questIDs = { 11111, 11112, 11113 }, -- replace with actual one-time treasure quests
-                }
+                    { questID = 83259, name = "Crystalline Repository" icon = "Interface\\Icons\\inv_jewelcrafting_dawnstone_03"  },
+                    { questID = 83258, name = "Powdered Fulgurance" icon = "Interface\\Icons\\inv_enchanting_wod_dust"  },
+                },
+                disenchanting = { 
+                    {label = "Fleeting Arcane Manifestation", questID = {84290, 84291, 84292, 84293, 84294} icon ="Interface\\Icons\\inv_magic_swirl_color2" },
+                    {label = "Gleaming Telluric Crystal", questID = 84295 icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
+                },
             },
             oneTime = {
                 treasures = {
@@ -312,7 +313,7 @@ KPReference = {
                 treasures = {
                     label = "Engineering Knowledge Treasures",
                     icon = "Interface\\Icons\\inv_misc_book_07",
-                    questIDs = { 44111, 44112, 44113 },
+                    questID = { 44111, 44112, 44113 },
                 }
             },
 
@@ -349,14 +350,13 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_misc_profession_book_engineering",
                 },
                 craftingOrder = {
-                    questID = 12346,
-                    label = "Weekly Alchemy Profession Quest",
+                    questID = 84128,
+                    label = "Engineering Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    label = "Alchemy Knowledge Treasures",
-                    icon = "Interface\\Icons\\inv_misc_book_07",
-                    questIDs = { 11111, 11112, 11113 }, -- replace with actual one-time treasure quests
+                    { questID = 83260, name = "Rust-Locked Mechanism" icon = "Interface\\Icons\\inv_misc_enggizmos_14"  },
+                    { questID = 83261, name = "Earthen Induction Coil" icon = "Interface\\Icons\\inv_misc_gear_03"  },
                 }
             },
             oneTime = {
@@ -397,7 +397,7 @@ KPReference = {
                 treasures = {
                     label = "Inscription Knowledge Treasures",
                     icon = "Interface\\Icons\\inv_misc_book_07",
-                    questIDs = { 44111, 44112, 44113 },
+                    questID = { 44111, 44112, 44113 },
                 }
             },
 
@@ -439,14 +439,13 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_misc_profession_book_inscription",
                 },
                 craftingOrder = {
-                    questID = 12346,
-                    label = "Weekly Alchemy Profession Quest",
+                    questID = 84129,
+                    label = "Inscription Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    label = "Alchemy Knowledge Treasures",
-                    icon = "Interface\\Icons\\inv_misc_book_07",
-                    questIDs = { 11111, 11112, 11113 }, -- replace with actual one-time treasure quests
+                    { questID = 83264, name = "Striated Inkstone" icon = "Interface\\Icons\\inv_ore_shadestone"  },
+                    { questID = 83262, name = "Wax-Sealed Records" icon = "Interface\\Icons\\inv_letter_02"  },
                 }
             },
             oneTime = {
@@ -488,7 +487,7 @@ KPReference = {
                 treasures = {
                     label = "Jewelcrafting Knowledge Treasures",
                     icon = "Interface\\Icons\\inv_misc_book_07",
-                    questIDs = { 44111, 44112, 44113 },
+                    questID = { 44111, 44112, 44113 },
                 }
             },
 
@@ -529,14 +528,13 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_misc_profession_book_jewelcrafting",
                 },
                 craftingOrder = {
-                    questID = 12346,
-                    label = "Weekly Alchemy Profession Quest",
+                    questID = 84130,
+                    label = "Jewelcrafting Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    label = "Alchemy Knowledge Treasures",
-                    icon = "Interface\\Icons\\inv_misc_book_07",
-                    questIDs = { 11111, 11112, 11113 }, -- replace with actual one-time treasure quests
+                    { questID = 83265, name = "Diaphanous Gem Shards" icon = "Interface\\Icons\\inv_jewelcrafting_70_gem01_white"  },
+                    { questID = 83266, name = "Deepstone Fragment" icon = "Interface\\Icons\\inv_misc_gem_x4_uncommon_cut_green"  },
                 }
             },
             oneTime = {
@@ -577,7 +575,7 @@ KPReference = {
                 treasures = {
                     label = "Leatherworking Knowledge Treasures",
                     icon = "Interface\\Icons\\inv_misc_book_07",
-                    questIDs = { 44111, 44112, 44113 },
+                    questID = { 44111, 44112, 44113 },
                 }
             },
 
@@ -617,14 +615,13 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_misc_profession_book_leatherworking",
                 },
                 craftingOrder = {
-                    questID = 12346,
-                    label = "Weekly Alchemy Profession Quest",
+                    questID = 84131,
+                    label = "Leatherworking Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    label = "Alchemy Knowledge Treasures",
-                    icon = "Interface\\Icons\\inv_misc_book_07",
-                    questIDs = { 11111, 11112, 11113 }, -- replace with actual one-time treasure quests
+                    { questID = 83268, name = "Stone-Leather Swatch" icon = "Interface\\Icons\\inv_10_skinning_scales_black"  },
+                    { questID = 83267, name = "Sturdy Nerubian Carapace" icon = "Interface\\Icons\\inv_shoulder_04"  },
                 }
             },
             oneTime = {
@@ -665,7 +662,7 @@ KPReference = {
                 treasures = {
                     label = "Tailoring Knowledge Treasures",
                     icon = "Interface\\Icons\\inv_misc_book_07",
-                    questIDs = { 44111, 44112, 44113 },
+                    questID = { 44111, 44112, 44113 },
                 }
             },
 
@@ -704,14 +701,13 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_misc_profession_book_tailoring",
                 },
                 craftingOrder = {
-                    questID = 12346,
-                    label = "Weekly Alchemy Profession Quest",
+                    questID = 84132,
+                    label = "Tailoring Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    label = "Alchemy Knowledge Treasures",
-                    icon = "Interface\\Icons\\inv_misc_book_07",
-                    questIDs = { 11111, 11112, 11113 }, -- replace with actual one-time treasure quests
+                    { questID = 83270, name = "Chitin Needle" icon = "Interface\\Icons\\inv_10_tailoring_purchasedthread_color1"  },
+                    { questID = 83269, name = "Spool of Webweave" icon = "Interface\\Icons\\inv_misc_thread_01"  },
                 }
             },
             oneTime = {
@@ -752,15 +748,15 @@ KPReference = {
                     rareNodes = {
                         label = "Rare Herb Node KP",
                         icon = "Interface\\Icons\\inv_misc_herb_09",
-                        questIDs = { 50011, 50012 }, -- each rare node grants KP once
+                        questID = { 50011, 50012 }, -- each rare node grants KP once
                     },
                 },
 
                 oneTime = {
-                    treasures = {
+                    specialHerbs = {
                         label = "Unique Herb Discoveries",
                         icon = "Interface\\Icons\\inv_misc_herb_08",
-                        locations = {}, -- one-time KP from special finds
+                        questID = { 51001, 51002 }, -- one-time KP from special finds
                     },
                 },
         },
@@ -772,14 +768,13 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_misc_profession_book_herbalism",
                 },
                 craftingOrder = {
-                    questID = 12346,
-                    label = "Weekly Alchemy Profession Quest",
+                    questID = {82970, 82962, 82965, 82958, 82916},
+                    label = "Weekly Herbalism Profession Quest",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    label = "Alchemy Knowledge Treasures",
-                    icon = "Interface\\Icons\\inv_misc_book_07",
-                    questIDs = {}, -- replace with actual one-time treasure quests
+                    {label = "Deepgrove Petal", questID = { 81416, 81417, 81418, 81419, 81420 } icon ="Interface\\Icons\\inv_magic_swirl_color2" },
+                    {label = "Deepgrove Rose", questID = 81421 icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
                 }
             },
             oneTime = {
@@ -815,14 +810,14 @@ KPReference = {
                     rareNodes = {
                         label = "Rare Ore Node KP",
                         icon = "Interface\\Icons\\inv_ore_tin_01",
-                        questIDs = { 60011, 60012 },
+                        questID = { 60011, 60012 },
                     },
                 },
                 oneTime = {
-                    treasures = {
+                    specialOre = {
                         label = "Unique Ore Discoveries",
                         icon = "Interface\\Icons\\inv_ore_mithril_01",
-                        locations = {},
+                        questID = { 61001, 61002 },
                     },
                 },
         },
@@ -834,14 +829,13 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_misc_profession_book_mining",
                 },
                 craftingOrder = {
-                    questID = 12346,
-                    label = "Weekly Alchemy Profession Quest",
-                    icon = "Interface\\Icons\\inv_crafting_orders",
+                    questID = {83103, 83102, 83104, 83106, 83105},
+                    label = "Weekly Mining Profession Quest",
+                    icon = "Interface\\Icons\\inv_crafting_orders", 
                 },
                 treasures = {
-                    label = "Alchemy Knowledge Treasures",
-                    icon = "Interface\\Icons\\inv_misc_book_07",
-                    questIDs = { }, -- replace with actual one-time treasure quests
+                    {label = "Slab of Slate", questID = { 83054, 83053, 83052, 83051, 83050 } icon ="Interface\\Icons\\inv_magic_swirl_color2" },
+                    {label = "Erosion-Polished Slate", questID = 83049 icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
                 }
             },
             oneTime = {
@@ -876,10 +870,10 @@ KPReference = {
                     },
                 },
                 oneTime = {
-                    treasures = {
+                    rareCreatures = {
                         label = "Rare Creature Knowledge",
                         icon = "Interface\\Icons\\inv_misc_pelt_bear_01",
-                        locations = {},
+                        questID = { 71001, 71002 },
                     },
                 },
         },
@@ -892,14 +886,13 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_misc_profession_book_skinning",
                 },
                 craftingOrder = {
-                    questID = 12346,
-                    label = "Weekly Alchemy Profession Quest",
+                    questID = {83097, 83100, 82993, 83098, 82992},
+                    label = "Weekly Skinning Profession Quest",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    label = "Alchemy Knowledge Treasures",
-                    icon = "Interface\\Icons\\inv_misc_book_07",
-                    questIDs = { 11111, 11112, 11113 }, -- replace with actual one-time treasure quests
+                    {label = "Toughened Tempest Pelt", questID = { 81459, 81460, 81461, 81462, 81463 } icon ="Interface\\Icons\\inv_magic_swirl_color2" },
+                    {label = "Abyssal Fur", questID = 81464 icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
                 }
             },
             oneTime = {
