@@ -470,56 +470,65 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
             table.insert(card.weeklySection.entries, card.weeklyHeader)
             y = y - 24
 
-            -- GATHERING (Herb 182, Mine 186, Skin 393)
-            if profID == 182 or profID == 186 or profID == 393 then
-                local total = 0
-                if ref.weekly.treasures and type(ref.weekly.treasures) == "table" then
-                    total = #ref.weekly.treasures
-                end
-                local done = wk.treasures and total or 0
-                local text = string.format("Weekly Treasures: %d/%d", done, total)
-                if wk.treasures then text = text .. " |TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t" end
-                card.weeklyHeader:SetText(text)
+        -- GATHERING PROFESSIONS (Herbalism 182, Mining 186, Skinning 393)
+        if profID == 182 or profID == 186 or profID == 393 then
+            card.weeklyHeader:SetText("Weekly Treasures")
 
-            -- ENCHANTING DISENCHANTING
-            elseif profID == 333 and ref.weekly.disenchanting then
-                local items = ref.weekly.disenchanting
-                local total = #items
-                local completedCount = 0
+            for i, item in ipairs(ref.weekly.treasures) do
+                local q = item.questID
+                local completed = false
 
-                for _, it in ipairs(items) do
-                    local q = it.questID
-                    local ok = true
-                    if type(q) == "table" then
-                        for _, id in ipairs(q) do
-                            if not C_QuestLog.IsQuestFlaggedCompleted(id) then ok = false break end
+                if type(q) == "table" then
+                    -- ANY completed = the treasure is collected
+                    for _, id in ipairs(q) do
+                        if C_QuestLog.IsQuestFlaggedCompleted(id) then
+                            completed = true
+                            break
                         end
-                    else
-                        ok = C_QuestLog.IsQuestFlaggedCompleted(q)
                     end
-                    if ok then completedCount = completedCount + 1 end
+                else
+                    completed = C_QuestLog.IsQuestFlaggedCompleted(q)
                 end
 
-                local text = string.format("Weekly Disenchanting: %d/%d", completedCount, total)
-                if completedCount == total then text = text .. " |TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t" end
-                card.weeklyHeader:SetText(text)
+                local entry = AddWeeklyEntry(card.weeklySection, item.label or ("Treasure " .. i), completed)
+                entry:SetPoint("TOPLEFT", 0, y)
+                y = y - 20
+            end
 
-                -- detailed list entries
-                for i, it in ipairs(items) do
-                    local q = it.questID
-                    local ok = false
-                    if type(q) == "table" then
-                        ok = true
-                        for _, id in ipairs(q) do
-                            if not C_QuestLog.IsQuestFlaggedCompleted(id) then ok = false break end
+
+        -- ENCHANTING — DISENCHANTING (show each task separately like gathering)
+        elseif profID == 333 and ref.weekly.disenchanting then
+            card.weeklyHeader:SetText("Weekly Disenchanting")
+
+            local items = ref.weekly.disenchanting
+
+            for i, it in ipairs(items) do
+                local q = it.questID
+                local completed = false
+
+                if type(q) == "table" then
+                    -- ALL quests in the table must be complete for this entry to count
+                    completed = true
+                    for _, id in ipairs(q) do
+                        if not C_QuestLog.IsQuestFlaggedCompleted(id) then
+                            completed = false
+                            break
                         end
-                    else
-                        ok = C_QuestLog.IsQuestFlaggedCompleted(q)
                     end
-                    local entry = AddWeeklyEntry(card.weeklySection, it.label or ("Entry " .. i), ok)
-                    entry:SetPoint("TOPLEFT", 0, y)
-                    y = y - 20
+                else
+                    completed = C_QuestLog.IsQuestFlaggedCompleted(q)
                 end
+
+                local entry = AddWeeklyEntry(
+                    card.weeklySection,
+                    it.label or ("Disenchant " .. i),
+                    completed
+                )
+
+                entry:SetPoint("TOPLEFT", 0, y)
+                y = y - 20
+            end
+
 
             -- OTHER PROFESSIONS: stacked treasure list (shows each treasure)
             elseif ref.weekly.treasures then

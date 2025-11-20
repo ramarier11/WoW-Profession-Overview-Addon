@@ -819,8 +819,8 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_crafting_orders", 
                 },
                 treasures = {
-                    {label = "Slab of Slate", questID = { 83054, 83053, 83052, 83051, 83050 } icon ="Interface\\Icons\\inv_magic_swirl_color2" },
-                    {label = "Erosion-Polished Slate", questID = 83049 icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
+                    {label = "Slab of Slate", questID = { 83054, 83053, 83052, 83051, 83050 }, icon ="Interface\\Icons\\inv_magic_swirl_color2" },
+                    {label = "Erosion-Polished Slate", questID = 83049, icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
                 }
             },
             oneTime = {
