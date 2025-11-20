@@ -427,6 +427,7 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
         end
 
         -- ensure we have a profID to look up KPReference
+        local expIndex = expData and expData.id
         local profID = card._profNameToID and card._profNameToID[profName]
         if not profID then
             for _, p in ipairs(ProfessionData) do
