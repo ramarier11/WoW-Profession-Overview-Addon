@@ -292,6 +292,7 @@ end
 -- ########################################################
 -- ## Expansion Carousel for Detail View
 -- ########################################################
+-- Replace the existing CreateProfessionExpansionCard function with this version
 local function CreateProfessionExpansionCard(parent, profName, profData, yOffset)
     local card = CreateFrame("Frame", nil, parent, "BackdropTemplate")
     card:SetSize(440, 150)
@@ -304,19 +305,23 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
     })
     card:SetBackdropColor(0, 0, 0, 0.6)
 
+    -- build profName -> profID map on first use (card-local cache)
+    card._profNameToID = card._profNameToID or {}
+    if next(card._profNameToID) == nil then
+        for _, p in ipairs(ProfessionData) do
+            card._profNameToID[p.name] = p.id
+        end
+    end
+
+    ----------------------------------------------------
     -- Build a sortable list of expansions using per-character expData.id (fallback to 0)
+    ----------------------------------------------------
     local expansionsList = {}
     for expName, expData in pairs(profData.expansions or {}) do
         local id = expData and expData.id or 0
         table.insert(expansionsList, { name = expName, id = id, data = expData })
     end
 
-    -- If id wasn't saved for some reason, try to prefer ones with any skillLevel > 0
-    if #expansionsList == 0 then
-        -- no expansion data
-    end
-
-    -- Sort descending by id (newest first). If ids are equal, put expansions with higher skillLevel first
     table.sort(expansionsList, function(a, b)
         if (a.id or 0) ~= (b.id or 0) then
             return (a.id or 0) > (b.id or 0)
@@ -326,7 +331,6 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
         return aSkill > bSkill
     end)
 
-    -- Extract ordered names for the carousel logic
     local expansionNames = {}
     for _, item in ipairs(expansionsList) do
         table.insert(expansionNames, item.name)
@@ -335,15 +339,12 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
     local currentIndex = 1
 
     ----------------------------------------------------
-    -- Profession Name
+    -- UI elements
     ----------------------------------------------------
     local profTitle = card:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     profTitle:SetPoint("TOP", 0, -10)
     profTitle:SetText(profName)
 
-    ----------------------------------------------------
-    -- Expansion Header + Arrows
-    ----------------------------------------------------
     local leftButton = CreateFrame("Button", nil, card, "UIPanelButtonTemplate")
     leftButton:SetSize(25, 25)
     leftButton:SetPoint("TOPLEFT", 10, -40)
@@ -357,9 +358,6 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
     local expansionLabel = card:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
     expansionLabel:SetPoint("TOP", 0, -45)
 
-    ----------------------------------------------------
-    -- Skill / Knowledge Info
-    ----------------------------------------------------
     local skillText = card:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     skillText:SetPoint("TOP", expansionLabel, "BOTTOM", 0, -10)
 
@@ -367,26 +365,55 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
     knowledgeText:SetPoint("TOP", skillText, "BOTTOM", 0, -5)
 
     ------------------------------------------------------------
-    -- WEEKLY SECTION CONTAINER (must exist BEFORE UpdateDisplay)
+    -- WEEKLY container: parented to card (guaranteed to persist)
     ------------------------------------------------------------
-    card.weeklySection = CreateFrame("Frame", nil, skillText)
-    card.weeklySection:SetPoint("TOPLEFT", skillText, "TOPLEFT", 0, 0)
-    card.weeklySection:SetPoint("TOPRIGHT", skillText, "TOPRIGHT", 0, 0)
-    card.weeklySection:SetHeight(10)  -- will be resized dynamically
+    card.weeklySection = CreateFrame("Frame", nil, card)
+    -- we'll position it relative to knowledgeText inside UpdateDisplay
+    card.weeklySection:SetHeight(10)  -- will grow dynamically
+    card.weeklySection.entries = card.weeklySection.entries or {}
 
     card.weeklyHeader = card.weeklySection:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     card.weeklyHeader:SetPoint("TOPLEFT", 0, 0)
     card.weeklyHeader:SetText("Weekly Knowledge")
 
+    ----------------------------------------------------
+    -- Reusable helper for weekly entries
+    ----------------------------------------------------
+    local function AddWeeklyEntry(section, labelText, done)
+        local line = CreateFrame("Frame", nil, section)
+        line:SetHeight(18)
+
+        line.status = line:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+        line.status:SetPoint("LEFT", 0, 0)
+        line.status:SetText(done and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t" or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t")
+
+        line.label = line:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+        line.label:SetPoint("LEFT", line.status, "RIGHT", 6, 0)
+        line.label:SetText(labelText or "Entry")
+
+        table.insert(section.entries, line)
+        return line
+    end
+
+    local function ClearSection(section)
+        if not section then return end
+        for _, v in ipairs(section.entries or {}) do
+            if v.Hide then v:Hide() end
+            v:SetParent(nil)
+        end
+        section.entries = {}
+    end
 
     ----------------------------------------------------
-    -- Update Display
+    -- Update Display (keeps weekly code here but PROF ID known first)
     ----------------------------------------------------
     local function UpdateDisplay()
         if #expansionNames == 0 then
             expansionLabel:SetText("No expansion data")
             skillText:SetText("")
             knowledgeText:SetText("")
+            -- hide weekly if no expansion
+            card.weeklySection:Hide()
             return
         end
 
@@ -396,7 +423,17 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
             expansionLabel:SetText(expName or "Unknown")
             skillText:SetText("Skill: 0 / 0")
             knowledgeText:SetText("")
+            card.weeklySection:Hide()
             return
+        end
+
+        -- ensure we have a profID to look up KPReference
+        local profID = card._profNameToID and card._profNameToID[profName]
+        -- if profID nil, try fallback numeric parsing (rare)
+        if not profID then
+            for _, p in ipairs(ProfessionData) do
+                if p.name == profName then profID = p.id break end
+            end
         end
 
         expansionLabel:SetText(expName)
@@ -411,221 +448,109 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
             knowledgeText:Hide()
         end
 
-    --------------------------------------------------------------------
-    -- WEEKLY KNOWLEDGE DISPLAY (DYNAMIC, FIXED ANCHORS + HEIGHT)
-    --------------------------------------------------------------------
-    local ref = KPReference[profID] and KPReference[profID][expData.id]
-    local wk = expData.weeklyKnowledgePoints or {}
-    local section = card.weeklySection
+        -- Position weeklySection under knowledgeText now that knowledgeText exists
+        card.weeklySection:ClearAllPoints()
+        card.weeklySection:SetPoint("TOPLEFT", knowledgeText, "BOTTOMLEFT", 0, -12)
+        card.weeklySection:SetPoint("TOPRIGHT", knowledgeText, "BOTTOMRIGHT", 0, -12)
+        ClearSection(card.weeklySection)
 
-    -- Clear previous entries
-    if section.entries then
-        for _, e in ipairs(section.entries) do e:Hide() end
-    end
-    section.entries = {}
+        local ref = (profID and KPReference[profID]) and KPReference[profID][expData.id]
+        local wk = expData.weeklyKnowledgePoints or {}
 
-    -- Always anchor weeklySection under knowledgeText
-    section:ClearAllPoints()
-    section:SetPoint("TOPLEFT", knowledgeText, "BOTTOMLEFT", 0, -15)
-    section:SetPoint("TOPRIGHT", knowledgeText, "BOTTOMRIGHT", 0, -15)
-
-    local yOffset = 0
-    local totalHeight = 0
-
-    local function AddWeeklyLine(text)
-        local line = section:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        line:SetPoint("TOPLEFT", 0, yOffset)
-        line:SetText(text)
-        yOffset = yOffset - 18
-        totalHeight = totalHeight + 18
-        table.insert(section.entries, line)
-    end
-
-    local function AddWeeklyEntry(item, done)
-        local line = CreateFrame("Frame", nil, section)
-        line:SetHeight(18)
-        line:SetPoint("TOPLEFT", 0, yOffset)
-
-        local status = line:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        status:SetPoint("LEFT")
-        status:SetText(done and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t" or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t")
-
-        local label = line:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        label:SetPoint("LEFT", status, "RIGHT", 6, 0)
-        label:SetText(item.label or "Treasure")
-
-        yOffset = yOffset - 20
-        totalHeight = totalHeight + 20
-        table.insert(section.entries, line)
-    end
-
-    section.weeklyHeader:ClearAllPoints()
-    section.weeklyHeader:SetPoint("TOPLEFT", 0, yOffset)
-    table.insert(section.entries, section.weeklyHeader)
-    yOffset = yOffset - 25
-    totalHeight = totalHeight + 25
-
-    --------------------------------------------------------------------
-    -- GATHERING PROFESSIONS  (HERB/MINE/SKIN – 1/5 → 5/5)
-    --------------------------------------------------------------------
-    if ref and ref.weekly then
-        if profID == 182 or profID == 186 or profID == 393 then
-            local total = #ref.weekly.treasures
-            local done = (wk.treasures and total) or 0
-            local text = string.format("Weekly Treasures: %d/%d", done, total)
-            if wk.treasures then
-                text = text .. " |TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t"
-            end
-            section.weeklyHeader:SetText(text)
-
-    --------------------------------------------------------------------
-    -- ENCHANTING — DISENCHANTING WEEKLY  (X/Y + entries)
-    --------------------------------------------------------------------
-        elseif profID == 333 and ref.weekly.disenchanting then
-            local items = ref.weekly.disenchanting
-            local total = #items
-            local count = 0
-
-            for _, item in ipairs(items) do
-                local q = item.questID
-                local completed = true
-
-                if type(q) == "table" then
-                    for _, id in ipairs(q) do
-                        if not C_QuestLog.IsQuestFlaggedCompleted(id) then
-                            completed = false
-                        end
-                    end
-                else
-                    completed = C_QuestLog.IsQuestFlaggedCompleted(q)
-                end
-
-                if completed then
-                    count = count + 1
-                end
-            end
-
-            local text = string.format("Weekly Disenchanting: %d/%d", count, total)
-            if count == total then
-                text = text .. " |TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t"
-            end
-
-            section.weeklyHeader:SetText(text)
-
-            -- Detailed list
-            for i, item in ipairs(items) do
-                local done = (i <= count)
-                AddWeeklyEntry(item, done)
-            end
-
-    --------------------------------------------------------------------
-    -- OTHER PROFESSIONS — STACKED TREASURE LIST
-    --------------------------------------------------------------------
-        elseif ref.weekly.treasures then
-            section.weeklyHeader:SetText("Weekly Treasures")
-
-            for _, item in ipairs(ref.weekly.treasures) do
-                local q = item.questID
-                local completed = false
-
-                if type(q) == "table" then
-                    for _, id in ipairs(q) do
-                        if C_QuestLog.IsQuestFlaggedCompleted(id) then
-                            completed = true
-                            break
-                        end
-                    end
-                else
-                    completed = C_QuestLog.IsQuestFlaggedCompleted(q)
-                end
-
-                AddWeeklyEntry(item, completed)
-            end
-        end
-    end
-
-    -- resize section height
-    section:SetHeight(totalHeight)
-    -- resize card to prevent clipping
-    card:SetHeight(150 + totalHeight)
-
-
-        -- Create once (if not already created)
-        if not card.treasureStatus then
-            card.treasureStatus = card:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-            card.treasureStatus:SetPoint("TOPLEFT", skillText, "BOTTOMLEFT", 0, -25)
-
-            card.openTreasureBtn = CreateFrame("Button", nil, card, "UIPanelButtonTemplate")
-            card.openTreasureBtn:SetSize(110, 20)
-            card.openTreasureBtn:SetPoint("LEFT", card.treasureStatus, "RIGHT", 8, 0)
-            card.openTreasureBtn:SetText("Show Missing")
-        end
-
-        -- Update text
-        local tex = expData.oneTimeCollectedAll
-            and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t"
-            or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
-
-        card.treasureStatus:SetText(string.format("%s One-Time Treasures", tex))
-
-        -- Ensure we have a profName -> profID lookup (create once per card)
-        if not card._profNameToID then
-            card._profNameToID = {}
-            for _, p in ipairs(ProfessionData) do
-                card._profNameToID[p.name] = p.id
-            end
-        end
-
-        local profID = card._profNameToID[profName]
-        local expIndex = expData and expData.id
-
-        -- Determine whether this expansion actually has one-time treasures in KPReference
-        local hasOneTimeRef = false
-        if profID and expIndex and KPReference[profID] and KPReference[profID][expIndex] and KPReference[profID][expIndex].oneTime then
-            local oneTime = KPReference[profID][expIndex].oneTime
-            -- Guard: some of your KPReference entries use .treasures nested
-            if (type(oneTime) == "table" and (oneTime.treasures or next(oneTime))) then
-                hasOneTimeRef = true
-            end
-        end
-
-        -- Create persistent widgets if not present (created once)
-        if not card.treasureStatus then
-            card.treasureStatus = card:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-            card.treasureStatus:SetPoint("TOPLEFT", skillText, "BOTTOMLEFT", 0, -25)
-
-            card.openTreasureBtn = CreateFrame("Button", nil, card, "UIPanelButtonTemplate")
-            card.openTreasureBtn:SetSize(110, 20)
-            card.openTreasureBtn:SetPoint("LEFT", card.treasureStatus, "RIGHT", 8, 0)
-            card.openTreasureBtn:SetText("Show Missing")
-        end
-
-        -- If expansion doesn't have any one-time treasures defined, hide both widgets entirely
-        if not hasOneTimeRef then
-            card.treasureStatus:Hide()
-            card.openTreasureBtn:Hide()
+        -- if no weekly data, hide section
+        if not ref or not ref.weekly then
+            card.weeklySection:Hide()
         else
-            -- There is a one-time reference — update the text and button visibility according to data
-            local tex = expData.oneTimeCollectedAll
-                and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t"
-                or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
+            -- show header and build content
+            card.weeklySection:Show()
+            local y = 0
+            -- set header text default then override per-type
+            card.weeklyHeader:ClearAllPoints()
+            card.weeklyHeader:SetPoint("TOPLEFT", 0, y)
+            table.insert(card.weeklySection.entries, card.weeklyHeader)
+            y = y - 24
 
-            card.treasureStatus:SetText(string.format("%s One-Time Treasures", tex))
-            card.treasureStatus:Show()
+            -- GATHERING (Herb 182, Mine 186, Skin 393)
+            if profID == 182 or profID == 186 or profID == 393 then
+                local total = 0
+                if ref.weekly.treasures and type(ref.weekly.treasures) == "table" then
+                    total = #ref.weekly.treasures
+                end
+                local done = wk.treasures and total or 0
+                local text = string.format("Weekly Treasures: %d/%d", done, total)
+                if wk.treasures then text = text .. " |TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t" end
+                card.weeklyHeader:SetText(text)
 
-            if not expData.oneTimeCollectedAll and expData.missingOneTimeTreasures and #expData.missingOneTimeTreasures > 0 then
-                card.openTreasureBtn:Show()
-                card.openTreasureBtn:SetScript("OnClick", function()
-                    ProfessionTrackerUI:ShowMissingTreasureWindow(expData.missingOneTimeTreasures, profName, expName)
-                end)
-            else
-                card.openTreasureBtn:Hide()
+            -- ENCHANTING DISENCHANTING
+            elseif profID == 333 and ref.weekly.disenchanting then
+                local items = ref.weekly.disenchanting
+                local total = #items
+                local completedCount = 0
+
+                for _, it in ipairs(items) do
+                    local q = it.questID
+                    local ok = true
+                    if type(q) == "table" then
+                        for _, id in ipairs(q) do
+                            if not C_QuestLog.IsQuestFlaggedCompleted(id) then ok = false break end
+                        end
+                    else
+                        ok = C_QuestLog.IsQuestFlaggedCompleted(q)
+                    end
+                    if ok then completedCount = completedCount + 1 end
+                end
+
+                local text = string.format("Weekly Disenchanting: %d/%d", completedCount, total)
+                if completedCount == total then text = text .. " |TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t" end
+                card.weeklyHeader:SetText(text)
+
+                -- detailed list entries
+                for i, it in ipairs(items) do
+                    local q = it.questID
+                    local ok = false
+                    if type(q) == "table" then
+                        ok = true
+                        for _, id in ipairs(q) do
+                            if not C_QuestLog.IsQuestFlaggedCompleted(id) then ok = false break end
+                        end
+                    else
+                        ok = C_QuestLog.IsQuestFlaggedCompleted(q)
+                    end
+                    local entry = AddWeeklyEntry(card.weeklySection, it.label or ("Entry " .. i), ok)
+                    entry:SetPoint("TOPLEFT", 0, y)
+                    y = y - 20
+                end
+
+            -- OTHER PROFESSIONS: stacked treasure list (shows each treasure)
+            elseif ref.weekly.treasures then
+                card.weeklyHeader:SetText("Weekly Treasures")
+                for i, it in ipairs(ref.weekly.treasures) do
+                    local q = it.questID
+                    local ok = false
+                    if type(q) == "table" then
+                        for _, id in ipairs(q) do
+                            if C_QuestLog.IsQuestFlaggedCompleted(id) then ok = true break end
+                        end
+                    else
+                        ok = C_QuestLog.IsQuestFlaggedCompleted(q)
+                    end
+                    local entry = AddWeeklyEntry(card.weeklySection, it.label or ("Treasure " .. i), ok)
+                    entry:SetPoint("TOPLEFT", 0, y)
+                    y = y - 20
+                end
             end
+
+            -- finalize height of weeklySection based on entries
+            -- compute rows count (entries table includes header)
+            local rows = #card.weeklySection.entries or 0
+            local newHeight = math.max(18 * rows + 8, 10)
+            card.weeklySection:SetHeight(newHeight)
+
+            -- increase card height to fit content
+            local baseHeight = 150 -- your original base
+            card:SetHeight(baseHeight + newHeight)
         end
-
-
     end
-
 
     ----------------------------------------------------
     -- Arrow Logic (with Looping)
@@ -647,6 +572,7 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
     UpdateDisplay()
     return card
 end
+
 
 
 
