@@ -404,7 +404,7 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
         section.entries = {}
     end
 
-----------------------------------------------------
+    ----------------------------------------------------
     -- Update Display (keeps weekly code here but PROF ID known first)
     ----------------------------------------------------
     local function UpdateDisplay()
@@ -475,23 +475,11 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
         if profID == 182 or profID == 186 or profID == 393 then
             card.weeklyHeader:SetText("Weekly Treasures")
 
+            -- Use the saved weekly status, not live quest checks
+            local completed = wk.treasures or false
+
             if ref.weekly.treasures and type(ref.weekly.treasures) == "table" then
                 for i, item in ipairs(ref.weekly.treasures) do
-                    local q = item.questID
-                    local completed = false
-
-                    if type(q) == "table" then
-                        -- ANY completed = the treasure is collected
-                        for _, id in ipairs(q) do
-                            if C_QuestLog.IsQuestFlaggedCompleted(id) then
-                                completed = true
-                                break
-                            end
-                        end
-                    else
-                        completed = C_QuestLog.IsQuestFlaggedCompleted(q)
-                    end
-
                     local entry = AddWeeklyEntry(card.weeklySection, item.label or item.name or ("Treasure " .. i), completed)
                     entry:SetPoint("TOPLEFT", 0, y)
                     entry:SetPoint("TOPRIGHT", 0, y)
@@ -503,23 +491,10 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
         elseif profID == 333 and ref.weekly.disenchanting then
             card.weeklyHeader:SetText("Weekly Disenchanting")
 
+            -- Use the saved weekly status
+            local completed = wk.disenchanting or false
+
             for i, it in ipairs(ref.weekly.disenchanting) do
-                local q = it.questID
-                local completed = false
-
-                if type(q) == "table" then
-                    -- ALL quests in the table must be complete for this entry to count
-                    completed = true
-                    for _, id in ipairs(q) do
-                        if not C_QuestLog.IsQuestFlaggedCompleted(id) then
-                            completed = false
-                            break
-                        end
-                    end
-                else
-                    completed = C_QuestLog.IsQuestFlaggedCompleted(q)
-                end
-
                 local entry = AddWeeklyEntry(
                     card.weeklySection,
                     it.label or ("Disenchant " .. i),
@@ -534,17 +509,12 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
         -- OTHER PROFESSIONS: stacked treasure list (shows each treasure)
         elseif ref.weekly.treasures and type(ref.weekly.treasures) == "table" then
             card.weeklyHeader:SetText("Weekly Treasures")
+            
+            -- Use the saved weekly status
+            local completed = wk.treasures or false
+            
             for i, it in ipairs(ref.weekly.treasures) do
-                local q = it.questID
-                local ok = false
-                if type(q) == "table" then
-                    for _, id in ipairs(q) do
-                        if C_QuestLog.IsQuestFlaggedCompleted(id) then ok = true break end
-                    end
-                else
-                    ok = C_QuestLog.IsQuestFlaggedCompleted(q)
-                end
-                local entry = AddWeeklyEntry(card.weeklySection, it.label or it.name or ("Treasure " .. i), ok)
+                local entry = AddWeeklyEntry(card.weeklySection, it.label or it.name or ("Treasure " .. i), completed)
                 entry:SetPoint("TOPLEFT", 0, y)
                 entry:SetPoint("TOPRIGHT", 0, y)
                 y = y - 20
