@@ -369,7 +369,7 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
     ------------------------------------------------------------
     -- WEEKLY SECTION CONTAINER (must exist BEFORE UpdateDisplay)
     ------------------------------------------------------------
-    card.weeklySection = CreateFrame("Frame", nil, card)
+    card.weeklySection = CreateFrame("Frame", nil, skillText)
     card.weeklySection:SetPoint("TOPLEFT", skillText, "TOPLEFT", 0, 0)
     card.weeklySection:SetPoint("TOPRIGHT", skillText, "TOPRIGHT", 0, 0)
     card.weeklySection:SetHeight(10)  -- will be resized dynamically
