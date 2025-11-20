@@ -90,8 +90,8 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    { questID = 83253, name = "Alchemical Sediment" icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
-                    { questID = 83255, name = "Deepstone Crucible" icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
+                    { questID = 83253, name = "Alchemical Sediment", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
+                    { questID = 83255, name = "Deepstone Crucible", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
                 }
             },
             oneTime = {
@@ -178,8 +178,8 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    { questID = 83257, name = "Coreway Billet" icon = "Interface\\Icons\\inv_ingot_titansteel_dark"  },
-                    { questID = 83256, name = "Dense Bladestone" icon = "Interface\\Icons\\inv_stone_sharpeningstone_05"  },
+                    { questID = 83257, name = "Coreway Billet", icon = "Interface\\Icons\\inv_ingot_titansteel_dark"  },
+                    { questID = 83256, name = "Dense Bladestone", icon = "Interface\\Icons\\inv_stone_sharpeningstone_05"  },
                 }
             },
             oneTime = {
@@ -267,12 +267,12 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    { questID = 83259, name = "Crystalline Repository" icon = "Interface\\Icons\\inv_jewelcrafting_dawnstone_03"  },
-                    { questID = 83258, name = "Powdered Fulgurance" icon = "Interface\\Icons\\inv_enchanting_wod_dust"  },
+                    { questID = 83259, name = "Crystalline Repository", icon = "Interface\\Icons\\inv_jewelcrafting_dawnstone_03"  },
+                    { questID = 83258, name = "Powdered Fulgurance", icon = "Interface\\Icons\\inv_enchanting_wod_dust"  },
                 },
                 disenchanting = { 
-                    {label = "Fleeting Arcane Manifestation", questID = {84290, 84291, 84292, 84293, 84294} icon ="Interface\\Icons\\inv_magic_swirl_color2" },
-                    {label = "Gleaming Telluric Crystal", questID = 84295 icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
+                    {label = "Fleeting Arcane Manifestation", questID = {84290, 84291, 84292, 84293, 84294}, icon ="Interface\\Icons\\inv_magic_swirl_color2" },
+                    {label = "Gleaming Telluric Crystal", questID = 84295, icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
                 },
             },
             oneTime = {
@@ -355,8 +355,8 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    { questID = 83260, name = "Rust-Locked Mechanism" icon = "Interface\\Icons\\inv_misc_enggizmos_14"  },
-                    { questID = 83261, name = "Earthen Induction Coil" icon = "Interface\\Icons\\inv_misc_gear_03"  },
+                    { questID = 83260, name = "Rust-Locked Mechanism", icon = "Interface\\Icons\\inv_misc_enggizmos_14"  },
+                    { questID = 83261, name = "Earthen Induction Coil", icon = "Interface\\Icons\\inv_misc_gear_03"  },
                 }
             },
             oneTime = {
@@ -444,8 +444,8 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    { questID = 83264, name = "Striated Inkstone" icon = "Interface\\Icons\\inv_ore_shadestone"  },
-                    { questID = 83262, name = "Wax-Sealed Records" icon = "Interface\\Icons\\inv_letter_02"  },
+                    { questID = 83264, name = "Striated Inkstone", icon = "Interface\\Icons\\inv_ore_shadestone"  },
+                    { questID = 83262, name = "Wax-Sealed Records", icon = "Interface\\Icons\\inv_letter_02"  },
                 }
             },
             oneTime = {
@@ -533,8 +533,8 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    { questID = 83265, name = "Diaphanous Gem Shards" icon = "Interface\\Icons\\inv_jewelcrafting_70_gem01_white"  },
-                    { questID = 83266, name = "Deepstone Fragment" icon = "Interface\\Icons\\inv_misc_gem_x4_uncommon_cut_green"  },
+                    { questID = 83265, name = "Diaphanous Gem Shards", icon = "Interface\\Icons\\inv_jewelcrafting_70_gem01_white"  },
+                    { questID = 83266, name = "Deepstone Fragment", icon = "Interface\\Icons\\inv_misc_gem_x4_uncommon_cut_green"  },
                 }
             },
             oneTime = {
@@ -620,8 +620,8 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    { questID = 83268, name = "Stone-Leather Swatch" icon = "Interface\\Icons\\inv_10_skinning_scales_black"  },
-                    { questID = 83267, name = "Sturdy Nerubian Carapace" icon = "Interface\\Icons\\inv_shoulder_04"  },
+                    { questID = 83268, name = "Stone-Leather Swatch", icon = "Interface\\Icons\\inv_10_skinning_scales_black"  },
+                    { questID = 83267, name = "Sturdy Nerubian Carapace", icon = "Interface\\Icons\\inv_shoulder_04"  },
                 }
             },
             oneTime = {
@@ -706,8 +706,8 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    { questID = 83270, name = "Chitin Needle" icon = "Interface\\Icons\\inv_10_tailoring_purchasedthread_color1"  },
-                    { questID = 83269, name = "Spool of Webweave" icon = "Interface\\Icons\\inv_misc_thread_01"  },
+                    { questID = 83270, name = "Chitin Needle", icon = "Interface\\Icons\\inv_10_tailoring_purchasedthread_color1"  },
+                    { questID = 83269, name = "Spool of Webweave", icon = "Interface\\Icons\\inv_misc_thread_01"  },
                 }
             },
             oneTime = {
@@ -773,8 +773,8 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    {label = "Deepgrove Petal", questID = { 81416, 81417, 81418, 81419, 81420 } icon ="Interface\\Icons\\inv_magic_swirl_color2" },
-                    {label = "Deepgrove Rose", questID = 81421 icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
+                    {label = "Deepgrove Petal", questID = { 81416, 81417, 81418, 81419, 81420 }, icon ="Interface\\Icons\\inv_magic_swirl_color2" },
+                    {label = "Deepgrove Rose", questID = 81421, icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
                 }
             },
             oneTime = {
@@ -834,8 +834,8 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_crafting_orders", 
                 },
                 treasures = {
-                    {label = "Slab of Slate", questID = { 83054, 83053, 83052, 83051, 83050 } icon ="Interface\\Icons\\inv_magic_swirl_color2" },
-                    {label = "Erosion-Polished Slate", questID = 83049 icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
+                    {label = "Slab of Slate", questID = { 83054, 83053, 83052, 83051, 83050 }, icon ="Interface\\Icons\\inv_magic_swirl_color2" },
+                    {label = "Erosion-Polished Slate", questID = 83049, icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
                 }
             },
             oneTime = {
@@ -891,8 +891,8 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    {label = "Toughened Tempest Pelt", questID = { 81459, 81460, 81461, 81462, 81463 } icon ="Interface\\Icons\\inv_magic_swirl_color2" },
-                    {label = "Abyssal Fur", questID = 81464 icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
+                    {label = "Toughened Tempest Pelt", questID = { 81459, 81460, 81461, 81462, 81463 }, icon ="Interface\\Icons\\inv_magic_swirl_color2" },
+                    {label = "Abyssal Fur", questID = 81464, icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
                 }
             },
             oneTime = {
