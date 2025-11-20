@@ -1102,6 +1102,39 @@ local function SafeIsQuestCompleted(qID)
     return ok and result
 end
 
+-- Returns true if ANY questID in a table is completed
+local function AnyQuestCompleted(questTable)
+    for _, q in ipairs(questTable) do
+        if C_QuestLog.IsQuestFlaggedCompleted(q) then
+            return true
+        end
+    end
+    return false
+end
+
+-- Returns true if ALL questIDs in a table are completed
+local function AllQuestsCompleted(questTable)
+    for _, q in ipairs(questTable) do
+        if not C_QuestLog.IsQuestFlaggedCompleted(q) then
+            return false
+        end
+    end
+    return true
+end
+
+-- Handles a questID that may be:
+--  • a number  
+--  • a list of numbers (ANY needed)  
+local function WeeklyQuestCompleted(questID)
+    if type(questID) == "number" then
+        return C_QuestLog.IsQuestFlaggedCompleted(questID)
+    elseif type(questID) == "table" then
+        return AnyQuestCompleted(questID)
+    end
+    return false
+end
+
+
 
 -- ========================================================
 -- Profession Data Retrieval
@@ -1568,6 +1601,9 @@ local function UpdateCharacterProfessionData()
             professions[savedName] = nil
         end
     end
+
+
+
 
     -- ===== ALWAYS re-evaluate one-time treasures AFTER we've merged/kept expansion structure =====
     -- This is the key: RecalculateOneTimeTreasures doesn't require TradeSkill UI.
