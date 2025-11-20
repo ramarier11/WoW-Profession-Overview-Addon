@@ -1338,20 +1338,87 @@ local function RecalculateWeeklyKnowledgePoints()
         ref
     )
         if not ref.weekly then return end
-        
+
         expData.weeklyKnowledgePoints = expData.weeklyKnowledgePoints or {}
         local wk = expData.weeklyKnowledgePoints
 
-        -- Treatise
+        --------------------------------------------------
+        -- Helper: check if ANY quest in array is complete
+        --------------------------------------------------
+        local function AnyCompleted(questList)
+            for _, q in ipairs(questList) do
+                if SafeIsQuestCompleted(q) then
+                    return true
+                end
+            end
+            return false
+        end
+
+        --------------------------------------------------
+        -- Helper: check if ALL quests (single or arrays)
+        -- inside a set of treasure entries are complete
+        --------------------------------------------------
+        local function AllTreasureEntriesComplete(entries)
+            for _, entry in ipairs(entries) do
+                local q = entry.questID
+
+                if type(q) == "table" then
+                    -- must complete *all* inside this table
+                    for _, innerID in ipairs(q) do
+                        if not SafeIsQuestCompleted(innerID) then
+                            return false
+                        end
+                    end
+                else
+                    -- single quest
+                    if not SafeIsQuestCompleted(q) then
+                        return false
+                    end
+                end
+            end
+            return true
+        end
+
+        --------------------------------------------------
+        -- Treatise (always single quest)
+        --------------------------------------------------
         if ref.weekly.treatise and ref.weekly.treatise.questID then
             wk.treatise = SafeIsQuestCompleted(ref.weekly.treatise.questID)
         end
 
-        -- Future weekly types fit right here:
-        -- if ref.weekly.craftingOrderQuest then ... end
-        -- if ref.weekly.treasures then ... end
+        --------------------------------------------------
+        -- Crafting Orders (array of questIDs)
+        -- Weekly is complete if ANY assigned weekly is done
+        --------------------------------------------------
+        if ref.weekly.craftingOrder and ref.weekly.craftingOrder.questID then
+            local q = ref.weekly.craftingOrder.questID
+            if type(q) == "table" then
+                wk.craftingOrderQuest = AnyCompleted(q)
+            else
+                wk.craftingOrderQuest = SafeIsQuestCompleted(q)
+            end
+        end
+
+        --------------------------------------------------
+        -- Gathering Weekly Treasures
+        -- Each entry: questID (single or table)
+        -- Entire weekly = TRUE if *all* treasure entries done
+        --------------------------------------------------
+        if ref.weekly.treasures and type(ref.weekly.treasures) == "table" then
+            wk.treasures = AllTreasureEntriesComplete(ref.weekly.treasures)
+        end
+
+        --------------------------------------------------
+        -- Enchanting “disenchanting” weekly
+        -- Same rules as gathering: must complete ALL
+        --------------------------------------------------
+        if ref.weekly.disenchanting and type(ref.weekly.disenchanting) == "table" then
+            wk.disenchanting = AllTreasureEntriesComplete(ref.weekly.disenchanting)
+        end
+
     end)
 end
+
 
 
 
