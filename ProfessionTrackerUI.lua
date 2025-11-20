@@ -366,15 +366,18 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
     local knowledgeText = card:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     knowledgeText:SetPoint("TOP", skillText, "BOTTOM", 0, -5)
 
-    -- Weekly Section (container)
-    card.weeklySection = CreateFrame("Frame", nil, card)
-    card.weeklySection:SetPoint("TOPLEFT", card.kpSection, "BOTTOMLEFT", 0, -10)
-    card.weeklySection:SetPoint("TOPRIGHT", card.kpSection, "BOTTOMRIGHT", 0, -10)
-    card.weeklySection:SetHeight(10)
+    ------------------------------------------------------------
+    -- WEEKLY SECTION CONTAINER (must exist BEFORE UpdateDisplay)
+    ------------------------------------------------------------
+    card.weeklySection = CreateFrame("Frame", nil, card.content)
+    card.weeklySection:SetPoint("TOPLEFT", card.content, "TOPLEFT", 0, 0)
+    card.weeklySection:SetPoint("TOPRIGHT", card.content, "TOPRIGHT", 0, 0)
+    card.weeklySection:SetHeight(10)  -- will be resized dynamically
 
     card.weeklyHeader = card.weeklySection:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     card.weeklyHeader:SetPoint("TOPLEFT", 0, 0)
     card.weeklyHeader:SetText("Weekly Knowledge")
+
 
     ----------------------------------------------------
     -- Update Display
