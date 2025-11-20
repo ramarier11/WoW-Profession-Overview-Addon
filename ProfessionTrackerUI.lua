@@ -446,23 +446,10 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
             knowledgeText:Hide()
         end
 
-        -- Show/Hide One-Time Treasure Button
-        if expData.missingOneTimeTreasures and #expData.missingOneTimeTreasures > 0 then
-            card.treasureButton:Show()
-            card.treasureButton:SetText(string.format("Missing Treasures (%d)", #expData.missingOneTimeTreasures))
-        else
-            card.treasureButton:Hide()
-        end
-
-        -- Position weeklySection under treasureButton (or knowledgeText if button hidden)
+        -- Position weeklySection under knowledgeText
         card.weeklySection:ClearAllPoints()
-        if card.treasureButton:IsShown() then
-            card.weeklySection:SetPoint("TOPLEFT", card.treasureButton, "BOTTOMLEFT", 0, -12)
-            card.weeklySection:SetPoint("TOPRIGHT", card.treasureButton, "BOTTOMRIGHT", 0, -12)
-        else
-            card.weeklySection:SetPoint("TOPLEFT", knowledgeText, "BOTTOMLEFT", 0, -12)
-            card.weeklySection:SetPoint("TOPRIGHT", knowledgeText, "BOTTOMRIGHT", 0, -12)
-        end
+        card.weeklySection:SetPoint("TOPLEFT", knowledgeText, "BOTTOMLEFT", 0, -12)
+        card.weeklySection:SetPoint("TOPRIGHT", knowledgeText, "BOTTOMRIGHT", 0, -12)
         ClearSection(card.weeklySection)
 
         local ref = (profID and KPReference[profID]) and KPReference[profID][expData.id]
@@ -542,8 +529,7 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
 
         -- increase card height to fit content
         local baseHeight = 150
-        local treasureButtonHeight = card.treasureButton:IsShown() and 34 or 0
-        card:SetHeight(baseHeight + treasureButtonHeight + newHeight)
+        card:SetHeight(baseHeight + newHeight)
     end
 
     ----------------------------------------------------
