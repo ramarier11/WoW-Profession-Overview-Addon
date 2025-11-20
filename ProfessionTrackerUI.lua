@@ -404,7 +404,7 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
         section.entries = {}
     end
 
-    ----------------------------------------------------
+----------------------------------------------------
     -- Update Display (keeps weekly code here but PROF ID known first)
     ----------------------------------------------------
     local function UpdateDisplay()
@@ -412,7 +412,6 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
             expansionLabel:SetText("No expansion data")
             skillText:SetText("")
             knowledgeText:SetText("")
-            -- hide weekly if no expansion
             card.weeklySection:Hide()
             return
         end
@@ -429,7 +428,6 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
 
         -- ensure we have a profID to look up KPReference
         local profID = card._profNameToID and card._profNameToID[profName]
-        -- if profID nil, try fallback numeric parsing (rare)
         if not profID then
             for _, p in ipairs(ProfessionData) do
                 if p.name == profName then profID = p.id break end
@@ -448,7 +446,7 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
             knowledgeText:Hide()
         end
 
-        -- Position weeklySection under knowledgeText now that knowledgeText exists
+        -- Position weeklySection under knowledgeText
         card.weeklySection:ClearAllPoints()
         card.weeklySection:SetPoint("TOPLEFT", knowledgeText, "BOTTOMLEFT", 0, -12)
         card.weeklySection:SetPoint("TOPRIGHT", knowledgeText, "BOTTOMRIGHT", 0, -12)
@@ -460,49 +458,52 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
         -- if no weekly data, hide section
         if not ref or not ref.weekly then
             card.weeklySection:Hide()
-        else
-            -- show header and build content
-            card.weeklySection:Show()
-            local y = 0
-            -- set header text default then override per-type
-            card.weeklyHeader:ClearAllPoints()
-            card.weeklyHeader:SetPoint("TOPLEFT", 0, y)
-            table.insert(card.weeklySection.entries, card.weeklyHeader)
-            y = y - 24
+            card:SetHeight(150)
+            return
+        end
+
+        -- show header and build content
+        card.weeklySection:Show()
+        local y = 0
+        
+        card.weeklyHeader:ClearAllPoints()
+        card.weeklyHeader:SetPoint("TOPLEFT", 0, y)
+        table.insert(card.weeklySection.entries, card.weeklyHeader)
+        y = y - 24
 
         -- GATHERING PROFESSIONS (Herbalism 182, Mining 186, Skinning 393)
         if profID == 182 or profID == 186 or profID == 393 then
             card.weeklyHeader:SetText("Weekly Treasures")
 
-            for i, item in ipairs(ref.weekly.treasures) do
-                local q = item.questID
-                local completed = false
+            if ref.weekly.treasures and type(ref.weekly.treasures) == "table" then
+                for i, item in ipairs(ref.weekly.treasures) do
+                    local q = item.questID
+                    local completed = false
 
-                if type(q) == "table" then
-                    -- ANY completed = the treasure is collected
-                    for _, id in ipairs(q) do
-                        if C_QuestLog.IsQuestFlaggedCompleted(id) then
-                            completed = true
-                            break
+                    if type(q) == "table" then
+                        -- ANY completed = the treasure is collected
+                        for _, id in ipairs(q) do
+                            if C_QuestLog.IsQuestFlaggedCompleted(id) then
+                                completed = true
+                                break
+                            end
                         end
+                    else
+                        completed = C_QuestLog.IsQuestFlaggedCompleted(q)
                     end
-                else
-                    completed = C_QuestLog.IsQuestFlaggedCompleted(q)
-                end
 
-                local entry = AddWeeklyEntry(card.weeklySection, item.label or ("Treasure " .. i), completed)
-                entry:SetPoint("TOPLEFT", 0, y)
-                y = y - 20
+                    local entry = AddWeeklyEntry(card.weeklySection, item.label or item.name or ("Treasure " .. i), completed)
+                    entry:SetPoint("TOPLEFT", 0, y)
+                    entry:SetPoint("TOPRIGHT", 0, y)
+                    y = y - 20
+                end
             end
 
-
-        -- ENCHANTING — DISENCHANTING (show each task separately like gathering)
+        -- ENCHANTING – DISENCHANTING (show each task separately)
         elseif profID == 333 and ref.weekly.disenchanting then
             card.weeklyHeader:SetText("Weekly Disenchanting")
 
-            local items = ref.weekly.disenchanting
-
-            for i, it in ipairs(items) do
+            for i, it in ipairs(ref.weekly.disenchanting) do
                 local q = it.questID
                 local completed = false
 
@@ -526,39 +527,38 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
                 )
 
                 entry:SetPoint("TOPLEFT", 0, y)
+                entry:SetPoint("TOPRIGHT", 0, y)
                 y = y - 20
             end
 
-
-            -- OTHER PROFESSIONS: stacked treasure list (shows each treasure)
-            elseif ref.weekly.treasures then
-                card.weeklyHeader:SetText("Weekly Treasures")
-                for i, it in ipairs(ref.weekly.treasures) do
-                    local q = it.questID
-                    local ok = false
-                    if type(q) == "table" then
-                        for _, id in ipairs(q) do
-                            if C_QuestLog.IsQuestFlaggedCompleted(id) then ok = true break end
-                        end
-                    else
-                        ok = C_QuestLog.IsQuestFlaggedCompleted(q)
+        -- OTHER PROFESSIONS: stacked treasure list (shows each treasure)
+        elseif ref.weekly.treasures and type(ref.weekly.treasures) == "table" then
+            card.weeklyHeader:SetText("Weekly Treasures")
+            for i, it in ipairs(ref.weekly.treasures) do
+                local q = it.questID
+                local ok = false
+                if type(q) == "table" then
+                    for _, id in ipairs(q) do
+                        if C_QuestLog.IsQuestFlaggedCompleted(id) then ok = true break end
                     end
-                    local entry = AddWeeklyEntry(card.weeklySection, it.label or ("Treasure " .. i), ok)
-                    entry:SetPoint("TOPLEFT", 0, y)
-                    y = y - 20
+                else
+                    ok = C_QuestLog.IsQuestFlaggedCompleted(q)
                 end
+                local entry = AddWeeklyEntry(card.weeklySection, it.label or it.name or ("Treasure " .. i), ok)
+                entry:SetPoint("TOPLEFT", 0, y)
+                entry:SetPoint("TOPRIGHT", 0, y)
+                y = y - 20
             end
-
-            -- finalize height of weeklySection based on entries
-            -- compute rows count (entries table includes header)
-            local rows = #card.weeklySection.entries or 0
-            local newHeight = math.max(18 * rows + 8, 10)
-            card.weeklySection:SetHeight(newHeight)
-
-            -- increase card height to fit content
-            local baseHeight = 150 -- your original base
-            card:SetHeight(baseHeight + newHeight)
         end
+
+        -- finalize height of weeklySection based on entries
+        local rows = #card.weeklySection.entries
+        local newHeight = math.max(18 * rows + 8, 10)
+        card.weeklySection:SetHeight(newHeight)
+
+        -- increase card height to fit content
+        local baseHeight = 150
+        card:SetHeight(baseHeight + newHeight)
     end
 
     ----------------------------------------------------
