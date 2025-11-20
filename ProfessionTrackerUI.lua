@@ -366,6 +366,16 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
     local knowledgeText = card:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     knowledgeText:SetPoint("TOP", skillText, "BOTTOM", 0, -5)
 
+    -- Weekly Section (container)
+    card.weeklySection = CreateFrame("Frame", nil, card)
+    card.weeklySection:SetPoint("TOPLEFT", card.kpSection, "BOTTOMLEFT", 0, -10)
+    card.weeklySection:SetPoint("TOPRIGHT", card.kpSection, "BOTTOMRIGHT", 0, -10)
+    card.weeklySection:SetHeight(10)
+
+    card.weeklyHeader = card.weeklySection:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    card.weeklyHeader:SetPoint("TOPLEFT", 0, 0)
+    card.weeklyHeader:SetText("Weekly Knowledge")
+
     ----------------------------------------------------
     -- Update Display
     ----------------------------------------------------
@@ -397,6 +407,117 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
         else
             knowledgeText:Hide()
         end
+
+    --------------------------------------------------------------------
+    -- WEEKLY KNOWLEDGE DISPLAY
+    --------------------------------------------------------------------
+    local ref = KPReference[profID] and KPReference[profID][expIndex]
+    local wk = expData.weeklyKnowledgePoints or {}
+    local section = card.weeklySection
+
+    -- Clear previous weekly entries
+    if section.entries then
+        for _, e in ipairs(section.entries) do e:Hide() end
+    end
+    section.entries = {}
+
+    local y = -20 -- spacing offset
+
+    if ref and ref.weekly then
+        --------------------------------------------------------
+        -- 1) GATHERING PROFESSIONS
+        --------------------------------------------------------
+        if profID == 182 or profID == 186 or profID == 393 then
+            local total = #ref.weekly.treasures
+            local completed = (wk.treasures and total) or 0
+            local text = string.format("%d/%d", completed, total)
+
+            if wk.treasures then
+                text = text .. "  |TInterface\\RaidFrame\\ReadyCheck-Ready:0|t"
+            end
+
+            section.weeklyHeader:SetText("Weekly Treasures: " .. text)
+
+        --------------------------------------------------------
+        -- 2) ENCHANTING DISENCHANTING
+        --------------------------------------------------------
+        elseif profID == 333 and ref.weekly.disenchanting then
+            local items = ref.weekly.disenchanting
+            local total = #items
+            local completedCount = 0
+
+            for _, item in ipairs(items) do
+                local q = item.questID
+                local done
+
+                if type(q) == "table" then
+                    done = true
+                    for _, id in ipairs(q) do
+                        if not C_QuestLog.IsQuestFlaggedCompleted(id) then
+                            done = false break
+                        end
+                    end
+                else
+                    done = C_QuestLog.IsQuestFlaggedCompleted(q)
+                end
+
+                if done then completedCount = completedCount + 1 end
+            end
+
+            local text = string.format("%d/%d", completedCount, total)
+            if completedCount == total then
+                text = text .. "  |TInterface\\RaidFrame\\ReadyCheck-Ready:0|t"
+            end
+
+            section.weeklyHeader:SetText("Weekly Disenchanting: " .. text)
+
+            -- Detailed entries
+            for i, item in ipairs(items) do
+                local entry = section.entries[i] or CreateWeeklyEntry(section)
+                section.entries[i] = entry
+
+                entry:SetPoint("TOPLEFT", 0, y)
+                y = y - 24
+
+                local done = (i <= completedCount)
+                entry.status:SetText(done and "|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t" or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:0|t")
+                entry.label:SetText(item.label or ("Entry " .. i))
+                entry.icon:SetTexture(item.icon or 134400)
+                entry:Show()
+            end
+
+        --------------------------------------------------------
+        -- 3) ALL OTHER PROFESSIONS: Vertical list of treasures
+        --------------------------------------------------------
+        elseif ref.weekly.treasures then
+            section.weeklyHeader:SetText("Weekly Treasures")
+
+            for i, item in ipairs(ref.weekly.treasures) do
+                local entry = section.entries[i] or CreateWeeklyEntry(section)
+                section.entries[i] = entry
+
+                entry:SetPoint("TOPLEFT", 0, y)
+                y = y - 24
+
+                local q = item.questID
+                local done = false
+                if type(q) == "table" then
+                    for _, id in ipairs(q) do
+                        if C_QuestLog.IsQuestFlaggedCompleted(id) then done = true break end
+                    end
+                else
+                    done = C_QuestLog.IsQuestFlaggedCompleted(q)
+                end
+
+                entry.status:SetText(done and "|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t" or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:0|t")
+                entry.label:SetText(item.label or ("Entry " .. i))
+                entry.icon:SetTexture(item.icon or 134400)
+                entry:Show()
+            end
+        end
+    end
+
+
 
         -- Create once (if not already created)
         if not card.treasureStatus then
@@ -513,37 +634,23 @@ local function GetCharacterKey()
     return string.format("%s-%s", name, realm)
 end
 
--- function ProfessionTrackerUI:RefreshMissingTreasureWindow()
---     local win = self.missingTreasureWindow
---     if not win or not win:IsShown() then return end
---     if not win.profName or not win.expName then return end
+local function CreateWeeklyEntry(parent)
+    local f = CreateFrame("Frame", nil, parent)
+    f:SetHeight(20)
 
---     local charKey = ProfessionTracker.UI.currentCharacterKey
---     local charData = ProfessionTrackerDB.characters[charKey]
---     if not charData then return end
+    f.icon = f:CreateTexture(nil, "ARTWORK")
+    f.icon:SetSize(20, 20)
+    f.icon:SetPoint("LEFT")
 
---     local profData = charData.professions[win.profName]
---     if not profData then
---         win:Hide()
---         return
---     end
+    f.status = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    f.status:SetPoint("LEFT", f.icon, "RIGHT", 4, 0)
 
---     local expData = profData.expansions[win.expName]
---     if not expData then
---         win:Hide()
---         return
---     end
+    f.label = f:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    f.label:SetPoint("LEFT", f.status, "RIGHT", 4, 0)
 
---     -- If all treasures collected, close the window
---     if expData.oneTimeCollectedAll then
---         win:Hide()
---         return
---     end
+    return f
+end
 
---     -- Rebuild using the updated missing treasures list
---     local missing = expData.missingOneTimeTreasures or {}
---     self:ShowMissingTreasureWindow(missing, win.profName, win.expName)
--- end
 function ProfessionTrackerUI:RefreshMissingTreasureWindow()
     
     local win = self.missingTreasureWindow
