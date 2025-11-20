@@ -466,9 +466,10 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
         card.weeklySection:Show()
         local y = 0
         
+        -- Update header text but don't add it to entries (it's persistent)
         card.weeklyHeader:ClearAllPoints()
         card.weeklyHeader:SetPoint("TOPLEFT", 0, y)
-        table.insert(card.weeklySection.entries, card.weeklyHeader)
+        card.weeklyHeader:Show()
         y = y - 24
 
         -- GATHERING PROFESSIONS (Herbalism 182, Mining 186, Skinning 393)
