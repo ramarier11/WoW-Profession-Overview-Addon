@@ -409,114 +409,142 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
         end
 
     --------------------------------------------------------------------
-    -- WEEKLY KNOWLEDGE DISPLAY
+    -- WEEKLY KNOWLEDGE DISPLAY (DYNAMIC, FIXED ANCHORS + HEIGHT)
     --------------------------------------------------------------------
-    local ref = KPReference[profID] and KPReference[profID][expIndex]
+    local ref = KPReference[profID] and KPReference[profID][expData.id]
     local wk = expData.weeklyKnowledgePoints or {}
     local section = card.weeklySection
 
-    -- Clear previous weekly entries
+    -- Clear previous entries
     if section.entries then
         for _, e in ipairs(section.entries) do e:Hide() end
     end
     section.entries = {}
 
-    local y = -20 -- spacing offset
+    -- Always anchor weeklySection under knowledgeText
+    section:ClearAllPoints()
+    section:SetPoint("TOPLEFT", knowledgeText, "BOTTOMLEFT", 0, -15)
+    section:SetPoint("TOPRIGHT", knowledgeText, "BOTTOMRIGHT", 0, -15)
 
+    local yOffset = 0
+    local totalHeight = 0
+
+    local function AddWeeklyLine(text)
+        local line = section:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+        line:SetPoint("TOPLEFT", 0, yOffset)
+        line:SetText(text)
+        yOffset = yOffset - 18
+        totalHeight = totalHeight + 18
+        table.insert(section.entries, line)
+    end
+
+    local function AddWeeklyEntry(item, done)
+        local line = CreateFrame("Frame", nil, section)
+        line:SetHeight(18)
+        line:SetPoint("TOPLEFT", 0, yOffset)
+
+        local status = line:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+        status:SetPoint("LEFT")
+        status:SetText(done and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t" or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t")
+
+        local label = line:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+        label:SetPoint("LEFT", status, "RIGHT", 6, 0)
+        label:SetText(item.label or "Treasure")
+
+        yOffset = yOffset - 20
+        totalHeight = totalHeight + 20
+        table.insert(section.entries, line)
+    end
+
+    section.weeklyHeader:ClearAllPoints()
+    section.weeklyHeader:SetPoint("TOPLEFT", 0, yOffset)
+    table.insert(section.entries, section.weeklyHeader)
+    yOffset = yOffset - 25
+    totalHeight = totalHeight + 25
+
+    --------------------------------------------------------------------
+    -- GATHERING PROFESSIONS  (HERB/MINE/SKIN – 1/5 → 5/5)
+    --------------------------------------------------------------------
     if ref and ref.weekly then
-        --------------------------------------------------------
-        -- 1) GATHERING PROFESSIONS
-        --------------------------------------------------------
         if profID == 182 or profID == 186 or profID == 393 then
             local total = #ref.weekly.treasures
-            local completed = (wk.treasures and total) or 0
-            local text = string.format("%d/%d", completed, total)
-
+            local done = (wk.treasures and total) or 0
+            local text = string.format("Weekly Treasures: %d/%d", done, total)
             if wk.treasures then
-                text = text .. "  |TInterface\\RaidFrame\\ReadyCheck-Ready:0|t"
+                text = text .. " |TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t"
             end
+            section.weeklyHeader:SetText(text)
 
-            section.weeklyHeader:SetText("Weekly Treasures: " .. text)
-
-        --------------------------------------------------------
-        -- 2) ENCHANTING DISENCHANTING
-        --------------------------------------------------------
+    --------------------------------------------------------------------
+    -- ENCHANTING — DISENCHANTING WEEKLY  (X/Y + entries)
+    --------------------------------------------------------------------
         elseif profID == 333 and ref.weekly.disenchanting then
             local items = ref.weekly.disenchanting
             local total = #items
-            local completedCount = 0
+            local count = 0
 
             for _, item in ipairs(items) do
                 local q = item.questID
-                local done
+                local completed = true
 
                 if type(q) == "table" then
-                    done = true
                     for _, id in ipairs(q) do
                         if not C_QuestLog.IsQuestFlaggedCompleted(id) then
-                            done = false break
+                            completed = false
                         end
                     end
                 else
-                    done = C_QuestLog.IsQuestFlaggedCompleted(q)
+                    completed = C_QuestLog.IsQuestFlaggedCompleted(q)
                 end
 
-                if done then completedCount = completedCount + 1 end
+                if completed then
+                    count = count + 1
+                end
             end
 
-            local text = string.format("%d/%d", completedCount, total)
-            if completedCount == total then
-                text = text .. "  |TInterface\\RaidFrame\\ReadyCheck-Ready:0|t"
+            local text = string.format("Weekly Disenchanting: %d/%d", count, total)
+            if count == total then
+                text = text .. " |TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t"
             end
 
-            section.weeklyHeader:SetText("Weekly Disenchanting: " .. text)
+            section.weeklyHeader:SetText(text)
 
-            -- Detailed entries
+            -- Detailed list
             for i, item in ipairs(items) do
-                local entry = section.entries[i] or CreateWeeklyEntry(section)
-                section.entries[i] = entry
-
-                entry:SetPoint("TOPLEFT", 0, y)
-                y = y - 24
-
-                local done = (i <= completedCount)
-                entry.status:SetText(done and "|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t" or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:0|t")
-                entry.label:SetText(item.label or ("Entry " .. i))
-                entry.icon:SetTexture(item.icon or 134400)
-                entry:Show()
+                local done = (i <= count)
+                AddWeeklyEntry(item, done)
             end
 
-        --------------------------------------------------------
-        -- 3) ALL OTHER PROFESSIONS: Vertical list of treasures
-        --------------------------------------------------------
+    --------------------------------------------------------------------
+    -- OTHER PROFESSIONS — STACKED TREASURE LIST
+    --------------------------------------------------------------------
         elseif ref.weekly.treasures then
             section.weeklyHeader:SetText("Weekly Treasures")
 
-            for i, item in ipairs(ref.weekly.treasures) do
-                local entry = section.entries[i] or CreateWeeklyEntry(section)
-                section.entries[i] = entry
-
-                entry:SetPoint("TOPLEFT", 0, y)
-                y = y - 24
-
+            for _, item in ipairs(ref.weekly.treasures) do
                 local q = item.questID
-                local done = false
+                local completed = false
+
                 if type(q) == "table" then
                     for _, id in ipairs(q) do
-                        if C_QuestLog.IsQuestFlaggedCompleted(id) then done = true break end
+                        if C_QuestLog.IsQuestFlaggedCompleted(id) then
+                            completed = true
+                            break
+                        end
                     end
                 else
-                    done = C_QuestLog.IsQuestFlaggedCompleted(q)
+                    completed = C_QuestLog.IsQuestFlaggedCompleted(q)
                 end
 
-                entry.status:SetText(done and "|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t" or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:0|t")
-                entry.label:SetText(item.label or ("Entry " .. i))
-                entry.icon:SetTexture(item.icon or 134400)
-                entry:Show()
+                AddWeeklyEntry(item, completed)
             end
         end
     end
 
+    -- resize section height
+    section:SetHeight(totalHeight)
+    -- resize card to prevent clipping
+    card:SetHeight(150 + totalHeight)
 
 
         -- Create once (if not already created)
