@@ -1369,7 +1369,7 @@ local function RecalculateWeeklyKnowledgePoints()
                     allCompleted = false
                 end
             end
-
+            print(#wk.gatherNodes)
             wk.gatherNodesAllComplete = allCompleted
         end
 
