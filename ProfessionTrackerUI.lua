@@ -375,9 +375,7 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
     card.weeklyTreasuresHeader = card.weeklySection:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     card.weeklyTreasuresHeader:SetPoint("TOPLEFT", 0, 0)
     card.weeklyTreasuresHeader:SetText("Weekly Knowledge")
-    card.weeklyDisenchantingHeader = card.weeklySection:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    card.weeklyDisenchantingHeader:SetPoint("TOPLEFT", 0, 0)
-    card.weeklyDisenchantingHeader:SetText("Disenchanting Weekly")
+    
 
     ----------------------------------------------------
     -- Reusable helper for weekly entries
@@ -553,6 +551,9 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
 
         -- ENCHANTING – DISENCHANTING (show each task separately)
         if profID == 333 and ref.weekly.gatherNodes then
+            card.weeklyDisenchantingHeader = card.weeklySection:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+            card.weeklyDisenchantingHeader:SetPoint("TOPLEFT", 0, 0)
+            card.weeklyDisenchantingHeader:SetText("Disenchanting Weekly")
             card.weeklyDisenchantingHeader:SetText("Weekly Disenchanting")
 
             -- Use the saved weekly status
