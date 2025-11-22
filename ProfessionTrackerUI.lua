@@ -552,6 +552,7 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
         -- ENCHANTING – DISENCHANTING (show each task separately)
         if profID == 333 and ref.weekly.gatherNodes then
             card.weeklyDisenchantingSection = CreateFrame("Frame", nil, weeklySection)
+            card.weeklyDisenchantingSection:SetHeight(10)  -- will grow dynamically
             card.weeklyDisenchantingSection.entries = card.weeklyDisenchantingSection.entries or {}
             card.weeklyDisenchantingHeader = card.weeklyDisenchantingSection:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
             card.weeklyDisenchantingHeader:SetPoint("TOPLEFT", 0, -100)
