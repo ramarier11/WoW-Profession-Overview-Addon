@@ -551,29 +551,49 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
 
         -- ENCHANTING – DISENCHANTING (show each task separately)
         if profID == 333 and ref.weekly.gatherNodes then
-            card.weeklyDisenchantingSection = CreateFrame("Frame", nil, weeklySection)
-            card.weeklyDisenchantingSection:SetHeight(10)  -- will grow dynamically
-            card.weeklyDisenchantingSection.entries = card.weeklyDisenchantingSection.entries or {}
-            card.weeklyDisenchantingHeader = card.weeklyDisenchantingSection:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-            card.weeklyDisenchantingHeader:SetPoint("TOPLEFT", 0, -100)
-            card.weeklyDisenchantingHeader:SetText("Disenchanting Weekly")
-            card.weeklyDisenchantingHeader:SetText("Weekly Disenchanting")
+            -- Create a sub-section PARENTED TO card.weeklySection
+            card.weeklyDisenchantingSection = card.weeklyDisenchantingSection
+                or CreateFrame("Frame", nil, card.weeklySection)
 
-            -- Use the saved weekly status
+            local section = card.weeklyDisenchantingSection
+            section:Show()
+            section:SetWidth(card.weeklySection:GetWidth())
+            section.entries = section.entries or {}
+
+            -- clear old entries
+            for _, v in ipairs(section.entries) do
+                v:Hide()
+                v:SetParent(nil)
+            end
+            section.entries = {}
+
+            -- Header
+            if not section.header then
+                section.header = section:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+                section.header:SetText("Weekly Disenchanting")
+            end
+
+            section.header:ClearAllPoints()
+            section.header:SetPoint("TOPLEFT", 0, y)
+            section.header:Show()
+            y = y - 24
+
+            -- Use saved weekly status
             local completed = wk.gatherNodes or false
 
+            -- Create rows
             for i, it in ipairs(ref.weekly.gatherNodes) do
-                local entry = AddWeeklyEntry(
-                    card.weeklyDisenchantingSection,
-                    it.label or ("Disenchant " .. i),
-                    completed
-                )
+                local entry = AddWeeklyEntry(section, it.label or ("Disenchant " .. i), completed)
 
                 entry:SetPoint("TOPLEFT", 0, y)
                 entry:SetPoint("TOPRIGHT", 0, y)
                 y = y - 20
+
+                table.insert(section.entries, entry)
+                table.insert(card.weeklySection.entries, entry) -- ensure height calc includes these
             end
         end
+
         -- finalize height of weeklySection based on entries
         local rows = #card.weeklySection.entries
         local newHeight = math.max(18 * rows + 8, 10)
