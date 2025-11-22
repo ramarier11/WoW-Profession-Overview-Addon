@@ -372,9 +372,12 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
     card.weeklySection:SetHeight(10)  -- will grow dynamically
     card.weeklySection.entries = card.weeklySection.entries or {}
 
-    card.weeklyHeader = card.weeklySection:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    card.weeklyHeader:SetPoint("TOPLEFT", 0, 0)
-    card.weeklyHeader:SetText("Weekly Knowledge")
+    card.weeklyTreasuresHeader = card.weeklySection:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    card.weeklyTreasuresHeader:SetPoint("TOPLEFT", 0, 0)
+    card.weeklyTreasuresHeader:SetText("Weekly Knowledge")
+    card.weeklyDisenchantingHeader = card.weeklySection:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    card.weeklyDisenchantingHeader:SetPoint("TOPLEFT", 0, 0)
+    card.weeklyDisenchantingHeader:SetText("Disenchanting Weekly")
 
     ----------------------------------------------------
     -- Reusable helper for weekly entries
@@ -512,14 +515,14 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
         local y = 0
         
         -- Update header text but don't add it to entries (it's persistent)
-        card.weeklyHeader:ClearAllPoints()
-        card.weeklyHeader:SetPoint("TOPLEFT", 0, y)
-        card.weeklyHeader:Show()
+        card.weeklyTreasuresHeader:ClearAllPoints()
+        card.weeklyTreasuresHeader:SetPoint("TOPLEFT", 0, y)
+        card.weeklyTreasuresHeader:Show()
         y = y - 24
 
         -- GATHERING PROFESSIONS (Herbalism 182, Mining 186, Skinning 393)
         if profID == 182 or profID == 186 or profID == 393 then
-            card.weeklyHeader:SetText("Weekly Treasures")
+            card.weeklyTreasuresHeader:SetText("Weekly Treasures")
 
             -- Use the saved weekly status, not live quest checks
             local completed = wk.treasures or false
@@ -535,7 +538,7 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
 
         -- OTHER PROFESSIONS: stacked treasure list (shows each treasure)
         elseif ref.weekly.treasures and type(ref.weekly.treasures) == "table" then
-            card.weeklyHeader:SetText("Weekly Treasures")
+            card.weeklyTreasuresHeader:SetText("Weekly Treasures")
             
             -- Use the saved weekly status
             local completed = wk.treasures or false
@@ -550,7 +553,7 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
 
         -- ENCHANTING – DISENCHANTING (show each task separately)
         if profID == 333 and ref.weekly.gatherNodes then
-            card.weeklyHeader:SetText("Weekly Disenchanting")
+            card.weeklyDisenchantingHeader:SetText("Weekly Disenchanting")
 
             -- Use the saved weekly status
             local completed = wk.gatherNodes or false
@@ -566,7 +569,7 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
                 entry:SetPoint("TOPRIGHT", 0, y)
                 y = y - 20
             end
-        end 
+        end
         -- finalize height of weeklySection based on entries
         local rows = #card.weeklySection.entries
         local newHeight = math.max(18 * rows + 8, 10)
