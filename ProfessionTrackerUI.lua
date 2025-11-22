@@ -1158,7 +1158,6 @@ function ProfessionTrackerUI:ShowDetailView()
     --------------------------------------------------------
     local headers = {}
     local cards = {}
-    local yOffset = -20
 
     if charData.professions then
         for profName, profData in pairs(charData.professions) do
@@ -1166,12 +1165,10 @@ function ProfessionTrackerUI:ShowDetailView()
             -- Create card (do not position yet)
             local card = CreateProfessionExpansionCard(self.scrollChild, profName, profData, 0)
             table.insert(cards, card)
-
-            yOffset = yOffset - 40
         end
     else
         local noProf = self.scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        noProf:SetPoint("TOP", 0, -80)
+        noProf:SetPoint("TOP", 0, -40)
         noProf:SetText("No profession data available")
         return
     end
