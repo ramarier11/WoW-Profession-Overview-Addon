@@ -1366,13 +1366,12 @@ local function RecalculateWeeklyKnowledgePoints()
                 if not wk.gatherNodes[i] then
                     wk.gatherNodes[i] = {
                         label = entry.label or ("Node " .. i),
-                        total = type(q) == "table" and #q or 1  -- ✅ Store total possible
                     }
                 end
 
                 -- ✅ Always update count based on current state
                 wk.gatherNodes[i].count = completedCount
-                wk.gatherNodes[i].completed = (completedCount == wk.gatherNodes[i].total)
+                wk.gatherNodes[i].completed = (completedCount == #q)
 
                 if not wk.gatherNodes[i].completed then
                     allCompleted = false
