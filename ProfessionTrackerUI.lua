@@ -1081,8 +1081,8 @@ local function LayoutProfessionCards(scrollChild, cards)
     local perRow = (num == 1) and 1 or 2
 
     -- Get available width
-    local totalWidth = scrollChild:GetWidth() - 40
-    local cardWidth = math.floor(totalWidth / perRow) - 10
+    local totalWidth = scrollChild:GetWidth() - 20
+    local cardWidth = math.floor(totalWidth / perRow)
 
     -- Place cards
     local xOffset = 20
