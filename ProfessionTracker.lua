@@ -1341,9 +1341,14 @@ local function RecalculateWeeklyKnowledgePoints()
         --     wk.gatherNodes = AllTreasureEntriesComplete(ref.weekly.gatherNodes)
         -- end
         if ref.weekly.gatherNodes and type(ref.weekly.gatherNodes) == "table" then
-            wk.gatherNodes = {}  -- Fresh array
+            wk.gatherNodes = wk.gatherNodes or {}
+            
+            for k in pairs(wk.gatherNodes) do
+                wk.gatherNodes[k] = nil
+            end
+
             local allCompleted = true
-            local numCompleted = 0
+
             for i, entry in ipairs(ref.weekly.gatherNodes) do
                 local q = entry.questID
                 local completed = false
@@ -1352,7 +1357,6 @@ local function RecalculateWeeklyKnowledgePoints()
                     for _, innerID in ipairs(q) do
                         if SafeIsQuestCompleted(innerID) then
                             completed = true
-                            numCompleted = numCompleted + 1
                             break
                         end
                     end
@@ -1360,17 +1364,15 @@ local function RecalculateWeeklyKnowledgePoints()
                     completed = SafeIsQuestCompleted(q)
                 end
 
-                -- ✅ Store as array entry with metadata
-                table.insert(wk.gatherNodes, {
-                    label = entry.label or ("Node " .. i),
-                    completed = completed
-                })
+                -- ✅ Use label or name as key (fallback to index if missing)
+                local key = entry.label or entry.name or tostring(i)
+                wk.gatherNodes[key] = completed
 
                 if not completed then
                     allCompleted = false
                 end
             end
-            print(numCompleted)
+
             wk.gatherNodesAllComplete = allCompleted
         end
 
