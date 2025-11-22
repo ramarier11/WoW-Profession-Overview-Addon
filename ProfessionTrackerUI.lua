@@ -1148,16 +1148,6 @@ function ProfessionTrackerUI:ShowDetailView()
         return
     end
 
-    -- Back button
-    local backButton = CreateFrame("Button", nil, self.scrollChild, "UIPanelButtonTemplate")
-    backButton:SetSize(100, 25)
-    backButton:SetPoint("TOPLEFT", 10, -10)
-    backButton:SetText("← Dashboard")
-    backButton:SetScript("OnClick", function()
-        self.viewMode = "dashboard"
-        self:Refresh()
-    end)
-
     -- Header
     local headerText = self.scrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
     headerText:SetPoint("TOP", 0, -15)
