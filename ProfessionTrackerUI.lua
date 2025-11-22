@@ -538,9 +538,9 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
             card.weeklyHeader:SetText("Weekly Disenchanting")
 
             -- Use the saved weekly status
-            local completed = wk.disenchanting or false
+            local completed = wk.gatherNodes or false
 
-            for i, it in ipairs(ref.weekly.disenchanting) do
+            for i, it in ipairs(ref.weekly.gatherNodes) do
                 local entry = AddWeeklyEntry(
                     card.weeklySection,
                     it.label or ("Disenchant " .. i),
