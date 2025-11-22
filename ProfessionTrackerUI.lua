@@ -551,7 +551,8 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
 
         -- ENCHANTING – DISENCHANTING (show each task separately)
         if profID == 333 and ref.weekly.gatherNodes then
-            card.weeklyDisenchantingHeader = card.weeklySection:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+            card.weeklyDisenchantingSection = CreateFrame("Frame", nil, weeklySection)
+            card.weeklyDisenchantingHeader = card.weeklyDisenchantingSection:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
             card.weeklyDisenchantingHeader:SetPoint("TOPLEFT", 0, -100)
             card.weeklyDisenchantingHeader:SetText("Disenchanting Weekly")
             card.weeklyDisenchantingHeader:SetText("Weekly Disenchanting")
@@ -561,7 +562,7 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
 
             for i, it in ipairs(ref.weekly.gatherNodes) do
                 local entry = AddWeeklyEntry(
-                    card.weeklyDisenchantingHeader,
+                    card.weeklyDisenchantingSection,
                     it.label or ("Disenchant " .. i),
                     completed
                 )
