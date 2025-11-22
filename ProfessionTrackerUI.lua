@@ -533,8 +533,23 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
                 end
             end
 
+        -- OTHER PROFESSIONS: stacked treasure list (shows each treasure)
+        elseif ref.weekly.treasures and type(ref.weekly.treasures) == "table" then
+            card.weeklyHeader:SetText("Weekly Treasures")
+            
+            -- Use the saved weekly status
+            local completed = wk.treasures or false
+            
+            for i, it in ipairs(ref.weekly.treasures) do
+                local entry = AddWeeklyEntry(card.weeklySection, it.label or it.name or ("Treasure " .. i), completed)
+                entry:SetPoint("TOPLEFT", 0, y)
+                entry:SetPoint("TOPRIGHT", 0, y)
+                y = y - 20
+            end
+        end
+        
         -- ENCHANTING – DISENCHANTING (show each task separately)
-        elseif profID == 333 and ref.weekly.gatherNodes then
+        if profID == 333 and ref.weekly.gatherNodes then
             card.weeklyHeader:SetText("Weekly Disenchanting")
 
             -- Use the saved weekly status
@@ -551,21 +566,6 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
                 entry:SetPoint("TOPRIGHT", 0, y)
                 y = y - 20
             end
-
-        -- OTHER PROFESSIONS: stacked treasure list (shows each treasure)
-        elseif ref.weekly.treasures and type(ref.weekly.treasures) == "table" then
-            card.weeklyHeader:SetText("Weekly Treasures")
-            
-            -- Use the saved weekly status
-            local completed = wk.treasures or false
-            
-            for i, it in ipairs(ref.weekly.treasures) do
-                local entry = AddWeeklyEntry(card.weeklySection, it.label or it.name or ("Treasure " .. i), completed)
-                entry:SetPoint("TOPLEFT", 0, y)
-                entry:SetPoint("TOPRIGHT", 0, y)
-                y = y - 20
-            end
-        end
 
         -- finalize height of weeklySection based on entries
         local rows = #card.weeklySection.entries
