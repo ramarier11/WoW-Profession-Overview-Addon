@@ -1173,13 +1173,6 @@ function ProfessionTrackerUI:ShowDetailView()
     if charData.professions then
         for profName, profData in pairs(charData.professions) do
 
-            -- Profession title
-            local profHeader = self.scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-            profHeader:SetTextColor(1, 0.8, 0)
-            profHeader:SetText(profName or "Unknown Profession")
-            profHeader:SetPoint("TOPLEFT", 20, yOffset)
-            table.insert(headers, profHeader)
-
             -- Create card (do not position yet)
             local card = CreateProfessionExpansionCard(self.scrollChild, profName, profData, 0)
             table.insert(cards, card)
