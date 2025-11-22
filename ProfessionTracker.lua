@@ -931,7 +931,30 @@ local ExpansionIndex = {
     ["Khaz Algar"] = 11,
 }
 
+-- ========================================================
+-- CONSTANTS (File-Level)
+-- ========================================================
+
+local EXCLUDED_PROFESSIONS = {
+    ["Cooking"] = true,
+    ["Fishing"] = true,
+    ["Archaeology"] = true,
+    ["First Aid"] = true,
+}
+
+local GATHERING_PROFESSIONS = {
+    [182] = true,  -- Herbalism
+    [186] = true,  -- Mining
+    [393] = true,  -- Skinning
+}
+
 local KNOWLEDGE_SYSTEM_START = 10 -- Dragon Isles and later
+
+-- Build profession lookup once
+local ProfessionNameToID = {}
+for _, p in ipairs(ProfessionData) do
+    ProfessionNameToID[p.name] = p.id
+end
 
 ProfessionData = {
     {
@@ -1025,17 +1048,6 @@ local function EnsureTable(t, key)
     return t[key]
 end
 
-local function GetCurrentWeekTimestamp()
-    -- Get Tuesday 00:00:00 of current week (US reset time)
-    local serverTime = GetServerTime()
-    local weekday = date("%w", serverTime) -- 0 = Sunday, 2 = Tuesday
-    local daysSinceTuesday = (weekday - 2) % 7
-    local tuesdayMidnight = serverTime - (daysSinceTuesday * 86400)
-    
-    -- Align to midnight
-    local midnight = tuesdayMidnight - (tuesdayMidnight % 86400)
-    return midnight
-end
 -- ========================================================
 -- Helper Functions
 -- ========================================================
@@ -1048,17 +1060,12 @@ local function ForEachProfessionExpansion(callback)
     local charData = ProfessionTrackerDB.characters[charKey]
     if not charData or not charData.professions then return end
 
-    -- Build reusable name → professionID lookup
-    local profNameToID = {}
-    for _, p in ipairs(ProfessionData) do
-        profNameToID[p.name] = p.id
-    end
 
     -- Iterate only this character's professions
     for profName, profData in pairs(charData.professions) do
         
         -- Resolve profession ID
-        local profID = profNameToID[profName]
+        local profID = ProfessionNameToID[profName]
 
         -- Fallback: infer from expansions
         if not profID and profData.expansions then
@@ -1093,34 +1100,58 @@ local function ForEachProfessionExpansion(callback)
     end
 end
 
-
-local function SafeIsQuestCompleted(qID)
-    if not qID then return false end
-    local ok, result = pcall(function()
-        return C_QuestLog.IsQuestFlaggedCompleted(qID)
-    end)
-    return ok and result
-end
-
--- Returns true if ANY questID in a table is completed
-local function AnyQuestCompleted(questTable)
-    for _, q in ipairs(questTable) do
-        if C_QuestLog.IsQuestFlaggedCompleted(q) then
+local function CheckQuestCompletion(questID, checkType)
+    if not questID then return false end
+    
+    if type(questID) == "number" then
+        return C_QuestLog.IsQuestFlaggedCompleted(questID)
+    elseif type(questID) == "table" then
+        if checkType == "all" then
+            for _, q in ipairs(questID) do
+                if not C_QuestLog.IsQuestFlaggedCompleted(q) then
+                    return false
+                end
+            end
             return true
+        else -- "any" is default
+            for _, q in ipairs(questID) do
+                if C_QuestLog.IsQuestFlaggedCompleted(q) then
+                    return true
+                end
+            end
+            return false
         end
     end
     return false
 end
 
--- Returns true if ALL questIDs in a table are completed
-local function AllQuestsCompleted(questTable)
-    for _, q in ipairs(questTable) do
-        if not C_QuestLog.IsQuestFlaggedCompleted(q) then
-            return false
-        end
-    end
-    return true
-end
+-- local function SafeIsQuestCompleted(qID)
+--     if not qID then return false end
+--     local ok, result = pcall(function()
+--         return C_QuestLog.IsQuestFlaggedCompleted(qID)
+--     end)
+--     return ok and result
+-- end
+
+-- -- Returns true if ANY questID in a table is completed
+-- local function AnyQuestCompleted(questTable)
+--     for _, q in ipairs(questTable) do
+--         if C_QuestLog.IsQuestFlaggedCompleted(q) then
+--             return true
+--         end
+--     end
+--     return false
+-- end
+
+-- -- Returns true if ALL questIDs in a table are completed
+-- local function AllQuestsCompleted(questTable)
+--     for _, q in ipairs(questTable) do
+--         if not C_QuestLog.IsQuestFlaggedCompleted(q) then
+--             return false
+--         end
+--     end
+--     return true
+-- end
 
 -- Handles a questID that may be:
 --  • a number  
@@ -1129,7 +1160,7 @@ local function WeeklyQuestCompleted(questID)
     if type(questID) == "number" then
         return C_QuestLog.IsQuestFlaggedCompleted(questID)
     elseif type(questID) == "table" then
-        return AnyQuestCompleted(questID)
+        return CheckQuestCompletion(questID)
     end
     return false
 end
@@ -1184,7 +1215,7 @@ local function RecalculateOneTimeTreasures(charKey)
 
         if treasureRef.locations then
             for _, loc in ipairs(treasureRef.locations) do
-                local completed = SafeIsQuestCompleted(loc.questID)
+                local completed = CheckQuestCompletion(loc.questID)
                 if not completed then
                     allDone = false
                     table.insert(missing, {
@@ -1208,27 +1239,45 @@ end
 -- Knowledge Point Calculations
 -- ========================================================
 
-local function GetPointsMissingForTree(configID, nodeID)
-    local todo = { nodeID }
-    local missing = 0
+-- local function GetPointsMissingForTree(configID, nodeID)
+--     local todo = { nodeID }
+--     local missing = 0
     
-    while next(todo) do
-        local currentNodeID = table.remove(todo)
+--     while next(todo) do
+--         local currentNodeID = table.remove(todo)
         
-        -- Add children to process
-        local children = C_ProfSpecs.GetChildrenForPath(currentNodeID)
-        if children then
-            for _, childID in ipairs(children) do
-                table.insert(todo, childID)
-            end
-        end
+--         -- Add children to process
+--         local children = C_ProfSpecs.GetChildrenForPath(currentNodeID)
+--         if children then
+--             for _, childID in ipairs(children) do
+--                 table.insert(todo, childID)
+--             end
+--         end
         
-        -- Calculate missing points for this node
-        local info = C_Traits.GetNodeInfo(configID, currentNodeID)
-        if info then
-            -- Enabling a node counts as 1 rank but doesn't cost anything
-            local enableFix = info.activeRank == 0 and 1 or 0
-            missing = missing + info.maxRanks - info.activeRank - enableFix
+--         -- Calculate missing points for this node
+--         local info = C_Traits.GetNodeInfo(configID, currentNodeID)
+--         if info then
+--             -- Enabling a node counts as 1 rank but doesn't cost anything
+--             local enableFix = info.activeRank == 0 and 1 or 0
+--             missing = missing + info.maxRanks - info.activeRank - enableFix
+--         end
+--     end
+    
+--     return missing
+-- end
+local function GetPointsMissingForTree(configID, nodeID, missing)
+    missing = missing or 0
+    
+    local info = C_Traits.GetNodeInfo(configID, nodeID)
+    if info then
+        local enableFix = info.activeRank == 0 and 1 or 0
+        missing = missing + info.maxRanks - info.activeRank - enableFix
+    end
+    
+    local children = C_ProfSpecs.GetChildrenForPath(nodeID)
+    if children then
+        for _, childID in ipairs(children) do
+            missing = GetPointsMissingForTree(configID, childID, missing)
         end
     end
     
@@ -1280,7 +1329,7 @@ local function RecalculateWeeklyKnowledgePoints()
         --------------------------------------------------
         local function AnyCompleted(questList)
             for _, q in ipairs(questList) do
-                if SafeIsQuestCompleted(q) then
+                if CheckQuestCompletion(q) then
                     return true
                 end
             end
@@ -1298,13 +1347,13 @@ local function RecalculateWeeklyKnowledgePoints()
                 if type(q) == "table" then
                     -- must complete *all* inside this table
                     for _, innerID in ipairs(q) do
-                        if not SafeIsQuestCompleted(innerID) then
+                        if not CheckQuestCompletion(innerID) then
                             return false
                         end
                     end
                 else
                     -- single quest
-                    if not SafeIsQuestCompleted(q) then
+                    if not CheckQuestCompletion(q) then
                         return false
                     end
                 end
@@ -1316,7 +1365,7 @@ local function RecalculateWeeklyKnowledgePoints()
         -- Treatise (always single quest)
         --------------------------------------------------
         if ref.weekly.treatise and ref.weekly.treatise.questID then
-            wk.treatise = SafeIsQuestCompleted(ref.weekly.treatise.questID)
+            wk.treatise = CheckQuestCompletion(ref.weekly.treatise.questID)
         end
 
         --------------------------------------------------
@@ -1328,7 +1377,7 @@ local function RecalculateWeeklyKnowledgePoints()
             if type(q) == "table" then
                 wk.craftingOrderQuest = AnyCompleted(q)
             else
-                wk.craftingOrderQuest = SafeIsQuestCompleted(q)
+                wk.craftingOrderQuest = CheckQuestCompletion(q)
             end
         end
 
@@ -1352,13 +1401,13 @@ local function RecalculateWeeklyKnowledgePoints()
                 if type(q) == "table" then
                     -- Count ALL completed quests in the array
                     for _, innerID in ipairs(q) do
-                        if SafeIsQuestCompleted(innerID) then
+                        if CheckQuestCompletion(innerID, "all") then
                             completedCount = completedCount + 1
                         end
                     end
                 else
                     -- Single quest: 0 or 1
-                    if SafeIsQuestCompleted(q) then
+                    if CheckQuestCompletion(q) then
                         completedCount = 1
                     end
                 end
@@ -1404,7 +1453,7 @@ local function RecalculateWeeklyKnowledgePoints()
                     -- Multi-quest treasure (must complete ANY)
                     --------------------------------------------------
                     for _, innerID in ipairs(q) do
-                        if SafeIsQuestCompleted(innerID) then
+                        if CheckQuestCompletion(innerID) then
                             completed = true
                             break
                         end
@@ -1413,7 +1462,7 @@ local function RecalculateWeeklyKnowledgePoints()
                     --------------------------------------------------
                     -- Single quest treasure
                     --------------------------------------------------
-                    completed = SafeIsQuestCompleted(q)
+                    completed = CheckQuestCompletion(q)
                 end
 
                 -- Save individual treasure status
@@ -1444,6 +1493,7 @@ local function UpdateCharacterProfessionData()
         }
     end
 
+    local currentTime = time()
     local charKey = GetCharacterKey()
     local charData = EnsureTable(ProfessionTrackerDB.characters, charKey)
 
@@ -1457,7 +1507,7 @@ local function UpdateCharacterProfessionData()
         charData.faction = UnitFactionGroup("player")
     end
 
-    charData.lastLogin = time()
+    charData.lastLogin = currentTime
 
     local professions = EnsureTable(charData, "professions")
     local currentProfs = {}
@@ -1467,17 +1517,11 @@ local function UpdateCharacterProfessionData()
         if profIndex then
             local name, _, skillLevel, maxSkillLevel, _, _, skillLine = GetProfessionInfo(profIndex)
             if name then
-                local excludedProfs = {
-                    ["Cooking"] = true,
-                    ["Fishing"] = true,
-                    ["Archaeology"] = true,
-                    ["First Aid"] = true,
-                }
 
-                if not excludedProfs[name] then
+                if not EXCLUDED_PROFESSIONS[name] then
                     currentProfs[name] = true
                     local profession = EnsureTable(professions, name)
-                    profession.lastUpdated = time()
+                    profession.lastUpdated = currentTime
                     profession.name = name
 
                     -- Ensure expansions table exists (may have been populated by previous full-scan)
@@ -1509,17 +1553,11 @@ local function UpdateCharacterProfessionData()
                                 if concentrationCurrencyID then
                                     local currencyInfo = C_CurrencyInfo.GetCurrencyInfo(concentrationCurrencyID)
                                     if currencyInfo then
-                                        -- Skip concentration for gathering professions
-                                        local noConcentrationProfs = {
-                                            [182] = true,  -- Herbalism
-                                            [186] = true,  -- Mining
-                                            [393] = true,  -- Skinning
-                                        }
 
-                                        if not noConcentrationProfs[skillLine] then
+                                        if not GATHERING_PROFESSIONS[skillLine] then
                                             expData.concentration = currencyInfo.quantity or 0
                                             expData.maxConcentration = currencyInfo.maxQuantity or 1000
-                                            expData.concentrationLastUpdated = time()
+                                            expData.concentrationLastUpdated = currentTime
                                         else
                                             -- Make sure they're cleared so UI hides it
                                             expData.concentration = nil
