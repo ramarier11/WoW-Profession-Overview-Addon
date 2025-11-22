@@ -1068,6 +1068,54 @@ end
     print("|cff00ff00[Profession Tracker]|r Created", charCount, "character cards")
 end
 
+----------------------------------------------------------
+-- NEW: Dynamic 1–2 card grid layout for detail view
+----------------------------------------------------------
+local function LayoutProfessionCards(scrollChild, cards)
+    if #cards == 0 then return end
+
+    local availableWidth = scrollChild:GetWidth() - 20
+    local cardWidth = cards[1]:GetWidth()  -- 440 from your CreateProfessionExpansionCard
+    local spacingX = 10
+    local spacingY = 14
+
+    -- Determine how many cards fit per row.
+    -- If 2 fit → 2 per row. Otherwise 1.
+    local cardsPerRow = (cardWidth * 2 + spacingX) <= availableWidth and 2 or 1
+
+    local x = 0
+    local y = -10
+    local rowHeight = 0
+    local col = 1
+
+    for i, card in ipairs(cards) do
+        card:ClearAllPoints()
+
+        -- If this card is the first in its row
+        if col == 1 then
+            card:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 10, y)
+            rowHeight = card:GetHeight()
+        else
+            -- Place next card to the right
+            card:SetPoint("TOPLEFT", cards[i-1], "TOPRIGHT", spacingX, 0)
+            rowHeight = math.max(rowHeight, card:GetHeight())
+        end
+
+        -- Move to next column
+        col = col + 1
+
+        -- If row is full OR last card → advance to next row
+        if col > cardsPerRow then
+            y = y - (rowHeight + spacingY)
+            col = 1
+        end
+    end
+
+    -- Adjust scrollChild height so the frame scrolls correctly
+    scrollChild:SetHeight(math.abs(y) + rowHeight + 20)
+end
+
+
 --------------------------------------------------------
 -- Detail View
 --------------------------------------------------------
@@ -1111,45 +1159,41 @@ function ProfessionTrackerUI:ShowDetailView()
     headerText:SetPoint("TOP", 0, -15)
     headerText:SetText(string.format("%s - %s", charData.name or "Unknown", charData.realm or ""))
 
+
+    --------------------------------------------------------
+    -- NEW: Gather all profession cards first
+    --------------------------------------------------------
+    local cards = {}
+    local headers = {}
     local yOffset = -50
 
-    -- Professions
     if charData.professions then
         for profName, profData in pairs(charData.professions) do
+
+            -- Create header label (stays above card)
             local profHeader = self.scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-            profHeader:SetPoint("TOPLEFT", 20, yOffset)
             profHeader:SetTextColor(1, 0.8, 0)
             profHeader:SetText(profName or "Unknown Profession")
-            yOffset = yOffset - 30
+            profHeader:SetPoint("TOPLEFT", 20, yOffset)
+            table.insert(headers, profHeader)
 
-            if profData.expansions then
-                -- Convert expansions table into a sortable list
-                local expansionsList = {}
-                for expName, expData in pairs(profData.expansions) do
-                    table.insert(expansionsList, { name = expName, data = expData })
-                end
+            -- Create card WITH NO POSITION (grid handles it)
+            local card = CreateProfessionExpansionCard(self.scrollChild, profName, profData, 0)
+            table.insert(cards, card)
 
-                -- Sort in descending order by expansion ID (higher = newer)
-                table.sort(expansionsList, function(a, b)
-                    return (a.data.id or 0) > (b.data.id or 0)
-                end)
-
-                local card = CreateProfessionExpansionCard(self.scrollChild, profName, profData, yOffset)
-                yOffset = yOffset - 170
-
-            end
-
-
-            yOffset = yOffset - 20
+            yOffset = yOffset - 40
         end
-    else
-        local noProfText = self.scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        noProfText:SetPoint("TOP", 0, -80)
-        noProfText:SetText("No profession data available")
     end
 
-    self.scrollChild:SetHeight(math.abs(yOffset))
+    --------------------------------------------------------
+    -- Apply new horizontal layout: 1 or 2 cards per row
+    --------------------------------------------------------
+    LayoutProfessionCards(self.scrollChild, cards)
+
+    -- Update scroll height
+    self.scrollChild:SetHeight(self.scrollChild:GetHeight() + 80)
     self.scrollFrame:SetVerticalScroll(0)
+
 
 end
 
