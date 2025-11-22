@@ -916,46 +916,6 @@ KPReference = {
 
 }
 
-local ExpansionIndex = {
-    ["Classic"] = 1,
-    ["Outland"] = 2,
-    ["Northrend"] = 3,
-    ["Cataclysm"] = 4,
-    ["Pandaria"] = 5,
-    ["Draenor"] = 6,
-    ["Legion"] = 7,
-    ["Zandalari"] = 8,
-    ["Kul Tiran"] = 8,
-    ["Shadowlands"] = 9,
-    ["Dragon Isles"] = 10,
-    ["Khaz Algar"] = 11,
-}
-
--- ========================================================
--- CONSTANTS (File-Level)
--- ========================================================
-
-local EXCLUDED_PROFESSIONS = {
-    ["Cooking"] = true,
-    ["Fishing"] = true,
-    ["Archaeology"] = true,
-    ["First Aid"] = true,
-}
-
-local GATHERING_PROFESSIONS = {
-    [182] = true,  -- Herbalism
-    [186] = true,  -- Mining
-    [393] = true,  -- Skinning
-}
-
-local KNOWLEDGE_SYSTEM_START = 10 -- Dragon Isles and later
-
--- Build profession lookup once
-local ProfessionNameToID = {}
-for _, p in ipairs(ProfessionData) do
-    ProfessionNameToID[p.name] = p.id
-end
-
 ProfessionData = {
     {
         name = "Alchemy",
@@ -1023,6 +983,47 @@ ProfessionData = {
         expansions = { 2540, 2539, 2538, 2537, 2536, 2535, 2534, 2533, 2759, 2831, 2883 },
     },
 }
+
+local ExpansionIndex = {
+    ["Classic"] = 1,
+    ["Outland"] = 2,
+    ["Northrend"] = 3,
+    ["Cataclysm"] = 4,
+    ["Pandaria"] = 5,
+    ["Draenor"] = 6,
+    ["Legion"] = 7,
+    ["Zandalari"] = 8,
+    ["Kul Tiran"] = 8,
+    ["Shadowlands"] = 9,
+    ["Dragon Isles"] = 10,
+    ["Khaz Algar"] = 11,
+}
+
+-- ========================================================
+-- CONSTANTS (File-Level)
+-- ========================================================
+
+local EXCLUDED_PROFESSIONS = {
+    ["Cooking"] = true,
+    ["Fishing"] = true,
+    ["Archaeology"] = true,
+    ["First Aid"] = true,
+}
+
+local GATHERING_PROFESSIONS = {
+    [182] = true,  -- Herbalism
+    [186] = true,  -- Mining
+    [393] = true,  -- Skinning
+}
+
+local KNOWLEDGE_SYSTEM_START = 10 -- Dragon Isles and later
+
+-- Build profession lookup once
+local ProfessionNameToID = {}
+for _, p in ipairs(ProfessionData) do
+    ProfessionNameToID[p.name] = p.id
+end
+
 
 -- ========================================================
 -- Utility Functions
