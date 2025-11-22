@@ -1086,7 +1086,7 @@ local function LayoutProfessionCards(scrollChild, cards)
 
     -- Place cards
     local xOffset = 20
-    local yOffset = -100
+    local yOffset = -40
     local rowMaxHeight = 0
     local countInRow = 0
 
