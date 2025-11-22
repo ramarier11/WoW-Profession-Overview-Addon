@@ -1361,7 +1361,7 @@ local function RecalculateWeeklyKnowledgePoints()
 
                 -- ✅ Store as array entry with metadata
                 table.insert(wk.gatherNodes, {
-                    entry.label or ("Node " .. i) = completed
+                    entry.label or ("Node " .. i) = completed,
                     
                 })
 
