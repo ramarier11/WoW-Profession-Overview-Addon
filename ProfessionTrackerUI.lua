@@ -561,7 +561,7 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
 
             for i, it in ipairs(ref.weekly.gatherNodes) do
                 local entry = AddWeeklyEntry(
-                    card.weeklySection,
+                    card.weeklyDisenchantingHeader,
                     it.label or ("Disenchant " .. i),
                     completed
                 )
