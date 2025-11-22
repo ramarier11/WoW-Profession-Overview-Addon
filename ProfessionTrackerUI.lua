@@ -790,7 +790,7 @@ local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
 
     local objectives = {
         { key = "craftingOrderQuest", label = "KP Quest" },
-        { key = "treasures",          label = "KP Treasures" },
+        { key = "treasuresAllComplete",          label = "KP Treasures" },
         { key = "treatise",           label = "KP Treatise" },
     }
 
