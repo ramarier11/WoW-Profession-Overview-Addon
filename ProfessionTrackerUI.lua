@@ -1158,7 +1158,7 @@ function ProfessionTrackerUI:ShowDetailView()
     --------------------------------------------------------
     local headers = {}
     local cards = {}
-    local yOffset = -60
+    local yOffset = -20
 
     if charData.professions then
         for profName, profData in pairs(charData.professions) do
