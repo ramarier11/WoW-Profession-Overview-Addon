@@ -520,7 +520,7 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
 
         -- GATHERING PROFESSIONS (Herbalism 182, Mining 186, Skinning 393)
         if profID == 182 or profID == 186 or profID == 393 then
-            card.weeklyTreasuresHeader:SetText("Weekly Treasures")
+            card.weeklyTreasuresHeader:SetText("Weekly Gathering Nodes")
 
             -- Use the saved weekly status, not live quest checks
             local completed = wk.treasures or false
