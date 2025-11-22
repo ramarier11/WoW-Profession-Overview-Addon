@@ -575,7 +575,7 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
             end
         end
         -- finalize height of weeklySection based on entries
-        local rows = #card.weeklySection.entries
+        local rows = #card.weeklySection.entries + #card.weeklyDisenchantingSection
         local newHeight = math.max(18 * rows + 8, 10)
         card.weeklySection:SetHeight(newHeight)
 
