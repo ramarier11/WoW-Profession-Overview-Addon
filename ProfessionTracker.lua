@@ -1503,11 +1503,7 @@ local function UpdateCharacterProfessionData()
                                 local missing = CalculateMissingKnowledgePoints(exp.skillLineID)
                                 expData.pointsUntilMaxKnowledge = missing or expData.pointsUntilMaxKnowledge or 0
                                 expData.knowledgePoints = expData.knowledgePoints or 0
-                                expData.weeklyKnowledgePoints = expData.weeklyKnowledgePoints or {
-                                    treatise = false,
-                                    treasures = false,
-                                    craftingOrderQuest = false,
-                                }
+
                                 -- Get concentration currency info
                                 local concentrationCurrencyID = C_TradeSkillUI.GetConcentrationCurrencyID and C_TradeSkillUI.GetConcentrationCurrencyID(exp.skillLineID)
                                 if concentrationCurrencyID then
