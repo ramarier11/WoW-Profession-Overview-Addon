@@ -270,7 +270,7 @@ KPReference = {
                     { questID = 83259, name = "Crystalline Repository", icon = "Interface\\Icons\\inv_jewelcrafting_dawnstone_03"  },
                     { questID = 83258, name = "Powdered Fulgurance", icon = "Interface\\Icons\\inv_enchanting_wod_dust"  },
                 },
-                disenchanting = { 
+                gatherNodes = { 
                     {label = "Fleeting Arcane Manifestation", questID = {84290, 84291, 84292, 84293, 84294}, icon ="Interface\\Icons\\inv_magic_swirl_color2" },
                     {label = "Gleaming Telluric Crystal", questID = 84295, icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
                 },
@@ -772,7 +772,7 @@ KPReference = {
                     label = "Weekly Herbalism Profession Quest",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
-                treasures = {
+                gatherNodes = {
                     {label = "Deepgrove Petal", questID = { 81416, 81417, 81418, 81419, 81420 }, icon ="Interface\\Icons\\inv_magic_swirl_color2" },
                     {label = "Deepgrove Rose", questID = 81421, icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
                 }
@@ -833,7 +833,7 @@ KPReference = {
                     label = "Weekly Mining Profession Quest",
                     icon = "Interface\\Icons\\inv_crafting_orders", 
                 },
-                treasures = {
+                gatherNodes = {
                     {label = "Slab of Slate", questID = { 83054, 83053, 83052, 83051, 83050 }, icon ="Interface\\Icons\\inv_magic_swirl_color2" },
                     {label = "Erosion-Polished Slate", questID = 83049, icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
                 }
@@ -890,7 +890,7 @@ KPReference = {
                     label = "Weekly Skinning Profession Quest",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
-                treasures = {
+                gatherNodes = {
                     {label = "Toughened Tempest Pelt", questID = { 81459, 81460, 81461, 81462, 81463 }, icon ="Interface\\Icons\\inv_magic_swirl_color2" },
                     {label = "Abyssal Fur", questID = 81464, icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
                 }
@@ -1404,17 +1404,59 @@ local function RecalculateWeeklyKnowledgePoints()
         -- Each entry: questID (single or table)
         -- Entire weekly = TRUE if *all* treasure entries done
         --------------------------------------------------
-        if ref.weekly.treasures and type(ref.weekly.treasures) == "table" then
-            wk.treasures = AllTreasureEntriesComplete(ref.weekly.treasures)
+        if ref.weekly.gatherNodes and type(ref.weekly.gatherNodes) == "table" then
+            wk.gatherNodes = AllTreasureEntriesComplete(ref.weekly.gatherNodes)
         end
 
         --------------------------------------------------
-        -- Enchanting “disenchanting” weekly
-        -- Same rules as gathering: must complete ALL
+        -- Gathering Weekly Treasures (individual + overall)
         --------------------------------------------------
-        if ref.weekly.disenchanting and type(ref.weekly.disenchanting) == "table" then
-            wk.disenchanting = AllTreasureEntriesComplete(ref.weekly.disenchanting)
+        if ref.weekly.treasures and type(ref.weekly.treasures) == "table" then
+
+            -- store per-treasure results as table
+            wk.treasures = wk.treasures or {}
+
+            -- clear old values
+            for k in pairs(wk.treasures) do
+                wk.treasures[k] = nil
+            end
+
+            local allCompleted = true
+
+            for _, entry in ipairs(ref.weekly.treasures) do
+                local q = entry.questID
+                local completed = false
+
+                if type(q) == "table" then
+                    --------------------------------------------------
+                    -- Multi-quest treasure (must complete ANY)
+                    --------------------------------------------------
+                    for _, innerID in ipairs(q) do
+                        if SafeIsQuestCompleted(innerID) then
+                            completed = true
+                            break
+                        end
+                    end
+                else
+                    --------------------------------------------------
+                    -- Single quest treasure
+                    --------------------------------------------------
+                    completed = SafeIsQuestCompleted(q)
+                end
+
+                -- Save individual treasure status
+                wk.treasures[q] = completed
+
+                -- Used for the full-complete boolean
+                if not completed then
+                    allCompleted = false
+                end
+            end
+
+            -- store the overall weekly treasure completion (for older UI code)
+            wk.treasuresAllComplete = allCompleted
         end
+
 
     end)
 end
