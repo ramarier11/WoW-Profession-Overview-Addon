@@ -1359,13 +1359,55 @@ local function RecalculateWeeklyKnowledgePoints()
         -- Entire weekly = TRUE if *all* treasure entries done
         --------------------------------------------------
         if ref.weekly.gatherNodes and type(ref.weekly.gatherNodes) == "table" then
-            wk.gatherNodes = AllTreasureEntriesComplete(ref.weekly.gatherNodes)
+
+            -- store per-treasure results as table
+            wk.gatherNodes = wk.gatherNodes or {}
+
+            -- clear old values
+            for k in pairs(wk.gatherNodes) do
+                wk.gatherNodes[k] = nil
+            end
+
+            local allCompleted = true
+
+            for _, entry in ipairs(ref.weekly.gatherNodes) do
+                local q = entry.questID
+                local completed = false
+
+                if type(q) == "table" then
+                    --------------------------------------------------
+                    -- Multi-quest treasure (must complete ANY)
+                    --------------------------------------------------
+                    for _, innerID in ipairs(q) do
+                        if SafeIsQuestCompleted(innerID) then
+                            completed = true
+                            break
+                        end
+                    end
+                else
+                    --------------------------------------------------
+                    -- Single quest treasure
+                    --------------------------------------------------
+                    completed = SafeIsQuestCompleted(q)
+                end
+
+                -- Save individual treasure status
+                wk.gatherNodes[q] = completed
+
+                -- Used for the full-complete boolean
+                if not completed then
+                    allCompleted = false
+                end
+            end
+
+            -- store the overall weekly treasure completion (for older UI code)
+            wk.gatherNodesAllComplete = allCompleted
         end
 
         --------------------------------------------------
         -- Gathering Weekly Treasures (individual + overall)
         --------------------------------------------------
-        if ref.weekly.treasures and type(ref.weekly.treasures) == "table" then
+        if ref.weekly.gatherNodes and type(ref.weekly.gatherNodes) == "table" then
 
             -- store per-treasure results as table
             wk.treasures = wk.treasures or {}
