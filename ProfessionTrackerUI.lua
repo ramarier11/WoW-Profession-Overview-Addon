@@ -527,7 +527,7 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
 
             if ref.weekly.treasures and type(ref.weekly.treasures) == "table" then
                 for i, item in ipairs(ref.weekly.treasures) do
-                    local entry = AddWeeklyEntry(card.weeklySection, item.label or item.name or ("Treasure " .. i), completed)
+                    local entry = AddWeeklyEntry(card.weeklySection, item.name or ("Treasure " .. i), completed)
                     entry:SetPoint("TOPLEFT", 0, y)
                     entry:SetPoint("TOPRIGHT", 0, y)
                     y = y - 20
@@ -542,7 +542,7 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
             local completed = wk.treasures or false
             
             for i, it in ipairs(ref.weekly.treasures) do
-                local entry = AddWeeklyEntry(card.weeklySection, it.label or it.name or ("Treasure " .. i), completed)
+                local entry = AddWeeklyEntry(card.weeklySection, it.name or ("Treasure " .. i), completed)
                 entry:SetPoint("TOPLEFT", 0, y)
                 entry:SetPoint("TOPRIGHT", 0, y)
                 y = y - 20
@@ -583,7 +583,7 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
 
             -- Create rows
             for i, it in ipairs(ref.weekly.gatherNodes) do
-                local entry = AddWeeklyEntry(section, it.label or ("Disenchant " .. i), completed)
+                local entry = AddWeeklyEntry(section, it.name or ("Disenchant " .. i), completed)
 
                 entry:SetPoint("TOPLEFT", 0, y)
                 entry:SetPoint("TOPRIGHT", 0, y)

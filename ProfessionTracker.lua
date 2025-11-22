@@ -39,16 +39,16 @@ KPReference = {
             weekly = {
                 treatise = {
                     questID = 12345,  
-                    label = "Treatise: Alchemy",
+                    name = "Treatise: Alchemy",
                     icon = "Interface\\Icons\\inv_inscription_treatise",
                 },
                 craftingOrder = {
                     questID = 12346,
-                    label = "Weekly Alchemy Profession Quest",
+                    name = "Weekly Alchemy Profession Quest",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    label = "Alchemy Knowledge Treasures",
+                    name = "Alchemy Knowledge Treasures",
                     icon = "Interface\\Icons\\inv_misc_book_07",
                     questID = { 11111, 11112, 11113 }, -- replace with actual one-time treasure quests
                 }
@@ -56,7 +56,7 @@ KPReference = {
 
             oneTime = {
                 treasures = {
-                    label = "One-Time Knowledge Treasures",
+                    name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
                         { mapID = 2022, x = 25.1, y = 73.3, name = "Well Insulated Mug", questID = 01001 },
@@ -81,12 +81,12 @@ KPReference = {
             weekly = {
                 treatise = {
                     questID = 83725,  
-                    label = "Treatise: Alchemy",
+                    name = "Treatise: Alchemy",
                     icon = "Interface\\Icons\\inv_misc_profession_book_alchemy",
                 },
                 craftingOrder = {
                     questID = 84133,
-                    label = "Alchemy Services Requested",
+                    name = "Alchemy Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
@@ -96,7 +96,7 @@ KPReference = {
             },
             oneTime = {
                 treasures = {
-                    label = "One-Time Knowledge Treasures",
+                    name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
                         { mapID = 2339, x = 32.5, y = 60.1, name = "Earthen Iron Powder", questID = 83840 },
@@ -121,16 +121,16 @@ KPReference = {
             weekly = {
                 treatise = {
                     questID = 12355,
-                    label = "Treatise: Blacksmithing",
+                    name = "Treatise: Blacksmithing",
                     icon = "Interface\\Icons\\inv_inscription_treatise",
                 },
                 craftingOrder = {
                     questID = 12356,
-                    label = "Weekly Blacksmithing Profession Quest",
+                    name = "Weekly Blacksmithing Profession Quest",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    label = "Blacksmithing Knowledge Treasures",
+                    name = "Blacksmithing Knowledge Treasures",
                     icon = "Interface\\Icons\\inv_misc_book_07",
                     questID = { 44111, 44112, 44113 },
                 }
@@ -138,7 +138,7 @@ KPReference = {
 
             oneTime = {
                 treasures = {
-                    label = "One-Time Knowledge Treasures",
+                    name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
                         { mapID = 2022, x = 56.4, y = 19.5, name = "Glimmer of Blacksmithing Wisdom", questID = 04001 },
@@ -169,12 +169,12 @@ KPReference = {
             weekly = {
                 treatise = {
                     questID = 83726,  
-                    label = "Treatise: Blacksmithing",
+                    name = "Treatise: Blacksmithing",
                     icon = "Interface\\Icons\\inv_misc_profession_book_blacksmithing",
                 },
                 craftingOrder = {
                     questID = 84127,
-                    label = "Blacksmithing Services Requested",
+                    name = "Blacksmithing Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
@@ -184,7 +184,7 @@ KPReference = {
             },
             oneTime = {
                 treasures = {
-                    label = "One-Time Knowledge Treasures",
+                    name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
                         { mapID = 2339, x = 47.6, y = 26.2, name = "Dornogal Hammer", questID = 83849 },
@@ -210,16 +210,16 @@ KPReference = {
             weekly = {
                 treatise = {
                     questID = 12355,
-                    label = "Treatise: Enchanting",
+                    name = "Treatise: Enchanting",
                     icon = "Interface\\Icons\\inv_inscription_treatise",
                 },
                 craftingOrder = {
                     questID = 12356,
-                    label = "Weekly Enchanting Profession Quest",
+                    name = "Weekly Enchanting Profession Quest",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    label = "Enchanting Knowledge Treasures",
+                    name = "Enchanting Knowledge Treasures",
                     icon = "Interface\\Icons\\inv_misc_book_07",
                     questID = { 44111, 44112, 44113 },
                 }
@@ -227,7 +227,7 @@ KPReference = {
 
             oneTime = {
                 treasures = {
-                    label = "One-Time Knowledge Treasures",
+                    name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
                         { mapID = 2022, x = 57.5, y = 83.6, name = "Flashfrozen Scroll", questID = 03001 },
@@ -258,12 +258,12 @@ KPReference = {
             weekly = {
                 treatise = {
                     questID = 83727,  
-                    label = "Treatise: Enchanting",
+                    name = "Treatise: Enchanting",
                     icon = "Interface\\Icons\\inv_misc_profession_book_enchanting",
                 },
                 craftingOrder = {
                     questID = {84085, 84086, 84084},
-                    label = "Weekly Enchanting Profession Quest",
+                    name = "Weekly Enchanting Profession Quest",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
@@ -271,13 +271,13 @@ KPReference = {
                     { questID = 83258, name = "Powdered Fulgurance", icon = "Interface\\Icons\\inv_enchanting_wod_dust"  },
                 },
                 gatherNodes = { 
-                    {label = "Fleeting Arcane Manifestation", questID = {84290, 84291, 84292, 84293, 84294}, icon ="Interface\\Icons\\inv_magic_swirl_color2" },
-                    {label = "Gleaming Telluric Crystal", questID = 84295, icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
+                    {name = "Fleeting Arcane Manifestation", questID = {84290, 84291, 84292, 84293, 84294}, icon ="Interface\\Icons\\inv_magic_swirl_color2" },
+                    {name = "Gleaming Telluric Crystal", questID = 84295, icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
                 },
             },
             oneTime = {
                 treasures = {
-                    label = "One-Time Knowledge Treasures",
+                    name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
                         { mapID = 2339, x = 58.0, y = 56.9, name = "Silver Dornogal Rod", questID = 83859 },
@@ -302,16 +302,16 @@ KPReference = {
             weekly = {
                 treatise = {
                     questID = 12355,
-                    label = "Treatise: Engineering",
+                    name = "Treatise: Engineering",
                     icon = "Interface\\Icons\\inv_inscription_treatise",
                 },
                 craftingOrder = {
                     questID = 12356,
-                    label = "Weekly Engineering Profession Quest",
+                    name = "Weekly Engineering Profession Quest",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    label = "Engineering Knowledge Treasures",
+                    name = "Engineering Knowledge Treasures",
                     icon = "Interface\\Icons\\inv_misc_book_07",
                     questID = { 44111, 44112, 44113 },
                 }
@@ -319,7 +319,7 @@ KPReference = {
 
             oneTime = {
                 treasures = {
-                    label = "One-Time Knowledge Treasures",
+                    name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
                         { mapID = 2022, x = 56.0, y = 44.9, name = "Boomthyr Rocket", questID = 02001 },
@@ -346,12 +346,12 @@ KPReference = {
             weekly = {
                 treatise = {
                     questID = 83728,  
-                    label = "Treatise: Engineering",
+                    name = "Treatise: Engineering",
                     icon = "Interface\\Icons\\inv_misc_profession_book_engineering",
                 },
                 craftingOrder = {
                     questID = 84128,
-                    label = "Engineering Services Requested",
+                    name = "Engineering Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
@@ -361,7 +361,7 @@ KPReference = {
             },
             oneTime = {
                 treasures = {
-                    label = "One-Time Knowledge Treasures",
+                    name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
                         { mapID = 2339, x = 64.8, y = 52.8, name = "Dornogal Spectacles", questID = 83867 },
@@ -386,16 +386,16 @@ KPReference = {
             weekly = {
                 treatise = {
                     questID = 12355,
-                    label = "Treatise: Inscription",
+                    name = "Treatise: Inscription",
                     icon = "Interface\\Icons\\inv_inscription_treatise",
                 },
                 craftingOrder = {
                     questID = 12356,
-                    label = "Weekly Inscription Profession Quest",
+                    name = "Weekly Inscription Profession Quest",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    label = "Inscription Knowledge Treasures",
+                    name = "Inscription Knowledge Treasures",
                     icon = "Interface\\Icons\\inv_misc_book_07",
                     questID = { 44111, 44112, 44113 },
                 }
@@ -403,7 +403,7 @@ KPReference = {
 
             oneTime = {
                 treasures = {
-                    label = "One-Time Knowledge Treasures",
+                    name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
                         { mapID = 2022, x = 67.87, y = 57.96, name = "Pulsing Earth Rune", questID = 07001 },
@@ -435,12 +435,12 @@ KPReference = {
             weekly = {
                 treatise = {
                     questID = 83730,  
-                    label = "Treatise: Inscription",
+                    name = "Treatise: Inscription",
                     icon = "Interface\\Icons\\inv_misc_profession_book_inscription",
                 },
                 craftingOrder = {
                     questID = 84129,
-                    label = "Inscription Services Requested",
+                    name = "Inscription Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
@@ -450,7 +450,7 @@ KPReference = {
             },
             oneTime = {
                 treasures = {
-                    label = "One-Time Knowledge Treasures",
+                    name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
                         { mapID = 2339, x = 57.2, y = 46.9, name = "Dornogal Scribe's Quill", questID = 83882 },
@@ -476,16 +476,16 @@ KPReference = {
             weekly = {
                 treatise = {
                     questID = 12355,
-                    label = "Treatise: Jewelcrafting",
+                    name = "Treatise: Jewelcrafting",
                     icon = "Interface\\Icons\\inv_inscription_treatise",
                 },
                 craftingOrder = {
                     questID = 12356,
-                    label = "Weekly Jewelcrafting Profession Quest",
+                    name = "Weekly Jewelcrafting Profession Quest",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    label = "Jewelcrafting Knowledge Treasures",
+                    name = "Jewelcrafting Knowledge Treasures",
                     icon = "Interface\\Icons\\inv_misc_book_07",
                     questID = { 44111, 44112, 44113 },
                 }
@@ -493,7 +493,7 @@ KPReference = {
 
             oneTime = {
                 treasures = {
-            label = "One-Time Knowledge Treasures",
+            name = "One-Time Knowledge Treasures",
             icon = "",
             locations = {
                 { mapID = 2022, x = 50.4, y = 45.1, name = "Closely Guarded Shiny", questID = 05001 },
@@ -524,12 +524,12 @@ KPReference = {
             weekly = {
                 treatise = {
                     questID = 83731,  
-                    label = "Treatise: Jewelcrafting",
+                    name = "Treatise: Jewelcrafting",
                     icon = "Interface\\Icons\\inv_misc_profession_book_jewelcrafting",
                 },
                 craftingOrder = {
                     questID = 84130,
-                    label = "Jewelcrafting Services Requested",
+                    name = "Jewelcrafting Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
@@ -539,7 +539,7 @@ KPReference = {
             },
             oneTime = {
                 treasures = {
-                    label = "One-Time Knowledge Treasures",
+                    name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
                         { mapID = 2339, x = 34.8, y = 52.2, name = "Earthen Gem Pliers", questID = 83891 },
@@ -564,16 +564,16 @@ KPReference = {
             weekly = {
                 treatise = {
                     questID = 12355,
-                    label = "Treatise: Leatherworking",
+                    name = "Treatise: Leatherworking",
                     icon = "Interface\\Icons\\inv_inscription_treatise",
                 },
                 craftingOrder = {
                     questID = 12356,
-                    label = "Weekly Leatherworking Profession Quest",
+                    name = "Weekly Leatherworking Profession Quest",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    label = "Leatherworking Knowledge Treasures",
+                    name = "Leatherworking Knowledge Treasures",
                     icon = "Interface\\Icons\\inv_misc_book_07",
                     questID = { 44111, 44112, 44113 },
                 }
@@ -581,7 +581,7 @@ KPReference = {
 
             oneTime = {
                 treasures = {
-                    label = "One-Time Knowledge Treasures",
+                    name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
                         { mapID = 2022, x = 39.0, y = 86.0, name = "Poacher's Pack", questID = 06001 },
@@ -611,12 +611,12 @@ KPReference = {
             weekly = {
                 treatise = {
                     questID = 83732,  
-                    label = "Treatise: Leatherworking",
+                    name = "Treatise: Leatherworking",
                     icon = "Interface\\Icons\\inv_misc_profession_book_leatherworking",
                 },
                 craftingOrder = {
                     questID = 84131,
-                    label = "Leatherworking Services Requested",
+                    name = "Leatherworking Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
@@ -626,7 +626,7 @@ KPReference = {
             },
             oneTime = {
                 treasures = {
-                    label = "One-Time Knowledge Treasures",
+                    name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
                         { mapID = 2339, x = 68.2, y = 23.3, name = "Earthen Lacing Tools", questID = 83898 },
@@ -651,16 +651,16 @@ KPReference = {
             weekly = {
                 treatise = {
                     questID = 12355,
-                    label = "Treatise: Tailoring",
+                    name = "Treatise: Tailoring",
                     icon = "Interface\\Icons\\inv_inscription_treatise",
                 },
                 craftingOrder = {
                     questID = 12356,
-                    label = "Weekly Tailoring Profession Quest",
+                    name = "Weekly Tailoring Profession Quest",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    label = "Tailoring Knowledge Treasures",
+                    name = "Tailoring Knowledge Treasures",
                     icon = "Interface\\Icons\\inv_misc_book_07",
                     questID = { 44111, 44112, 44113 },
                 }
@@ -668,7 +668,7 @@ KPReference = {
 
             oneTime = {
                 treasures = {
-                    label = "One-Time Knowledge Treasures",
+                    name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
                         { mapID = 2022, x = 74.7, y = 37.9, name = "Mysterious Banner", questID = 08001 },
@@ -697,12 +697,12 @@ KPReference = {
             weekly = {
                 treatise = {
                     questID = 83735,  
-                    label = "Treatise: Tailoring",
+                    name = "Treatise: Tailoring",
                     icon = "Interface\\Icons\\inv_misc_profession_book_tailoring",
                 },
                 craftingOrder = {
                     questID = 84132,
-                    label = "Tailoring Services Requested",
+                    name = "Tailoring Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
@@ -712,7 +712,7 @@ KPReference = {
             },
             oneTime = {
                 treasures = {
-                    label = "One-Time Knowledge Treasures",
+                    name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
                         { mapID = 2339, x = 61.5, y = 18.5, name = "Dornogal Seam Ripper", questID = 83922 },
@@ -742,11 +742,11 @@ KPReference = {
                 weekly = {
                     surveying = {
                         questID = 50001,
-                        label = "Herbalism Survey Weekly",
+                        name = "Herbalism Survey Weekly",
                         icon = "Interface\\Icons\\inv_herbalism",
                     },
                     rareNodes = {
-                        label = "Rare Herb Node KP",
+                        name = "Rare Herb Node KP",
                         icon = "Interface\\Icons\\inv_misc_herb_09",
                         questID = { 50011, 50012 }, -- each rare node grants KP once
                     },
@@ -754,7 +754,7 @@ KPReference = {
 
                 oneTime = {
                     specialHerbs = {
-                        label = "Unique Herb Discoveries",
+                        name = "Unique Herb Discoveries",
                         icon = "Interface\\Icons\\inv_misc_herb_08",
                         questID = { 51001, 51002 }, -- one-time KP from special finds
                     },
@@ -764,22 +764,22 @@ KPReference = {
             weekly = {
                 treatise = {
                     questID = 83729,  
-                    label = "Treatise: Herbalism",
+                    name = "Treatise: Herbalism",
                     icon = "Interface\\Icons\\inv_misc_profession_book_herbalism",
                 },
                 craftingOrder = {
                     questID = {82970, 82962, 82965, 82958, 82916},
-                    label = "Weekly Herbalism Profession Quest",
+                    name = "Weekly Herbalism Profession Quest",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 gatherNodes = {
-                    {label = "Deepgrove Petal", questID = { 81416, 81417, 81418, 81419, 81420 }, icon ="Interface\\Icons\\inv_magic_swirl_color2" },
-                    {label = "Deepgrove Rose", questID = 81421, icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
+                    {name = "Deepgrove Petal", questID = { 81416, 81417, 81418, 81419, 81420 }, icon ="Interface\\Icons\\inv_magic_swirl_color2" },
+                    {name = "Deepgrove Rose", questID = 81421, icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
                 }
             },
             oneTime = {
                 treasures = {
-                    label = "One-Time Knowledge Treasures",
+                    name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
                         { mapID = 2339, x = 59.1, y = 23.7, name = "Dornogal Gardening Scythe", questID = 83875 },
@@ -804,18 +804,18 @@ KPReference = {
                 weekly = {
                     surveying = {
                         questID = 60001,
-                        label = "Mining Survey Weekly",
+                        name = "Mining Survey Weekly",
                         icon = "Interface\\Icons\\inv_pick_03",
                     },
                     rareNodes = {
-                        label = "Rare Ore Node KP",
+                        name = "Rare Ore Node KP",
                         icon = "Interface\\Icons\\inv_ore_tin_01",
                         questID = { 60011, 60012 },
                     },
                 },
                 oneTime = {
                     specialOre = {
-                        label = "Unique Ore Discoveries",
+                        name = "Unique Ore Discoveries",
                         icon = "Interface\\Icons\\inv_ore_mithril_01",
                         questID = { 61001, 61002 },
                     },
@@ -825,22 +825,22 @@ KPReference = {
             weekly = {
                 treatise = {
                     questID = 83733,  
-                    label = "Treatise: Mining",
+                    name = "Treatise: Mining",
                     icon = "Interface\\Icons\\inv_misc_profession_book_mining",
                 },
                 craftingOrder = {
                     questID = {83103, 83102, 83104, 83106, 83105},
-                    label = "Weekly Mining Profession Quest",
+                    name = "Weekly Mining Profession Quest",
                     icon = "Interface\\Icons\\inv_crafting_orders", 
                 },
                 gatherNodes = {
-                    {label = "Slab of Slate", questID = { 83054, 83053, 83052, 83051, 83050 }, icon ="Interface\\Icons\\inv_magic_swirl_color2" },
-                    {label = "Erosion-Polished Slate", questID = 83049, icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
+                    {name = "Slab of Slate", questID = { 83054, 83053, 83052, 83051, 83050 }, icon ="Interface\\Icons\\inv_magic_swirl_color2" },
+                    {name = "Erosion-Polished Slate", questID = 83049, icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
                 }
             },
             oneTime = {
                 treasures = {
-                    label = "One-Time Knowledge Treasures",
+                    name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
                         { mapID = 2339, x = 36.6, y = 79.3, name = "Dornogal Chisel", questID = 83907 },
@@ -865,13 +865,13 @@ KPReference = {
                 weekly = {
                     huntQuest = {
                         questID = 70001,
-                        label = "Skinning Hunt Weekly",
+                        name = "Skinning Hunt Weekly",
                         icon = "Interface\\Icons\\inv_misc_pelt_wolf_01",
                     },
                 },
                 oneTime = {
                     rareCreatures = {
-                        label = "Rare Creature Knowledge",
+                        name = "Rare Creature Knowledge",
                         icon = "Interface\\Icons\\inv_misc_pelt_bear_01",
                         questID = { 71001, 71002 },
                     },
@@ -882,22 +882,22 @@ KPReference = {
             weekly = {
                 treatise = {
                     questID = 83734,  
-                    label = "Treatise: Skinning",
+                    name = "Treatise: Skinning",
                     icon = "Interface\\Icons\\inv_misc_profession_book_skinning",
                 },
                 craftingOrder = {
                     questID = {83097, 83100, 82993, 83098, 82992},
-                    label = "Weekly Skinning Profession Quest",
+                    name = "Weekly Skinning Profession Quest",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 gatherNodes = {
-                    {label = "Toughened Tempest Pelt", questID = { 81459, 81460, 81461, 81462, 81463 }, icon ="Interface\\Icons\\inv_magic_swirl_color2" },
-                    {label = "Abyssal Fur", questID = 81464, icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
+                    {name = "Toughened Tempest Pelt", questID = { 81459, 81460, 81461, 81462, 81463 }, icon ="Interface\\Icons\\inv_magic_swirl_color2" },
+                    {name = "Abyssal Fur", questID = 81464, icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
                 }
             },
             oneTime = {
                 treasures = {
-                    label = "One-Time Knowledge Treasures",
+                    name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
                         { mapID = 2339, x = 28.8, y = 51.7, name = "Dornogal Carving Knife", questID = 83914 },
@@ -1415,7 +1415,7 @@ local function RecalculateWeeklyKnowledgePoints()
 
                 -- ✅ Store as indexed array entry
                 wk.gatherNodes[i] = {
-                    label = entry.label or ("Node " .. i),
+                    name = entry.name or ("Node " .. i),
                     count = completedCount,
                     completed = (completedCount == totalCount)
                 }
