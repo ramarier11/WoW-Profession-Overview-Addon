@@ -534,7 +534,7 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
             end
 
         -- ENCHANTING – DISENCHANTING (show each task separately)
-        elseif profID == 333 and ref.weekly.disenchanting then
+        elseif profID == 333 and ref.weekly.gatherNodes then
             card.weeklyHeader:SetText("Weekly Disenchanting")
 
             -- Use the saved weekly status
