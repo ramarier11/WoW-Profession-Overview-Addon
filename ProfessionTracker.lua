@@ -1126,34 +1126,6 @@ local function CheckQuestCompletion(questID, checkType)
     return false
 end
 
--- local function SafeIsQuestCompleted(qID)
---     if not qID then return false end
---     local ok, result = pcall(function()
---         return C_QuestLog.IsQuestFlaggedCompleted(qID)
---     end)
---     return ok and result
--- end
-
--- -- Returns true if ANY questID in a table is completed
--- local function AnyQuestCompleted(questTable)
---     for _, q in ipairs(questTable) do
---         if C_QuestLog.IsQuestFlaggedCompleted(q) then
---             return true
---         end
---     end
---     return false
--- end
-
--- -- Returns true if ALL questIDs in a table are completed
--- local function AllQuestsCompleted(questTable)
---     for _, q in ipairs(questTable) do
---         if not C_QuestLog.IsQuestFlaggedCompleted(q) then
---             return false
---         end
---     end
---     return true
--- end
-
 -- Handles a questID that may be:
 --  • a number  
 --  • a list of numbers (ANY needed)  
@@ -1235,37 +1207,6 @@ local function RecalculateOneTimeTreasures(charKey)
     end)
 end
 
-
--- ========================================================
--- Knowledge Point Calculations
--- ========================================================
-
--- local function GetPointsMissingForTree(configID, nodeID)
---     local todo = { nodeID }
---     local missing = 0
-    
---     while next(todo) do
---         local currentNodeID = table.remove(todo)
-        
---         -- Add children to process
---         local children = C_ProfSpecs.GetChildrenForPath(currentNodeID)
---         if children then
---             for _, childID in ipairs(children) do
---                 table.insert(todo, childID)
---             end
---         end
-        
---         -- Calculate missing points for this node
---         local info = C_Traits.GetNodeInfo(configID, currentNodeID)
---         if info then
---             -- Enabling a node counts as 1 rank but doesn't cost anything
---             local enableFix = info.activeRank == 0 and 1 or 0
---             missing = missing + info.maxRanks - info.activeRank - enableFix
---         end
---     end
-    
---     return missing
--- end
 local function GetPointsMissingForTree(configID, nodeID, missing)
     missing = missing or 0
     
@@ -1434,18 +1375,10 @@ local function RecalculateWeeklyKnowledgePoints()
         -- Weekly Treasures (individual + overall)
         --------------------------------------------------
         if ref.weekly.treasures and type(ref.weekly.treasures) == "table" then
-
-            -- store per-treasure results as table
-            wk.treasures = wk.treasures or {}
-
-            -- clear old values
-            for k in pairs(wk.treasures) do
-                wk.treasures[k] = nil
-            end
-
+            wk.treasures = {}  -- Fresh array each time
             local allCompleted = true
 
-            for _, entry in ipairs(ref.weekly.treasures) do
+            for i, entry in ipairs(ref.weekly.treasures) do
                 local q = entry.questID
                 local completed = false
 
@@ -1466,16 +1399,18 @@ local function RecalculateWeeklyKnowledgePoints()
                     completed = CheckQuestCompletion(q)
                 end
 
-                -- Save individual treasure status
-                wk.treasures[q] = completed
+                -- ✅ Store as indexed array entry
+                wk.treasures[i] = {
+                    questID = q,  -- Store the original questID (could be number or table)
+                    label = entry.name or entry.label or ("Treasure " .. i),
+                    completed = completed
+                }
 
-                -- Used for the full-complete boolean
                 if not completed then
                     allCompleted = false
                 end
             end
 
-            -- store the overall weekly treasure completion (for older UI code)
             wk.treasuresAllComplete = allCompleted
         end
 
