@@ -270,7 +270,7 @@ KPReference = {
                     { questID = 83259, name = "Crystalline Repository", icon = "Interface\\Icons\\inv_jewelcrafting_dawnstone_03"  },
                     { questID = 83258, name = "Powdered Fulgurance", icon = "Interface\\Icons\\inv_enchanting_wod_dust"  },
                 },
-                disenchanting = { 
+                gatherNodes = { 
                     {label = "Fleeting Arcane Manifestation", questID = {84290, 84291, 84292, 84293, 84294}, icon ="Interface\\Icons\\inv_magic_swirl_color2" },
                     {label = "Gleaming Telluric Crystal", questID = 84295, icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
                 },
@@ -772,7 +772,7 @@ KPReference = {
                     label = "Weekly Herbalism Profession Quest",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
-                treasures = {
+                gatherNodes = {
                     {label = "Deepgrove Petal", questID = { 81416, 81417, 81418, 81419, 81420 }, icon ="Interface\\Icons\\inv_magic_swirl_color2" },
                     {label = "Deepgrove Rose", questID = 81421, icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
                 }
@@ -833,7 +833,7 @@ KPReference = {
                     label = "Weekly Mining Profession Quest",
                     icon = "Interface\\Icons\\inv_crafting_orders", 
                 },
-                treasures = {
+                gatherNodes = {
                     {label = "Slab of Slate", questID = { 83054, 83053, 83052, 83051, 83050 }, icon ="Interface\\Icons\\inv_magic_swirl_color2" },
                     {label = "Erosion-Polished Slate", questID = 83049, icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
                 }
@@ -890,7 +890,7 @@ KPReference = {
                     label = "Weekly Skinning Profession Quest",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
-                treasures = {
+                gatherNodes = {
                     {label = "Toughened Tempest Pelt", questID = { 81459, 81460, 81461, 81462, 81463 }, icon ="Interface\\Icons\\inv_magic_swirl_color2" },
                     {label = "Abyssal Fur", questID = 81464, icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
                 }
@@ -1134,8 +1134,6 @@ local function WeeklyQuestCompleted(questID)
     return false
 end
 
-
-
 -- ========================================================
 -- Profession Data Retrieval
 -- ========================================================
@@ -1164,50 +1162,6 @@ local function GetCharacterProfessionExpansions(professionName)
     return expansions
 end
 
--- ============================================================
--- Check One-Time Treasures for a Character's Profession
--- ============================================================
--- local function EvaluateOneTimeTreasures(charKey, profID, expIndex, profName, expName)
-    
---     local charData = ProfessionTrackerDB.characters[charKey]
---     if not charData or not charData.professions then return end
-
---     local profData = charData.professions[profName]
---     if not profData then return end
-    
---     local expData = profData.expansions and profData.expansions[expName]
---     if not expData then return end
-
---     local ref = KPReference[profID] 
---                 and KPReference[profID][expIndex] 
---                 and KPReference[profID][expIndex].oneTime
---                 and KPReference[profID][expIndex].oneTime.treasures
-
---     if not ref or not ref.locations then
---         expData.oneTimeCollectedAll = true
---         expData.missingOneTimeTreasures = {}
---         return
---     end
-
---     local missing = {}
---     local allCollected = true
-
---     for _, treasure in ipairs(ref.locations) do
---         if treasure.questID and not C_QuestLog.IsQuestFlaggedCompleted(treasure.questID) then
---             allCollected = false
---             table.insert(missing, {
---                 name = treasure.name,
---                 mapID = treasure.mapID,
---                 x = treasure.x,
---                 y = treasure.y,
---                 questID = treasure.questID
---             })
---         end
---     end
---     print("|cff00ff00ProfessionTracker:|r Updated treasure data.")
---     expData.oneTimeCollectedAll = allCollected
---     expData.missingOneTimeTreasures = missing
--- end
 
 -- ============================================================
 -- Recalculate one-time treasure completion for a character
@@ -1309,27 +1263,6 @@ local function CalculateMissingKnowledgePoints(skillLineID)
     return totalMissing
 end
 
--- ========================================================
--- Weekly Reset Handling
--- ========================================================
-
-local function CheckAndResetWeeklyProgress(weeklyProgress)
-    if not weeklyProgress then return end
-    
-    local currentWeek = GetCurrentWeekTimestamp()
-    
-    for activity, data in pairs(weeklyProgress) do
-        if data.lastReset and data.lastReset < currentWeek then
-            -- Reset this activity
-            data.completed = false
-            data.lastReset = currentWeek
-        elseif not data.lastReset then
-            -- Initialize reset timestamp
-            data.lastReset = currentWeek
-        end
-    end
-end
-
 local function RecalculateWeeklyKnowledgePoints()
     ForEachProfessionExpansion(function(
         charKey, charData,
@@ -1400,153 +1333,105 @@ local function RecalculateWeeklyKnowledgePoints()
         end
 
         --------------------------------------------------
-        -- Gathering Weekly Treasures
+        -- Weekly Gathering Nodes
         -- Each entry: questID (single or table)
-        -- Entire weekly = TRUE if *all* treasure entries done
+        -- Entire weekly = TRUE if *all* entries done
         --------------------------------------------------
-        if ref.weekly.treasures and type(ref.weekly.treasures) == "table" then
-            wk.treasures = AllTreasureEntriesComplete(ref.weekly.treasures)
+        -- if ref.weekly.gatherNodes and type(ref.weekly.gatherNodes) == "table" then
+        --     wk.gatherNodes = AllTreasureEntriesComplete(ref.weekly.gatherNodes)
+        -- end
+        if ref.weekly.gatherNodes and type(ref.weekly.gatherNodes) == "table" then
+            wk.gatherNodes = {}  -- Fresh array each time
+            local allCompleted = true
+
+            for i, entry in ipairs(ref.weekly.gatherNodes) do
+                local q = entry.questID
+                local completedCount = 0
+                local totalCount = type(q) == "table" and #q or 1
+
+                if type(q) == "table" then
+                    -- Count ALL completed quests in the array
+                    for _, innerID in ipairs(q) do
+                        if SafeIsQuestCompleted(innerID) then
+                            completedCount = completedCount + 1
+                        end
+                    end
+                else
+                    -- Single quest: 0 or 1
+                    if SafeIsQuestCompleted(q) then
+                        completedCount = 1
+                    end
+                end
+
+                -- ✅ Store as indexed array entry
+                wk.gatherNodes[i] = {
+                    label = entry.label or ("Node " .. i),
+                    count = completedCount,
+                    completed = (completedCount == totalCount)
+                }
+
+                if completedCount < totalCount then
+                    allCompleted = false
+                end
+            end
+
+            wk.gatherNodesAllComplete = allCompleted
         end
 
+
+
         --------------------------------------------------
-        -- Enchanting “disenchanting” weekly
-        -- Same rules as gathering: must complete ALL
+        -- Weekly Treasures (individual + overall)
         --------------------------------------------------
-        if ref.weekly.disenchanting and type(ref.weekly.disenchanting) == "table" then
-            wk.disenchanting = AllTreasureEntriesComplete(ref.weekly.disenchanting)
+        if ref.weekly.treasures and type(ref.weekly.treasures) == "table" then
+
+            -- store per-treasure results as table
+            wk.treasures = wk.treasures or {}
+
+            -- clear old values
+            for k in pairs(wk.treasures) do
+                wk.treasures[k] = nil
+            end
+
+            local allCompleted = true
+
+            for _, entry in ipairs(ref.weekly.treasures) do
+                local q = entry.questID
+                local completed = false
+
+                if type(q) == "table" then
+                    --------------------------------------------------
+                    -- Multi-quest treasure (must complete ANY)
+                    --------------------------------------------------
+                    for _, innerID in ipairs(q) do
+                        if SafeIsQuestCompleted(innerID) then
+                            completed = true
+                            break
+                        end
+                    end
+                else
+                    --------------------------------------------------
+                    -- Single quest treasure
+                    --------------------------------------------------
+                    completed = SafeIsQuestCompleted(q)
+                end
+
+                -- Save individual treasure status
+                wk.treasures[q] = completed
+
+                -- Used for the full-complete boolean
+                if not completed then
+                    allCompleted = false
+                end
+            end
+
+            -- store the overall weekly treasure completion (for older UI code)
+            wk.treasuresAllComplete = allCompleted
         end
+
 
     end)
 end
-
-
-
-
-
--- ========================================================
--- Data Initialization & Update
--- ========================================================
--- Depracated Update -- Saving for future reference
--- local function UpdateCharacterProfessionData()
---     if not ProfessionTrackerDB then
---         ProfessionTrackerDB = {
---             version = "1.0.0",
---             characters = {},
---         }
---     end
-
---     local charKey = GetCharacterKey() -- returns Charname - RealmName as String
---     local charData = EnsureTable(ProfessionTrackerDB.characters, charKey) -- checks if table key "characters"[charKey] exists and if not creates it
-
---     -- ✅ Initialize metadata if not set yet
---     if not charData.name then -- if "characters"[charKey].name doesn't exist -> create a new entry
---         local name, realm = UnitFullName("player")
---         charData.name = name or UnitName("player") or "Unknown"
---         charData.realm = realm or GetRealmName() or "UnknownRealm"
---         charData.class = select(2, UnitClass("player"))
---         charData.level = UnitLevel("player")
---         charData.faction = UnitFactionGroup("player")
---     end
-
---     charData.lastLogin = time() -- save last login time
-
---     local professions = EnsureTable(charData, "professions") -- checks if table key "characters"["UnitName-RealmName"]["professions"] exists and if not creates it
---     local currentProfs = {} -- creates empty table called currentProfs
---     local profIndices = { GetProfessions() } -- creates table of current characters professions
---     for _, profIndex in ipairs(profIndices) do -- loops through current characters professions
-        
---         if profIndex then -- checks if profIndex exists (always true if you have a profession)
---             local name, _, skillLevel, maxSkillLevel, _, _, skillLine = GetProfessionInfo(profIndex) -- sets local vars equal to associated data
---             if name then -- always true
-                
-
---                 -- Exclude secondary professions for now
---                 local excludedProfs = {
---                     ["Cooking"] = true,
---                     ["Fishing"] = true,
---                     ["Archaeology"] = true,
---                     ["First Aid"] = true,
---                 }
---                 if not excludedProfs[name] then
---                     currentProfs[name] = true
---                     local profession = EnsureTable(professions, name) -- checks if "professions"["ProfessionName"] exists and creates if not
---                     profession.lastUpdated = time()
---                     local expansions = EnsureTable(profession, "expansions") -- checks if "professionName"["expansions"] exists and creates if not
-
---                     local expansionList = GetCharacterProfessionExpansions(name) -- calls GetCharacterProfessionExpansions(professionName) and returns value stored in expansionList var
---                     -- ✅ Skip if the table is empty or nil
---                     if expansionList and #expansionList > 0 then --checks if expansionList is not nil and length is > 0 
---                         for _, exp in ipairs(expansionList) do
-                            
---                                 local expName = exp.expansionName or "Unknown"
---                                 local expID = ExpansionIndex[expName] or 0
---                                 local hasKnowledgeSystem = expID >= KNOWLEDGE_SYSTEM_START
-
---                                 -- ✅ Merge rather than replace existing data
---                                 local expData = expansions[expName] or {}
---                                 expData.name = expName
---                                 expData.id = expID
---                                 expData.skillLineID = exp.skillLineID or expData.skillLineID
---                                 expData.skillLevel = exp.skillLevel or expData.skillLevel or 0
---                                 expData.maxSkillLevel = exp.maxSkillLevel or expData.maxSkillLevel or 0
-
---                                 if hasKnowledgeSystem then
---                                     local missing = CalculateMissingKnowledgePoints(exp.skillLineID)
---                                     expData.pointsUntilMaxKnowledge = missing or expData.pointsUntilMaxKnowledge or 0
---                                     expData.knowledgePoints = expData.knowledgePoints or 0
---                                     expData.weeklyKnowledgePoints = expData.weeklyKnowledgePoints or {
---                                         treatise = false,
---                                         treasures = false,
---                                         craftingOrderQuest = false,
---                                     }
---                                     expData.oneTimeCollectedAll = false
---                                     expData.missingOneTimeTreasures = {}
---                                     --EvaluateOneTimeTreasures(charKey, skillLine, expID, name, expName)
---                                     -- Get concentration currency info
---                                     local concentrationCurrencyID = C_TradeSkillUI.GetConcentrationCurrencyID and C_TradeSkillUI.GetConcentrationCurrencyID(exp.skillLineID)
---                                     if concentrationCurrencyID then
---                                         local currencyInfo = C_CurrencyInfo.GetCurrencyInfo(concentrationCurrencyID)
---                                         if currencyInfo then
---                                             expData.concentration = currencyInfo.quantity or 0
---                                             expData.maxConcentration = currencyInfo.maxQuantity or 1000
---                                             expData.concentrationLastUpdated = time()
---                                         end
---                                     end
---                                 end
-
---                                 -- ✅ Clean out legacy or unused fields
---                                 expData.maxKnowledgePoints = nil
-
---                             -- ✅ Save back to DB
---                             expansions[expName] = expData
-                            
---                         end
---                     else
---                     -- ✅ Optionally log for debugging
---                     print(string.format("|cffff0000[Profession Tracker]|r Skipped empty expansion data for %s", name))
---                 end
---             end
---             end
---         end
---     end
-
---     -- Remove unlearned professions
---     for savedName in pairs(professions) do
---         if not currentProfs[savedName] then
---             print("|cffff0000[Profession Tracker]|r Removed profession:", savedName)
---             professions[savedName] = nil
---         end
---     end
-
---     -- ✅ Auto-refresh UI if open
---     if ProfessionTracker.UI and ProfessionTracker.UI:IsShown() then
---         C_Timer.After(0.25, function()
---             ProfessionTracker.UI:Refresh()           
---         end)
---     end
-
---     print("|cff00ff00[Profession Tracker]|r Data updated for:", charKey)
--- end
 
 -- ========================================================
 -- Data Initialization & Update (patched merged version)
@@ -1618,11 +1503,7 @@ local function UpdateCharacterProfessionData()
                                 local missing = CalculateMissingKnowledgePoints(exp.skillLineID)
                                 expData.pointsUntilMaxKnowledge = missing or expData.pointsUntilMaxKnowledge or 0
                                 expData.knowledgePoints = expData.knowledgePoints or 0
-                                expData.weeklyKnowledgePoints = expData.weeklyKnowledgePoints or {
-                                    treatise = false,
-                                    treasures = false,
-                                    craftingOrderQuest = false,
-                                }
+
                                 -- Get concentration currency info
                                 local concentrationCurrencyID = C_TradeSkillUI.GetConcentrationCurrencyID and C_TradeSkillUI.GetConcentrationCurrencyID(exp.skillLineID)
                                 if concentrationCurrencyID then

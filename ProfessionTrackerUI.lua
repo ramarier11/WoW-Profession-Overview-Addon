@@ -372,9 +372,10 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
     card.weeklySection:SetHeight(10)  -- will grow dynamically
     card.weeklySection.entries = card.weeklySection.entries or {}
 
-    card.weeklyHeader = card.weeklySection:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    card.weeklyHeader:SetPoint("TOPLEFT", 0, 0)
-    card.weeklyHeader:SetText("Weekly Knowledge")
+    card.weeklyTreasuresHeader = card.weeklySection:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    card.weeklyTreasuresHeader:SetPoint("TOPLEFT", 0, 0)
+    card.weeklyTreasuresHeader:SetText("Weekly Knowledge")
+    
 
     ----------------------------------------------------
     -- Reusable helper for weekly entries
@@ -512,14 +513,14 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
         local y = 0
         
         -- Update header text but don't add it to entries (it's persistent)
-        card.weeklyHeader:ClearAllPoints()
-        card.weeklyHeader:SetPoint("TOPLEFT", 0, y)
-        card.weeklyHeader:Show()
+        card.weeklyTreasuresHeader:ClearAllPoints()
+        card.weeklyTreasuresHeader:SetPoint("TOPLEFT", 0, y)
+        card.weeklyTreasuresHeader:Show()
         y = y - 24
 
         -- GATHERING PROFESSIONS (Herbalism 182, Mining 186, Skinning 393)
         if profID == 182 or profID == 186 or profID == 393 then
-            card.weeklyHeader:SetText("Weekly Treasures")
+            card.weeklyTreasuresHeader:SetText("Weekly Gathering Nodes")
 
             -- Use the saved weekly status, not live quest checks
             local completed = wk.treasures or false
@@ -533,28 +534,9 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
                 end
             end
 
-        -- ENCHANTING – DISENCHANTING (show each task separately)
-        elseif profID == 333 and ref.weekly.disenchanting then
-            card.weeklyHeader:SetText("Weekly Disenchanting")
-
-            -- Use the saved weekly status
-            local completed = wk.disenchanting or false
-
-            for i, it in ipairs(ref.weekly.disenchanting) do
-                local entry = AddWeeklyEntry(
-                    card.weeklySection,
-                    it.label or ("Disenchant " .. i),
-                    completed
-                )
-
-                entry:SetPoint("TOPLEFT", 0, y)
-                entry:SetPoint("TOPRIGHT", 0, y)
-                y = y - 20
-            end
-
         -- OTHER PROFESSIONS: stacked treasure list (shows each treasure)
         elseif ref.weekly.treasures and type(ref.weekly.treasures) == "table" then
-            card.weeklyHeader:SetText("Weekly Treasures")
+            card.weeklyTreasuresHeader:SetText("Weekly Treasures")
             
             -- Use the saved weekly status
             local completed = wk.treasures or false
@@ -564,6 +546,51 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
                 entry:SetPoint("TOPLEFT", 0, y)
                 entry:SetPoint("TOPRIGHT", 0, y)
                 y = y - 20
+            end
+        end
+
+        -- ENCHANTING – DISENCHANTING (show each task separately)
+        if profID == 333 and ref.weekly.gatherNodes then
+            -- Create a sub-section PARENTED TO card.weeklySection
+            card.weeklyDisenchantingSection = card.weeklyDisenchantingSection
+                or CreateFrame("Frame", nil, card.weeklySection)
+
+            local section = card.weeklyDisenchantingSection
+            section:Show()
+            section:SetWidth(card.weeklySection:GetWidth())
+            section.entries = section.entries or {}
+
+            -- clear old entries
+            for _, v in ipairs(section.entries) do
+                v:Hide()
+                v:SetParent(nil)
+            end
+            section.entries = {}
+
+            -- Header
+            if not section.header then
+                section.header = section:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+                section.header:SetText("Weekly Disenchanting")
+            end
+
+            section.header:ClearAllPoints()
+            section.header:SetPoint("TOPLEFT", 0, y)
+            section.header:Show()
+            y = y - 24
+
+            -- Use saved weekly status
+            local completed = wk.gatherNodes or false
+
+            -- Create rows
+            for i, it in ipairs(ref.weekly.gatherNodes) do
+                local entry = AddWeeklyEntry(section, it.label or ("Disenchant " .. i), completed)
+
+                entry:SetPoint("TOPLEFT", 0, y)
+                entry:SetPoint("TOPRIGHT", 0, y)
+                y = y - 20
+
+                table.insert(section.entries, entry)
+                table.insert(card.weeklySection.entries, entry) -- ensure height calc includes these
             end
         end
 
@@ -790,8 +817,8 @@ local function AddProfessionObjectives(parentFrame, profName, profData, yOffset)
 
     local objectives = {
         { key = "craftingOrderQuest", label = "KP Quest" },
-        { key = "treasures",          label = "KP Treasures" },
-        { key = "treatise",           label = "KP Treatise" },
+        { key = "treasuresAllComplete", label = "KP Treasures" },
+        { key = "treatise", label = "KP Treatise" },
     }
 
     local x = 0
@@ -1069,12 +1096,65 @@ end
 end
 
 --------------------------------------------------------
+-- Layout: 1–2 Cards Per Row (Profession-Based)
+--------------------------------------------------------
+local function LayoutProfessionCards(scrollChild, cards)
+    if not cards or #cards == 0 then return end
+
+    -- Count primary professions (we assume max 2)
+    local num = #cards
+
+    -- Determine number per row
+    local perRow = (num == 1) and 1 or 2
+
+    -- Get available width
+    local totalWidth = scrollChild:GetWidth() - 20
+    local cardWidth = math.floor(totalWidth / perRow) -10
+
+    -- Place cards
+    local xOffset = 20
+    local yOffset = -40
+    local rowMaxHeight = 0
+    local countInRow = 0
+
+    for i, card in ipairs(cards) do
+        card:ClearAllPoints()
+        card:SetWidth(cardWidth)
+
+        -- Start a new row
+        if countInRow == perRow then
+            yOffset = yOffset - rowMaxHeight - 20
+            xOffset = 20
+            countInRow = 0
+            rowMaxHeight = 0
+        end
+
+        -- Position card
+        card:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", xOffset, yOffset)
+
+        local h = card:GetHeight()
+        if h > rowMaxHeight then
+            rowMaxHeight = h
+        end
+
+        xOffset = xOffset + cardWidth + 20
+        countInRow = countInRow + 1
+    end
+
+    -- Final scroll height
+    local totalHeight = math.abs(yOffset) + rowMaxHeight + 40
+    scrollChild:SetHeight(totalHeight)
+end
+
+
+
+--------------------------------------------------------
 -- Detail View
 --------------------------------------------------------
 function ProfessionTrackerUI:ShowDetailView()
     self:ClearScrollChild()
 
-    -- Clear existing content
+    -- Clear existing children
     for _, child in pairs({self.scrollChild:GetChildren()}) do
         child:Hide()
         child:ClearAllPoints()
@@ -1087,7 +1167,6 @@ function ProfessionTrackerUI:ShowDetailView()
         return
     end
 
-    -- ✅ Correct: get full data directly
     local charData = ProfessionTrackerDB.characters and ProfessionTrackerDB.characters[self.selectedCharacter]
     if not charData then
         local errorText = self.scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
@@ -1096,62 +1175,39 @@ function ProfessionTrackerUI:ShowDetailView()
         return
     end
 
-    -- Back button
-    local backButton = CreateFrame("Button", nil, self.scrollChild, "UIPanelButtonTemplate")
-    backButton:SetSize(100, 25)
-    backButton:SetPoint("TOPLEFT", 10, -10)
-    backButton:SetText("← Dashboard")
-    backButton:SetScript("OnClick", function()
-        self.viewMode = "dashboard"
-        self:Refresh()
-    end)
-
     -- Header
     local headerText = self.scrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
     headerText:SetPoint("TOP", 0, -15)
     headerText:SetText(string.format("%s - %s", charData.name or "Unknown", charData.realm or ""))
 
-    local yOffset = -50
+    --------------------------------------------------------
+    -- NEW: Collect all profession cards first
+    --------------------------------------------------------
+    local headers = {}
+    local cards = {}
 
-    -- Professions
     if charData.professions then
         for profName, profData in pairs(charData.professions) do
-            local profHeader = self.scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-            profHeader:SetPoint("TOPLEFT", 20, yOffset)
-            profHeader:SetTextColor(1, 0.8, 0)
-            profHeader:SetText(profName or "Unknown Profession")
-            yOffset = yOffset - 30
 
-            if profData.expansions then
-                -- Convert expansions table into a sortable list
-                local expansionsList = {}
-                for expName, expData in pairs(profData.expansions) do
-                    table.insert(expansionsList, { name = expName, data = expData })
-                end
-
-                -- Sort in descending order by expansion ID (higher = newer)
-                table.sort(expansionsList, function(a, b)
-                    return (a.data.id or 0) > (b.data.id or 0)
-                end)
-
-                local card = CreateProfessionExpansionCard(self.scrollChild, profName, profData, yOffset)
-                yOffset = yOffset - 170
-
-            end
-
-
-            yOffset = yOffset - 20
+            -- Create card (do not position yet)
+            local card = CreateProfessionExpansionCard(self.scrollChild, profName, profData, 0)
+            table.insert(cards, card)
         end
     else
-        local noProfText = self.scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        noProfText:SetPoint("TOP", 0, -80)
-        noProfText:SetText("No profession data available")
+        local noProf = self.scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        noProf:SetPoint("TOP", 0, -40)
+        noProf:SetText("No profession data available")
+        return
     end
 
-    self.scrollChild:SetHeight(math.abs(yOffset))
-    self.scrollFrame:SetVerticalScroll(0)
+    --------------------------------------------------------
+    -- NEW: Layout cards horizontally (1 or 2 per row)
+    --------------------------------------------------------
+    LayoutProfessionCards(self.scrollChild, cards)
 
+    self.scrollFrame:SetVerticalScroll(0)
 end
+
 
 
 
