@@ -1263,27 +1263,6 @@ local function CalculateMissingKnowledgePoints(skillLineID)
     return totalMissing
 end
 
--- ========================================================
--- Weekly Reset Handling
--- ========================================================
-
-local function CheckAndResetWeeklyProgress(weeklyProgress)
-    if not weeklyProgress then return end
-    
-    local currentWeek = GetCurrentWeekTimestamp()
-    
-    for activity, data in pairs(weeklyProgress) do
-        if data.lastReset and data.lastReset < currentWeek then
-            -- Reset this activity
-            data.completed = false
-            data.lastReset = currentWeek
-        elseif not data.lastReset then
-            -- Initialize reset timestamp
-            data.lastReset = currentWeek
-        end
-    end
-end
-
 local function RecalculateWeeklyKnowledgePoints()
     ForEachProfessionExpansion(function(
         charKey, charData,
