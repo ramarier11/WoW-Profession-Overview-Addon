@@ -1346,44 +1346,41 @@ local function RecalculateWeeklyKnowledgePoints()
 
             for i, entry in ipairs(ref.weekly.gatherNodes) do
                 local q = entry.questID
-                local completed = false
+                local completedCount = 0  -- ✅ Count how many are complete
 
                 if type(q) == "table" then
+                    -- ✅ Count ALL completed quests in the array
                     for _, innerID in ipairs(q) do
                         if SafeIsQuestCompleted(innerID) then
-                            completed = true
-                            break
+                            completedCount = completedCount + 1
                         end
                     end
                 else
-                    completed = SafeIsQuestCompleted(q)
+                    -- Single quest: 0 or 1
+                    if SafeIsQuestCompleted(q) then
+                        completedCount = 1
+                    end
                 end
 
                 -- ✅ Initialize or update entry
                 if not wk.gatherNodes[i] then
                     wk.gatherNodes[i] = {
                         label = entry.label or ("Node " .. i),
-                        completed = false,
-                        count = 0
+                        total = type(q) == "table" and #q or 1  -- ✅ Store total possible
                     }
                 end
 
-                -- ✅ If newly completed, increment count
-                if completed and not wk.gatherNodes[i].completed then
-                    wk.gatherNodes[i].count = wk.gatherNodes[i].count + 1
-                end
+                -- ✅ Always update count based on current state
+                wk.gatherNodes[i].count = completedCount
+                wk.gatherNodes[i].completed = (completedCount == wk.gatherNodes[i].total)
 
-                -- Update completion status
-                wk.gatherNodes[i].completed = completed
-
-                if not completed then
+                if not wk.gatherNodes[i].completed then
                     allCompleted = false
                 end
             end
 
             wk.gatherNodesAllComplete = allCompleted
         end
-
 
 
 
