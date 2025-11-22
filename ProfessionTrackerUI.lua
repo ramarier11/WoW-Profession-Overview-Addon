@@ -547,7 +547,7 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
                 y = y - 20
             end
         end
-        
+
         -- ENCHANTING – DISENCHANTING (show each task separately)
         if profID == 333 and ref.weekly.gatherNodes then
             card.weeklyHeader:SetText("Weekly Disenchanting")
@@ -566,7 +566,7 @@ local function CreateProfessionExpansionCard(parent, profName, profData, yOffset
                 entry:SetPoint("TOPRIGHT", 0, y)
                 y = y - 20
             end
-
+        end 
         -- finalize height of weeklySection based on entries
         local rows = #card.weeklySection.entries
         local newHeight = math.max(18 * rows + 8, 10)
