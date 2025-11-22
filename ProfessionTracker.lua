@@ -1410,16 +1410,16 @@ local function RecalculateWeeklyKnowledgePoints()
         if ref.weekly.gatherNodes and type(ref.weekly.gatherNodes) == "table" then
 
             -- store per-treasure results as table
-            wk.treasures = wk.treasures or {}
+            wk.gatherNodes = wk.gatherNodes or {}
 
             -- clear old values
-            for k in pairs(wk.treasures) do
-                wk.treasures[k] = nil
+            for k in pairs(wk.gatherNodes) do
+                wk.gatherNodes[k] = nil
             end
 
             local allCompleted = true
 
-            for _, entry in ipairs(ref.weekly.treasures) do
+            for _, entry in ipairs(ref.weekly.gatherNodes) do
                 local q = entry.questID
                 local completed = false
 
@@ -1441,7 +1441,7 @@ local function RecalculateWeeklyKnowledgePoints()
                 end
 
                 -- Save individual treasure status
-                wk.treasures[q] = completed
+                wk.gatherNodes[q] = completed
 
                 -- Used for the full-complete boolean
                 if not completed then
@@ -1450,7 +1450,7 @@ local function RecalculateWeeklyKnowledgePoints()
             end
 
             -- store the overall weekly treasure completion (for older UI code)
-            wk.treasuresAllComplete = allCompleted
+            wk.gatherNodesAllComplete = allCompleted
         end
 
 
