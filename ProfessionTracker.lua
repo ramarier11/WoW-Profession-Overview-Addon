@@ -1341,24 +1341,15 @@ local function RecalculateWeeklyKnowledgePoints()
         --     wk.gatherNodes = AllTreasureEntriesComplete(ref.weekly.gatherNodes)
         -- end
         if ref.weekly.gatherNodes and type(ref.weekly.gatherNodes) == "table" then
-            wk.gatherNodes = wk.gatherNodes or {}
-            
-            -- ✅ Clear old structure (preserve as table, not overwrite)
-            for k in pairs(wk.gatherNodes) do
-                if k ~= "completed" then
-                    wk.gatherNodes[k] = nil
-                end
-            end
-            
+            wk.gatherNodes = wk.gatherNodes or {}  -- Preserve existing data
             local allCompleted = true
 
             for i, entry in ipairs(ref.weekly.gatherNodes) do
                 local q = entry.questID
-                local completedCount = 0
-                local totalCount = type(q) == "table" and #q or 1
+                local completedCount = 0  -- ✅ Count how many are complete
 
                 if type(q) == "table" then
-                    -- Count ALL completed quests in the array
+                    -- ✅ Count ALL completed quests in the array
                     for _, innerID in ipairs(q) do
                         if SafeIsQuestCompleted(innerID) then
                             completedCount = completedCount + 1
@@ -1371,21 +1362,24 @@ local function RecalculateWeeklyKnowledgePoints()
                     end
                 end
 
-                -- ✅ Store as nested table with count and completed status
-                local label = entry.label or ("Node " .. i)
-                wk.gatherNodes[label] = {
-                    count = completedCount,
-                    total = totalCount,
-                    completed = (completedCount == totalCount)
-                }
+                -- ✅ Initialize or update entry
+                if not wk.gatherNodes[i] then
+                    wk.gatherNodes[i] = {
+                        label = entry.label or ("Node " .. i),
+                        total = type(q) == "table" and #q or 1  -- ✅ Store total possible
+                    }
+                end
 
-                if completedCount < totalCount then
+                -- ✅ Always update count based on current state
+                wk.gatherNodes[i].count = completedCount
+                wk.gatherNodes[i].completed = (completedCount == wk.gatherNodes[i].total)
+
+                if not wk.gatherNodes[i].completed then
                     allCompleted = false
                 end
             end
 
-            -- ✅ Overall completion status
-            wk.gatherNodes.completed = allCompleted
+            wk.gatherNodesAllComplete = allCompleted
         end
 
 
