@@ -1341,13 +1341,7 @@ local function RecalculateWeeklyKnowledgePoints()
         --     wk.gatherNodes = AllTreasureEntriesComplete(ref.weekly.gatherNodes)
         -- end
         if ref.weekly.gatherNodes and type(ref.weekly.gatherNodes) == "table" then
-            wk.gatherNodes = wk.gatherNodes or {}
-            
-            -- Clear old structure
-            for k in pairs(wk.gatherNodes) do
-                wk.gatherNodes[k] = nil
-            end
-            
+            wk.gatherNodes = {}  -- Fresh array each time
             local allCompleted = true
 
             for i, entry in ipairs(ref.weekly.gatherNodes) do
@@ -1369,9 +1363,9 @@ local function RecalculateWeeklyKnowledgePoints()
                     end
                 end
 
-                -- ✅ Store as nested table with count and completed status (no total)
-                local label = entry.label or ("Node " .. i)
-                wk.gatherNodes[label] = {
+                -- ✅ Store as indexed array entry
+                wk.gatherNodes[i] = {
+                    label = entry.label or ("Node " .. i),
                     count = completedCount,
                     completed = (completedCount == totalCount)
                 }
@@ -1381,10 +1375,8 @@ local function RecalculateWeeklyKnowledgePoints()
                 end
             end
 
-            -- ✅ Overall completion status
-            wk.gatherNodes.completed = allCompleted
+            wk.gatherNodesAllComplete = allCompleted
         end
-
 
 
 
