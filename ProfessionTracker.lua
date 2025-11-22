@@ -1343,7 +1343,7 @@ local function RecalculateWeeklyKnowledgePoints()
         if ref.weekly.gatherNodes and type(ref.weekly.gatherNodes) == "table" then
             wk.gatherNodes = {}  -- Fresh array
             local allCompleted = true
-
+            local numCompleted = 0
             for i, entry in ipairs(ref.weekly.gatherNodes) do
                 local q = entry.questID
                 local completed = false
@@ -1352,6 +1352,7 @@ local function RecalculateWeeklyKnowledgePoints()
                     for _, innerID in ipairs(q) do
                         if SafeIsQuestCompleted(innerID) then
                             completed = true
+                            numCompleted = numCompleted + 1
                             break
                         end
                     end
@@ -1369,7 +1370,7 @@ local function RecalculateWeeklyKnowledgePoints()
                     allCompleted = false
                 end
             end
-            print(#wk.gatherNodes)
+            print(numCompleted)
             wk.gatherNodesAllComplete = allCompleted
         end
 
