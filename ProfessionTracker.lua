@@ -1401,7 +1401,6 @@ local function RecalculateWeeklyKnowledgePoints()
 
                 -- ✅ Store as indexed array entry
                 wk.treasures[i] = {
-                    questID = q,  -- Store the original questID (could be number or table)
                     label = entry.name or entry.label or ("Treasure " .. i),
                     completed = completed
                 }
