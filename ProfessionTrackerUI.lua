@@ -64,6 +64,15 @@ local function AcquireCharacterEntry()
         frame:SetBackdrop(ENTRY_BACKDROP)
         frame:SetBackdropColor(0.1, 0.1, 0.1, 0.9)
         frame:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)
+        
+        -- Add hover highlight effect
+        frame:EnableMouse(true)
+        frame:SetScript("OnEnter", function(self)
+            self:SetBackdropBorderColor(1, 0.82, 0, 1)  -- Gold highlight
+        end)
+        frame:SetScript("OnLeave", function(self)
+            self:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)  -- Reset to normal
+        end)
     end
     frame:Show()
     return frame
