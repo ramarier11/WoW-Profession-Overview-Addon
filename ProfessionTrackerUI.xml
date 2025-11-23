@@ -79,12 +79,12 @@
     
     <!-- Character Entry Template -->
     <Frame name="CharacterEntryTemplate" virtual="true" mixin="BackdropTemplateMixin" inherits="BackdropTemplate">
-        <Size x="840" y="120"/>
+        <Size x="410" y="120"/>
         
         <Layers>
             <Layer level="OVERLAY">
                 <!-- Character Name -->
-                <FontString parentKey="Name" inherits="GameFontNormalLarge">
+                <FontString parentKey="Name" inherits="GameFontNormalHuge">
                     <Anchors>
                         <Anchor point="TOPLEFT" relativePoint="TOPLEFT">
                             <Offset x="10" y="-8"/>
@@ -93,7 +93,7 @@
                 </FontString>
                 
                 <!-- Character Info (Class, Level) -->
-                <FontString parentKey="Info" inherits="GameFontNormal">
+                <FontString parentKey="Info" inherits="GameFontNormalLarge">
                     <Anchors>
                         <Anchor point="TOPLEFT" relativeKey="$parent.Name" relativePoint="BOTTOMLEFT">
                             <Offset x="0" y="-2"/>
@@ -106,7 +106,7 @@
         <Frames>
             <!-- Profession Entry Container -->
             <Frame parentKey="ProfessionContainer">
-                <Size x="820" y="70"/>
+                <Size x="390" y="70"/>
                 <Anchors>
                     <Anchor point="TOPLEFT" relativePoint="TOPLEFT">
                         <Offset x="10" y="-45"/>
@@ -123,7 +123,7 @@
         <Layers>
             <Layer level="ARTWORK">
                 <!-- Profession Name -->
-                <FontString parentKey="Name" inherits="GameFontNormalSmall">
+                <FontString parentKey="Name" inherits="GameFontNormal">
                     <Anchors>
                         <Anchor point="TOPLEFT" relativePoint="TOPLEFT">
                             <Offset x="2" y="-2"/>
@@ -132,7 +132,7 @@
                 </FontString>
                 
                 <!-- Expansion Name -->
-                <FontString parentKey="Expansion" inherits="GameFontHighlightSmall">
+                <FontString parentKey="Expansion" inherits="GameFontHighlight">
                     <Anchors>
                         <Anchor point="TOPLEFT" relativeKey="$parent.Name" relativePoint="BOTTOMLEFT">
                             <Offset x="0" y="-1"/>
