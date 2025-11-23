@@ -1,0 +1,230 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+    
+    <!-- Main Dashboard Frame -->
+    <Frame name="ProfessionTrackerDashboard" parent="UIParent" movable="true" enableMouse="true" hidden="true">
+        <Size x="900" y="600"/>
+        <Anchors>
+            <Anchor point="CENTER"/>
+        </Anchors>
+        
+        <!-- Background -->
+        <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+            <EdgeSize>
+                <AbsValue val="32"/>
+            </EdgeSize>
+            <TileSize>
+                <AbsValue val="32"/>
+            </TileSize>
+            <BackgroundInsets>
+                <AbsInset left="11" right="12" top="12" bottom="11"/>
+            </BackgroundInsets>
+        </Backdrop>
+        
+        <Layers>
+            <!-- Title Text -->
+            <Layer level="ARTWORK">
+                <FontString name="$parentTitle" inherits="GameFontNormalLarge">
+                    <Anchors>
+                        <Anchor point="TOP" relativePoint="TOP">
+                            <Offset x="0" y="-20"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        
+        <Frames>
+            <!-- Close Button -->
+            <Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT">
+                        <Offset x="-5" y="-5"/>
+                    </Anchor>
+                </Anchors>
+            </Button>
+            
+            <!-- Scroll Frame for Character List -->
+            <ScrollFrame name="$parentScrollFrame" inherits="UIPanelScrollFrameTemplate">
+                <Size x="860" y="520"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+                        <Offset x="20" y="-60"/>
+                    </Anchor>
+                </Anchors>
+                
+                <ScrollChild>
+                    <Frame name="$parentScrollChild">
+                        <Size x="840" y="1"/>
+                    </Frame>
+                </ScrollChild>
+            </ScrollFrame>
+            
+            <!-- Refresh Button -->
+            <Button name="$parentRefreshButton" inherits="UIPanelButtonTemplate">
+                <Size x="100" y="25"/>
+                <Anchors>
+                    <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT">
+                        <Offset x="20" y="15"/>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        ProfessionTrackerDashboard:Refresh()
+                    </OnClick>
+                </Scripts>
+            </Button>
+        </Frames>
+        
+        <Scripts>
+            <OnLoad>
+                self:RegisterForDrag("LeftButton")
+                ProfessionTrackerDashboardTitle:SetText("Profession Tracker Dashboard")
+                ProfessionTrackerDashboardRefreshButton:SetText("Refresh")
+            </OnLoad>
+            <OnDragStart>
+                self:StartMoving()
+            </OnDragStart>
+            <OnDragStop>
+                self:StopMovingOrSizing()
+            </OnDragStop>
+        </Scripts>
+    </Frame>
+    
+    <!-- Character Entry Template -->
+    <Frame name="CharacterEntryTemplate" virtual="true">
+        <Size x="840" y="120"/>
+        
+        <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+            <EdgeSize>
+                <AbsValue val="16"/>
+            </EdgeSize>
+            <TileSize>
+                <AbsValue val="16"/>
+            </TileSize>
+            <BackgroundInsets>
+                <AbsInset left="4" right="4" top="4" bottom="4"/>
+            </BackgroundInsets>
+            <Color r="0.1" g="0.1" b="0.1" a="0.9"/>
+        </Backdrop>
+        
+        <Layers>
+            <Layer level="OVERLAY">
+                <!-- Character Name -->
+                <FontString name="$parentName" inherits="GameFontNormalLarge">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+                            <Offset x="10" y="-8"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                
+                <!-- Character Info (Class, Level) -->
+                <FontString name="$parentInfo" inherits="GameFontNormal">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeTo="$parentName" relativePoint="BOTTOMLEFT">
+                            <Offset x="0" y="-2"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        
+        <Frames>
+            <!-- Profession Entry Container -->
+            <Frame name="$parentProfessionContainer">
+                <Size x="820" y="70"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+                        <Offset x="10" y="-45"/>
+                    </Anchor>
+                </Anchors>
+            </Frame>
+        </Frames>
+    </Frame>
+    
+    <!-- Profession Progress Template -->
+    <Frame name="ProfessionProgressTemplate" virtual="true">
+        <Size x="200" y="65"/>
+        
+        <Layers>
+            <Layer level="ARTWORK">
+                <!-- Profession Name -->
+                <FontString name="$parentName" inherits="GameFontNormalSmall">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+                            <Offset x="2" y="-2"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                
+                <!-- Expansion Name -->
+                <FontString name="$parentExpansion" inherits="GameFontHighlightSmall">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeTo="$parentName" relativePoint="BOTTOMLEFT">
+                            <Offset x="0" y="-1"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+            </Layer>
+            
+            <Layer level="OVERLAY">
+                <!-- Weekly Progress Icons -->
+                <!-- Treatise Icon -->
+                <Texture name="$parentTreatiseIcon" file="Interface\Icons\inv_misc_profession_book_enchanting">
+                    <Size x="16" y="16"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeTo="$parentExpansion" relativePoint="BOTTOMLEFT">
+                            <Offset x="0" y="-3"/>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                
+                <!-- Crafting Order Icon -->
+                <Texture name="$parentCraftingOrderIcon" file="Interface\Icons\inv_crafting_orders">
+                    <Size x="16" y="16"/>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeTo="$parentTreatiseIcon" relativePoint="RIGHT">
+                            <Offset x="3" y="0"/>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                
+                <!-- Treasures Icon -->
+                <Texture name="$parentTreasuresIcon" file="Interface\Icons\inv_misc_book_07">
+                    <Size x="16" y="16"/>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeTo="$parentCraftingOrderIcon" relativePoint="RIGHT">
+                            <Offset x="3" y="0"/>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                
+                <!-- Gather Nodes Icon (for gathering profs) -->
+                <Texture name="$parentGatherNodesIcon" file="Interface\Icons\inv_magic_swirl_color2">
+                    <Size x="16" y="16"/>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeTo="$parentTreasuresIcon" relativePoint="RIGHT">
+                            <Offset x="3" y="0"/>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+    </Frame>
+    
+    <!-- Status Check Mark Texture (for completed activities) -->
+    <Frame name="StatusCheckTemplate" virtual="true">
+        <Size x="12" y="12"/>
+        <Layers>
+            <Layer level="OVERLAY" textureSubLevel="2">
+                <Texture name="$parentCheck" file="Interface\RaidFrame\ReadyCheck-Ready">
+                    <Size x="12" y="12"/>
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+    </Frame>
+    
+</Ui>
