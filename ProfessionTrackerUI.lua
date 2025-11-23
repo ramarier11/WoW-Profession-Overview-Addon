@@ -213,6 +213,10 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     -- Get weekly progress data
     local weekly = expData.weeklyKnowledgePoints or {}
     
+    -- Check if this is a gathering profession or enchanting
+    local isGathering = GATHERING_PROFESSIONS[profName]
+    local isEnchanting = (profData and profData.name == "Enchanting")
+    
     -- Helper to create status line with icon, text, and check/x
     local function GetStatusLine(icon, label, completed)
         local statusIcon = completed 
@@ -238,18 +242,17 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
         weekly.craftingOrderQuest == true
     ))
     
-    -- Treasures status
-    local treasuresComplete = weekly.treasuresAllComplete == true
-    table.insert(statusLines, GetStatusLine(
-        "Interface\\Icons\\inv_misc_book_07",
-        "Treasures",
-        treasuresComplete
-    ))
+    -- Treasures status (exclude for gathering professions, but include for enchanting)
+    if not isGathering then
+        local treasuresComplete = weekly.treasuresAllComplete == true
+        table.insert(statusLines, GetStatusLine(
+            "Interface\\Icons\\inv_misc_book_07",
+            "Treasures",
+            treasuresComplete
+        ))
+    end
     
     -- Gather Nodes status (for gathering professions and enchanting)
-    local isGathering = GATHERING_PROFESSIONS[profName]
-    local isEnchanting = (profData and profData.name == "Enchanting")
-    
     if isGathering or isEnchanting then
         local nodesComplete = weekly.gatherNodesAllComplete == true
         table.insert(statusLines, GetStatusLine(
@@ -286,16 +289,19 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
         local craftingStatus = weekly.craftingOrderQuest and "|cff00ff00Completed|r" or "|cffff0000Not Completed|r"
         GameTooltip:AddLine("Crafting Order: " .. craftingStatus, 1, 1, 1)
         
-        -- Treasures
-        if weekly.treasures and type(weekly.treasures) == "table" then
-            GameTooltip:AddLine("Weekly Treasures:", 1, 1, 1)
-            for i, treasure in ipairs(weekly.treasures) do
-                local status = treasure.completed and "|cff00ff00✓|r" or "|cffff0000✗|r"
-                GameTooltip:AddLine("  " .. status .. " " .. (treasure.label or "Treasure " .. i), 0.9, 0.9, 0.9)
+        -- Treasures (exclude for gathering professions)
+        if not isGathering then
+            local treasuresComplete = weekly.treasuresAllComplete == true
+            if weekly.treasures and type(weekly.treasures) == "table" then
+                GameTooltip:AddLine("Weekly Treasures:", 1, 1, 1)
+                for i, treasure in ipairs(weekly.treasures) do
+                    local status = treasure.completed and "|cff00ff00✓|r" or "|cffff0000✗|r"
+                    GameTooltip:AddLine("  " .. status .. " " .. (treasure.label or "Treasure " .. i), 0.9, 0.9, 0.9)
+                end
+            else
+                local treasureStatus = treasuresComplete and "|cff00ff00Completed|r" or "|cffff0000Not Completed|r"
+                GameTooltip:AddLine("Treasures: " .. treasureStatus, 1, 1, 1)
             end
-        else
-            local treasureStatus = treasuresComplete and "|cff00ff00Completed|r" or "|cffff0000Not Completed|r"
-            GameTooltip:AddLine("Treasures: " .. treasureStatus, 1, 1, 1)
         end
         
         -- Gather Nodes
