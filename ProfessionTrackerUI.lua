@@ -213,6 +213,15 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     -- Get weekly progress data
     local weekly = expData.weeklyKnowledgePoints or {}
     
+    -- Helper to create status text with check/x icon
+    local function GetStatusText(label, completed)
+        local icon = completed 
+            and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t" 
+            or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
+        local color = completed and "|cff00ff00" or "|cffff0000"
+        return string.format("%s %s%s|r", icon, color, label)
+    end
+    
     -- Helper to set icon alpha based on completion
     local function SetIconStatus(icon, completed)
         if completed then
@@ -224,7 +233,11 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
         end
     end
     
+    -- Build status text
+    local statusLines = {}
+    
     -- Treatise status
+    table.insert(statusLines, GetStatusText("Treatise", weekly.treatise == true))
     SetIconStatus(frame.TreatiseIcon, weekly.treatise == true)
     frame.TreatiseIcon:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
@@ -239,6 +252,7 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     frame.TreatiseIcon:SetScript("OnLeave", function() GameTooltip:Hide() end)
     
     -- Crafting Order status
+    table.insert(statusLines, GetStatusText("Crafting Order", weekly.craftingOrderQuest == true))
     SetIconStatus(frame.CraftingOrderIcon, weekly.craftingOrderQuest == true)
     frame.CraftingOrderIcon:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
@@ -254,6 +268,7 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     
     -- Treasures status
     local treasuresComplete = weekly.treasuresAllComplete == true
+    table.insert(statusLines, GetStatusText("Treasures", treasuresComplete))
     SetIconStatus(frame.TreasuresIcon, treasuresComplete)
     frame.TreasuresIcon:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
@@ -278,8 +293,9 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     local isEnchanting = (profData and profData.name == "Enchanting")
     
     if isGathering or isEnchanting then
-        frame.GatherNodesIcon:Show()
         local nodesComplete = weekly.gatherNodesAllComplete == true
+        table.insert(statusLines, GetStatusText("Gather Nodes", nodesComplete))
+        frame.GatherNodesIcon:Show()
         SetIconStatus(frame.GatherNodesIcon, nodesComplete)
         
         frame.GatherNodesIcon:SetScript("OnEnter", function(self)
@@ -302,6 +318,17 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     else
         frame.GatherNodesIcon:Hide()
     end
+    
+    -- Create or update status text display
+    if not frame.StatusText then
+        frame.StatusText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+        frame.StatusText:SetPoint("TOPLEFT", frame.GatherNodesIcon, "BOTTOMLEFT", -2, -5)
+        frame.StatusText:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -5, -40)
+        frame.StatusText:SetJustifyH("LEFT")
+        frame.StatusText:SetJustifyV("TOP")
+    end
+    
+    frame.StatusText:SetText(table.concat(statusLines, "\n"))
     
     return frame
 end
