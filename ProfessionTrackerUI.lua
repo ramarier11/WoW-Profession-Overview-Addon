@@ -254,7 +254,7 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     -- frame.Name:SetText(profName)
     
     -- Set expansion name
-    frame.Expansion:SetText(expName)
+    frame.Expansion:SetText(profName)
     
     -- Get weekly progress data
     local weekly = expData.weeklyKnowledgePoints or {}
