@@ -165,21 +165,32 @@ function ProfessionTrackerDashboard:CreateCharacterEntry(charKey, charData)
         
         for profName, profData in pairs(charData.professions) do
             if profData.expansions then
+                -- Find the most current expansion (highest ID)
+                local mostCurrentExp = nil
+                local highestExpID = 0
+                
                 for expName, expData in pairs(profData.expansions) do
-                    -- Only show expansions with knowledge systems (Dragon Isles and later)
-                    if expData.id and expData.id >= 10 then
-                        local profFrame = self:CreateProfessionProgress(entry, profName, expName, expData, profData)
-                        if profFrame then
-                            profFrame:SetParent(entry.ProfessionContainer)
-                            profFrame:SetPoint("TOPLEFT", entry.ProfessionContainer, "TOPLEFT", xOffset, 0)
-                            xOffset = xOffset + 205
-                            table.insert(entry.professionFrames, profFrame)
-                            profIndex = profIndex + 1
-                            
-                            -- Wrap to next row if needed
-                            if profIndex % 4 == 0 then
-                                xOffset = 0
-                            end
+                    if expData.id and expData.id >= 10 then -- Only knowledge system expansions
+                        if expData.id > highestExpID then
+                            highestExpID = expData.id
+                            mostCurrentExp = {name = expName, data = expData}
+                        end
+                    end
+                end
+                
+                -- Only show the most current expansion
+                if mostCurrentExp then
+                    local profFrame = self:CreateProfessionProgress(entry, profName, mostCurrentExp.name, mostCurrentExp.data, profData)
+                    if profFrame then
+                        profFrame:SetParent(entry.ProfessionContainer)
+                        profFrame:SetPoint("TOPLEFT", entry.ProfessionContainer, "TOPLEFT", xOffset, 0)
+                        xOffset = xOffset + 205
+                        table.insert(entry.professionFrames, profFrame)
+                        profIndex = profIndex + 1
+                        
+                        -- Wrap to next row if needed
+                        if profIndex % 4 == 0 then
+                            xOffset = 0
                         end
                     end
                 end
