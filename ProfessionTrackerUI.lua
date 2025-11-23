@@ -213,80 +213,38 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     -- Get weekly progress data
     local weekly = expData.weeklyKnowledgePoints or {}
     
-    -- Helper to create status text with check/x icon
-    local function GetStatusText(label, completed)
-        local icon = completed 
+    -- Helper to create status line with icon, text, and check/x
+    local function GetStatusLine(icon, label, completed)
+        local statusIcon = completed 
             and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t" 
             or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
-        local color = completed and "|cff00ff00" or "|cffff0000"
-        return string.format("%s %s%s|r", icon, color, label)
-    end
-    
-    -- Helper to set icon alpha based on completion
-    local function SetIconStatus(icon, completed)
-        if completed then
-            icon:SetAlpha(1.0)
-            icon:SetDesaturated(false)
-        else
-            icon:SetAlpha(0.3)
-            icon:SetDesaturated(true)
-        end
+        return string.format("|T%s:16:16|t %s %s", icon, label, statusIcon)
     end
     
     -- Build status text
     local statusLines = {}
     
     -- Treatise status
-    table.insert(statusLines, GetStatusText("Treatise", weekly.treatise == true))
-    SetIconStatus(frame.TreatiseIcon, weekly.treatise == true)
-    frame.TreatiseIcon:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-        GameTooltip:AddLine("Treatise")
-        if weekly.treatise then
-            GameTooltip:AddLine("|cff00ff00Completed|r", 1, 1, 1)
-        else
-            GameTooltip:AddLine("|cffff0000Not Completed|r", 1, 1, 1)
-        end
-        GameTooltip:Show()
-    end)
-    frame.TreatiseIcon:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    table.insert(statusLines, GetStatusLine(
+        "Interface\\Icons\\inv_misc_profession_book_enchanting",
+        "Treatise",
+        weekly.treatise == true
+    ))
     
     -- Crafting Order status
-    table.insert(statusLines, GetStatusText("Crafting Order", weekly.craftingOrderQuest == true))
-    SetIconStatus(frame.CraftingOrderIcon, weekly.craftingOrderQuest == true)
-    frame.CraftingOrderIcon:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-        GameTooltip:AddLine("Crafting Order Quest")
-        if weekly.craftingOrderQuest then
-            GameTooltip:AddLine("|cff00ff00Completed|r", 1, 1, 1)
-        else
-            GameTooltip:AddLine("|cffff0000Not Completed|r", 1, 1, 1)
-        end
-        GameTooltip:Show()
-    end)
-    frame.CraftingOrderIcon:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    table.insert(statusLines, GetStatusLine(
+        "Interface\\Icons\\inv_crafting_orders",
+        "Crafting Order",
+        weekly.craftingOrderQuest == true
+    ))
     
     -- Treasures status
     local treasuresComplete = weekly.treasuresAllComplete == true
-    table.insert(statusLines, GetStatusText("Treasures", treasuresComplete))
-    SetIconStatus(frame.TreasuresIcon, treasuresComplete)
-    frame.TreasuresIcon:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-        GameTooltip:AddLine("Weekly Treasures")
-        
-        if weekly.treasures and type(weekly.treasures) == "table" then
-            for i, treasure in ipairs(weekly.treasures) do
-                local status = treasure.completed and "|cff00ff00✓|r" or "|cffff0000✗|r"
-                GameTooltip:AddLine(string.format("%s %s", status, treasure.label or "Treasure " .. i), 1, 1, 1)
-            end
-        elseif treasuresComplete then
-            GameTooltip:AddLine("|cff00ff00All Completed|r", 1, 1, 1)
-        else
-            GameTooltip:AddLine("|cffff0000Not Completed|r", 1, 1, 1)
-        end
-        GameTooltip:Show()
-    end)
-    frame.TreasuresIcon:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    table.insert(statusLines, GetStatusLine(
+        "Interface\\Icons\\inv_misc_book_07",
+        "Treasures",
+        treasuresComplete
+    ))
     
     -- Gather Nodes status (for gathering professions and enchanting)
     local isGathering = GATHERING_PROFESSIONS[profName]
@@ -294,41 +252,75 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     
     if isGathering or isEnchanting then
         local nodesComplete = weekly.gatherNodesAllComplete == true
-        table.insert(statusLines, GetStatusText("Gather Nodes", nodesComplete))
-        frame.GatherNodesIcon:Show()
-        SetIconStatus(frame.GatherNodesIcon, nodesComplete)
-        
-        frame.GatherNodesIcon:SetScript("OnEnter", function(self)
-            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-            GameTooltip:AddLine("Gather Nodes")
-            
-            if weekly.gatherNodes and type(weekly.gatherNodes) == "table" then
-                for i, node in ipairs(weekly.gatherNodes) do
-                    local status = node.completed and "|cff00ff00✓|r" or "|cffff0000✗|r"
-                    GameTooltip:AddLine(string.format("%s %s (%d)", status, node.name or "Node " .. i, node.count or 0), 1, 1, 1)
-                end
-            elseif nodesComplete then
-                GameTooltip:AddLine("|cff00ff00All Completed|r", 1, 1, 1)
-            else
-                GameTooltip:AddLine("|cffff0000Not Completed|r", 1, 1, 1)
-            end
-            GameTooltip:Show()
-        end)
-        frame.GatherNodesIcon:SetScript("OnLeave", function() GameTooltip:Hide() end)
-    else
-        frame.GatherNodesIcon:Hide()
+        table.insert(statusLines, GetStatusLine(
+            "Interface\\Icons\\inv_magic_swirl_color2",
+            "Gather Nodes",
+            nodesComplete
+        ))
     end
     
     -- Create or update status text display
     if not frame.StatusText then
         frame.StatusText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-        frame.StatusText:SetPoint("TOPLEFT", frame.GatherNodesIcon, "BOTTOMLEFT", -2, -5)
-        frame.StatusText:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -5, -40)
+        frame.StatusText:SetPoint("TOPLEFT", frame.Expansion, "BOTTOMLEFT", 0, -5)
+        frame.StatusText:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -5, -25)
         frame.StatusText:SetJustifyH("LEFT")
         frame.StatusText:SetJustifyV("TOP")
+        frame.StatusText:SetSpacing(2)
     end
     
     frame.StatusText:SetText(table.concat(statusLines, "\n"))
+    
+    -- Add tooltip functionality to the entire frame
+    frame:EnableMouse(true)
+    frame:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:AddLine(profName .. " - " .. expName, 1, 1, 1, true)
+        GameTooltip:AddLine(" ")
+        
+        -- Treatise
+        local treatiseStatus = weekly.treatise and "|cff00ff00Completed|r" or "|cffff0000Not Completed|r"
+        GameTooltip:AddLine("Treatise: " .. treatiseStatus, 1, 1, 1)
+        
+        -- Crafting Order
+        local craftingStatus = weekly.craftingOrderQuest and "|cff00ff00Completed|r" or "|cffff0000Not Completed|r"
+        GameTooltip:AddLine("Crafting Order: " .. craftingStatus, 1, 1, 1)
+        
+        -- Treasures
+        if weekly.treasures and type(weekly.treasures) == "table" then
+            GameTooltip:AddLine("Weekly Treasures:", 1, 1, 1)
+            for i, treasure in ipairs(weekly.treasures) do
+                local status = treasure.completed and "|cff00ff00✓|r" or "|cffff0000✗|r"
+                GameTooltip:AddLine("  " .. status .. " " .. (treasure.label or "Treasure " .. i), 0.9, 0.9, 0.9)
+            end
+        else
+            local treasureStatus = treasuresComplete and "|cff00ff00Completed|r" or "|cffff0000Not Completed|r"
+            GameTooltip:AddLine("Treasures: " .. treasureStatus, 1, 1, 1)
+        end
+        
+        -- Gather Nodes
+        if isGathering or isEnchanting then
+            if weekly.gatherNodes and type(weekly.gatherNodes) == "table" then
+                GameTooltip:AddLine("Gather Nodes:", 1, 1, 1)
+                for i, node in ipairs(weekly.gatherNodes) do
+                    local status = node.completed and "|cff00ff00✓|r" or "|cffff0000✗|r"
+                    GameTooltip:AddLine("  " .. status .. " " .. (node.name or "Node " .. i) .. " (" .. (node.count or 0) .. ")", 0.9, 0.9, 0.9)
+                end
+            else
+                local nodesStatus = weekly.gatherNodesAllComplete and "|cff00ff00Completed|r" or "|cffff0000Not Completed|r"
+                GameTooltip:AddLine("Gather Nodes: " .. nodesStatus, 1, 1, 1)
+            end
+        end
+        
+        GameTooltip:Show()
+    end)
+    frame:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    
+    -- Hide the old icon textures since we're now embedding them in text
+    frame.TreatiseIcon:Hide()
+    frame.CraftingOrderIcon:Hide()
+    frame.TreasuresIcon:Hide()
+    frame.GatherNodesIcon:Hide()
     
     return frame
 end
