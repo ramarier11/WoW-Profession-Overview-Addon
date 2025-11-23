@@ -388,6 +388,11 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     -- Add tooltip functionality to the entire frame
     frame:EnableMouse(true)
     frame:SetScript("OnEnter", function(self)
+        -- Keep parent card highlighted
+        if parentEntry then
+            parentEntry:SetBackdropBorderColor(1, 0.82, 0, 1)
+        end
+
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
         GameTooltip:AddLine(profName .. " - " .. expName, 1, 1, 1, true)
         GameTooltip:AddLine(" ")
@@ -439,7 +444,14 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
         
         GameTooltip:Show()
     end)
-    frame:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    frame:SetScript("OnLeave", function(self) 
+        GameTooltip:Hide()
+        
+        -- Reset parent card highlight only if mouse truly left the card
+        if parentEntry and not MouseIsOver(parentEntry) then
+            parentEntry:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)
+        end
+    end)
     
     -- Hide the old icon textures since we're now embedding them in text
     frame.TreatiseIcon:Hide()
