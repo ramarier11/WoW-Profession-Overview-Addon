@@ -123,7 +123,7 @@
         <Layers>
             <Layer level="ARTWORK">
                 <!-- Profession Name -->
-                <FontString parentKey="Name" inherits="GameFontNormal">
+                <FontString parentKey="Name" inherits="GameFontNormalLarge">
                     <Anchors>
                         <Anchor point="TOPLEFT" relativePoint="TOPLEFT">
                             <Offset x="2" y="-2"/>
