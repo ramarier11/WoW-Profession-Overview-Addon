@@ -126,15 +126,43 @@ function ProfessionTrackerDashboard:Refresh()
         return (a.data.lastLogin or 0) > (b.data.lastLogin or 0)
     end)
     
-    -- Create entries
+    -- Create entries in 2-column layout
+    local xOffset = 0
     local yOffset = 0
-    for _, char in ipairs(sortedChars) do
+    local columnWidth = 420  -- Width of each character card plus spacing
+    local currentColumn = 0
+    local maxHeightInRow = 0
+    
+    for i, char in ipairs(sortedChars) do
         local entry = self:CreateCharacterEntry(char.key, char.data)
         if entry then
-            entry:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 0, yOffset)
-            yOffset = yOffset - (entry:GetHeight() + 10)
+            entry:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", xOffset, yOffset)
             table.insert(self.activeEntries, entry)
+            
+            -- Track the tallest entry in this row
+            local entryHeight = entry:GetHeight()
+            if entryHeight > maxHeightInRow then
+                maxHeightInRow = entryHeight
+            end
+            
+            -- Move to next column or next row
+            currentColumn = currentColumn + 1
+            if currentColumn >= 2 then
+                -- Move to next row
+                currentColumn = 0
+                xOffset = 0
+                yOffset = yOffset - (maxHeightInRow + 10)
+                maxHeightInRow = 0
+            else
+                -- Move to next column
+                xOffset = xOffset + columnWidth
+            end
         end
+    end
+    
+    -- Add one more row height if we ended mid-row
+    if currentColumn > 0 then
+        yOffset = yOffset - (maxHeightInRow + 10)
     end
     
     -- Update scroll child height
@@ -160,7 +188,7 @@ function ProfessionTrackerDashboard:CreateCharacterEntry(charKey, charData)
     
     -- Create profession progress indicators
     local profCount = 0
-    local maxProfessionsPerRow = 4
+    local maxProfessionsPerRow = 2  -- Changed from 4 to 2 for narrower cards
     
     if charData.professions then
         local profIndex = 0
@@ -189,7 +217,7 @@ function ProfessionTrackerDashboard:CreateCharacterEntry(charKey, charData)
                     if profFrame then
                         profFrame:SetParent(entry.ProfessionContainer)
                         profFrame:SetPoint("TOPLEFT", entry.ProfessionContainer, "TOPLEFT", xOffset, yOffset)
-                        xOffset = xOffset + 205
+                        xOffset = xOffset + 195  -- Adjusted for 2-column layout
                         table.insert(entry.professionFrames, profFrame)
                         profIndex = profIndex + 1
                         profCount = profCount + 1
@@ -236,7 +264,7 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     local isEnchanting = (profData and profData.name == "Enchanting")
     
     -- Get profession ID and expansion index for icon lookup
-    local profID = expData.baseSkillLineID
+    local profID = expData.skillLineID
     local expIndex = expData.id
     
     -- Get icon references from KPReference table
@@ -296,7 +324,7 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     -- Crafting Order status
     table.insert(statusLines, GetStatusLine(
         craftingOrderIcon,
-        "Profession Quest",
+        "Crafting Order",
         weekly.craftingOrderQuest == true
     ))
     
@@ -322,7 +350,7 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     
     -- Create or update status text display
     if not frame.StatusText then
-        frame.StatusText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+        frame.StatusText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         frame.StatusText:SetPoint("TOPLEFT", frame.Expansion, "BOTTOMLEFT", 0, -5)
         frame.StatusText:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -5, -25)
         frame.StatusText:SetJustifyH("LEFT")
