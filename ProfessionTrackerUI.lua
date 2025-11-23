@@ -99,7 +99,22 @@ local function AcquireCharacterEntry()
         frame:SetScript("OnLeave", function(self)
             self:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)  -- Reset to normal
         end)
+        -- Add hover highlight effect with cursor hint
+        frame:EnableMouse(true)
+        frame:SetScript("OnEnter", function(self)
+            self:SetBackdropBorderColor(1, 0.82, 0, 1)  -- Gold highlight
+            -- Show cursor as clickable
+            GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
+            GameTooltip:AddLine("Click to view detailed information", 1, 1, 1)
+            GameTooltip:Show()
+        end)
+        frame:SetScript("OnLeave", function(self)
+            self:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)  -- Reset to normal
+            GameTooltip:Hide()
+        end)
     end
+    
+
     frame:Show()
     return frame
 end
@@ -215,7 +230,18 @@ function ProfessionTrackerDashboard:CreateCharacterEntry(charKey, charData)
         classColor[3] * 255,
         charData.name or "Unknown",
         charData.realm or "Unknown"))
-    
+    -- Make entry clickable to show detail window
+    entry:SetScript("OnMouseUp", function(self, button)
+        if button == "LeftButton" then
+            if ProfessionTrackerUI and ProfessionTrackerUI.CharacterDetailWindow then
+                ProfessionTrackerUI.CharacterDetailWindow:ShowCharacter(charKey, charData)
+            end
+        end
+    end)
+
+    -- Store character data for reference
+    entry.charKey = charKey
+    entry.charData = charData
     -- Set character info
     entry.Info:SetText(string.format("Level %d %s", 
         charData.level or 0,
