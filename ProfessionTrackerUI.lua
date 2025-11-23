@@ -373,6 +373,35 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
         false
     ))
 
+    -- Concentration status (exclude for gathering professions)
+    if not isGathering and expData.concentration then
+        local concentrationIcon = "Interface\\Icons\\ui_profession_concentration"
+        local currentConc = expData.concentration or 0
+        local maxConc = expData.maxConcentration or 1000
+        local concentrationPct = (currentConc / maxConc) * 100
+        
+        -- Color code based on concentration level
+        local color
+        if concentrationPct >= 75 then
+            color = "|cff00ff00"  -- Green
+        elseif concentrationPct >= 50 then
+            color = "|cffffff00"  -- Yellow
+        elseif concentrationPct >= 25 then
+            color = "|cffff8800"  -- Orange
+        else
+            color = "|cffff0000"  -- Red
+        end
+        
+        local concentrationText = string.format("%s|T%s:16:16|t Concentration: %s%d/%d|r",
+            "",
+            concentrationIcon,
+            color,
+            currentConc,
+            maxConc)
+        
+        table.insert(statusLines, concentrationText)
+    end
+
     -- Create or update status text display
     if not frame.StatusText then
         frame.StatusText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
