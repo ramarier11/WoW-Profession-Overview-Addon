@@ -235,6 +235,46 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     local isGathering = GATHERING_PROFESSIONS[profName]
     local isEnchanting = (profData and profData.name == "Enchanting")
     
+    -- Get profession ID and expansion index for icon lookup
+    local profID = expData.skillLineID
+    local expIndex = expData.id
+    
+    -- Get icon references from KPReference table
+    local treatiseIcon = "Interface\\Icons\\inv_misc_profession_book_enchanting"
+    local craftingOrderIcon = "Interface\\Icons\\inv_crafting_orders"
+    local treasuresIcon = "Interface\\Icons\\inv_misc_book_07"
+    local gatherNodesIcon = "Interface\\Icons\\inv_magic_swirl_color2"
+    
+    if profID and expIndex and KPReference and KPReference[profID] and KPReference[profID][expIndex] then
+        local ref = KPReference[profID][expIndex]
+        
+        -- Get treatise icon
+        if ref.weekly and ref.weekly.treatise and ref.weekly.treatise.icon then
+            treatiseIcon = ref.weekly.treatise.icon
+        end
+        
+        -- Get crafting order icon
+        if ref.weekly and ref.weekly.craftingOrder and ref.weekly.craftingOrder.icon then
+            craftingOrderIcon = ref.weekly.craftingOrder.icon
+        end
+        
+        -- Get treasures icon (use first treasure's icon if available)
+        if ref.weekly and ref.weekly.treasures then
+            if type(ref.weekly.treasures) == "table" and ref.weekly.treasures[1] and ref.weekly.treasures[1].icon then
+                treasuresIcon = ref.weekly.treasures[1].icon
+            elseif ref.weekly.treasures.icon then
+                treasuresIcon = ref.weekly.treasures.icon
+            end
+        end
+        
+        -- Get gather nodes icon (use first node's icon if available)
+        if ref.weekly and ref.weekly.gatherNodes then
+            if type(ref.weekly.gatherNodes) == "table" and ref.weekly.gatherNodes[1] and ref.weekly.gatherNodes[1].icon then
+                gatherNodesIcon = ref.weekly.gatherNodes[1].icon
+            end
+        end
+    end
+    
     -- Helper to create status line with icon, text, and check/x
     local function GetStatusLine(icon, label, completed)
         local statusIcon = completed 
@@ -248,14 +288,14 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     
     -- Treatise status
     table.insert(statusLines, GetStatusLine(
-        "Interface\\Icons\\inv_misc_profession_book_enchanting",
+        treatiseIcon,
         "Treatise",
         weekly.treatise == true
     ))
     
     -- Crafting Order status
     table.insert(statusLines, GetStatusLine(
-        "Interface\\Icons\\inv_crafting_orders",
+        craftingOrderIcon,
         "Crafting Order",
         weekly.craftingOrderQuest == true
     ))
@@ -264,7 +304,7 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     if not isGathering then
         local treasuresComplete = weekly.treasuresAllComplete == true
         table.insert(statusLines, GetStatusLine(
-            "Interface\\Icons\\inv_misc_book_07",
+            treasuresIcon,
             "Treasures",
             treasuresComplete
         ))
@@ -274,7 +314,7 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     if isGathering or isEnchanting then
         local nodesComplete = weekly.gatherNodesAllComplete == true
         table.insert(statusLines, GetStatusLine(
-            "Interface\\Icons\\inv_magic_swirl_color2",
+            gatherNodesIcon,
             "Gather Nodes",
             nodesComplete
         ))
