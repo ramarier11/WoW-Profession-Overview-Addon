@@ -51,7 +51,7 @@
                 <Size x="100" y="25"/>
                 <Anchors>
                     <Anchor point="TOPLEFT" relativePoint="TOPLEFT">
-                        <Offset x="-20" y="-15"/>
+                        <Offset x="20" y="-15"/>
                     </Anchor>
                 </Anchors>
                 <Scripts>
