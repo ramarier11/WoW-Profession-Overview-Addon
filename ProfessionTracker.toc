@@ -2,8 +2,10 @@
 ## Version: 1.0.0
 ## Title: Profession Tracker
 ## Notes: My first addon
-## Author: YourName
+## Author: Rohu
 ## SavedVariables: ProfessionTrackerDB
 
 ProfessionTracker.lua
+ProfessionTrackerUI.xml
 ProfessionTrackerUI.lua
+CharacterDetailWindow.lua
