@@ -374,33 +374,48 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     ))
 
     -- Concentration status (exclude for gathering professions)
-    if not isGathering and expData.concentration then
-        local concentrationIcon = "Interface\\Icons\\ui_concentration"
-        local currentConc = expData.concentration or 0
-        local maxConc = expData.maxConcentration or 1000
-        local concentrationPct = (currentConc / maxConc) * 100
-        
-        -- Color code based on concentration level
-        local color
-        if concentrationPct >= 75 then
-            color = "|cff00ff00"  -- Green
-        elseif concentrationPct >= 50 then
-            color = "|cffffff00"  -- Yellow
-        elseif concentrationPct >= 25 then
-            color = "|cffff8800"  -- Orange
-        else
-            color = "|cffff0000"  -- Red
+        if not isGathering and expData.concentration then
+            GameTooltip:AddLine(" ")
+            local currentConc = expData.concentration or 0
+            local maxConc = expData.maxConcentration or 1000
+            local concentrationPct = (currentConc / maxConc) * 100
+            
+            -- Color based on concentration level
+            local r, g, b
+            if concentrationPct >= 75 then
+                r, g, b = 0, 1, 0  -- Green
+            elseif concentrationPct >= 50 then
+                r, g, b = 1, 1, 0  -- Yellow
+            elseif concentrationPct >= 25 then
+                r, g, b = 1, 0.53, 0  -- Orange
+            else
+                r, g, b = 1, 0, 0  -- Red
+            end
+            
+            GameTooltip:AddLine(string.format("Concentration: %d/%d (%.0f%%)", currentConc, maxConc, concentrationPct), r, g, b)
+            
+            -- Calculate time to full recovery (10 concentration per hour)
+            if currentConc < maxConc then
+                local missingConc = maxConc - currentConc
+                local hoursToFull = missingConc / 10
+                local daysToFull = math.floor(hoursToFull / 24)
+                local remainingHours = math.floor(hoursToFull % 24)
+                local remainingMinutes = math.floor((hoursToFull % 1) * 60)
+                
+                local timeText = ""
+                if daysToFull > 0 then
+                    timeText = string.format("%dd %dh %dm", daysToFull, remainingHours, remainingMinutes)
+                elseif remainingHours > 0 then
+                    timeText = string.format("%dh %dm", remainingHours, remainingMinutes)
+                else
+                    timeText = string.format("%dm", remainingMinutes)
+                end
+                
+                GameTooltip:AddLine(string.format("Time to full: %s", timeText), 0.7, 0.7, 0.7)
+            else
+                GameTooltip:AddLine("Concentration at maximum", 0, 1, 0)
+            end
         end
-        
-        local concentrationText = string.format("%s|T%s:16:16|t Concentration: %s%d/%d|r",
-            "",
-            concentrationIcon,
-            color,
-            currentConc,
-            maxConc)
-        
-        table.insert(statusLines, concentrationText)
-    end
 
     -- Create or update status text display
     if not frame.StatusText then
