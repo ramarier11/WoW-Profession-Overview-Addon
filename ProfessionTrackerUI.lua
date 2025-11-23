@@ -269,7 +269,9 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     
     -- Get icon references from KPReference table
     local treatiseIcon = "Interface\\Icons\\inv_misc_profession_book_enchanting"
-    local craftingOrderIcon = "Interface\\Gossipframe\\repeatablegossipicons\\Recurringavailablequesticon"
+    local craftingOrderIcon = parent:CreateTexture(nil, "ARTWORK")
+    craftingOrderIcon:SetSize(16,16)
+    craftingOrderIcon:SetAtlas("RecurringAvailableQuestIcon")
     local treasuresIcon = "Interface\\Icons\\inv_misc_book_07"
     local gatherNodesIcon = "Interface\\Icons\\inv_magic_swirl_color2"
     
