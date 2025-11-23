@@ -351,7 +351,7 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     -- Create or update status text display
     if not frame.StatusText then
         frame.StatusText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        frame.StatusText:SetPoint("TOPLEFT", frame.Expansion, "BOTTOMLEFT", 0, -5)
+        frame.StatusText:SetPoint("TOPLEFT", frame.Name, "BOTTOMLEFT", 0, -5)
         frame.StatusText:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -5, -25)
         frame.StatusText:SetJustifyH("LEFT")
         frame.StatusText:SetJustifyV("TOP")
