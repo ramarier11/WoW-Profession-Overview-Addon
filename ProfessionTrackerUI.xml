@@ -95,7 +95,7 @@
                 <!-- Character Info (Class, Level) -->
                 <FontString parentKey="Info" inherits="GameFontNormal">
                     <Anchors>
-                        <Anchor point="TOPLEFT" relativeTo="$parentName" relativePoint="BOTTOMLEFT">
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Name" relativePoint="BOTTOMLEFT">
                             <Offset x="0" y="-2"/>
                         </Anchor>
                     </Anchors>
@@ -134,7 +134,7 @@
                 <!-- Expansion Name -->
                 <FontString parentKey="Expansion" inherits="GameFontHighlightSmall">
                     <Anchors>
-                        <Anchor point="TOPLEFT" relativeTo="$parentName" relativePoint="BOTTOMLEFT">
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Name" relativePoint="BOTTOMLEFT">
                             <Offset x="0" y="-1"/>
                         </Anchor>
                     </Anchors>
@@ -147,7 +147,7 @@
                 <Texture parentKey="TreatiseIcon" file="Interface\Icons\inv_misc_profession_book_enchanting">
                     <Size x="16" y="16"/>
                     <Anchors>
-                        <Anchor point="TOPLEFT" relativeTo="$parentExpansion" relativePoint="BOTTOMLEFT">
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Expansion" relativePoint="BOTTOMLEFT">
                             <Offset x="0" y="-3"/>
                         </Anchor>
                     </Anchors>
@@ -157,7 +157,7 @@
                 <Texture parentKey="CraftingOrderIcon" file="Interface\Icons\inv_crafting_orders">
                     <Size x="16" y="16"/>
                     <Anchors>
-                        <Anchor point="LEFT" relativeTo="$parentTreatiseIcon" relativePoint="RIGHT">
+                        <Anchor point="LEFT" relativeKey="$parent.TreatiseIcon" relativePoint="RIGHT">
                             <Offset x="3" y="0"/>
                         </Anchor>
                     </Anchors>
@@ -167,7 +167,7 @@
                 <Texture parentKey="TreasuresIcon" file="Interface\Icons\inv_misc_book_07">
                     <Size x="16" y="16"/>
                     <Anchors>
-                        <Anchor point="LEFT" relativeTo="$parentCraftingOrderIcon" relativePoint="RIGHT">
+                        <Anchor point="LEFT" relativeKey="$parent.CraftingOrderIcon" relativePoint="RIGHT">
                             <Offset x="3" y="0"/>
                         </Anchor>
                     </Anchors>
@@ -177,7 +177,7 @@
                 <Texture parentKey="GatherNodesIcon" file="Interface\Icons\inv_magic_swirl_color2">
                     <Size x="16" y="16"/>
                     <Anchors>
-                        <Anchor point="LEFT" relativeTo="$parentTreasuresIcon" relativePoint="RIGHT">
+                        <Anchor point="LEFT" relativeKey="$parent.TreasuresIcon" relativePoint="RIGHT">
                             <Offset x="3" y="0"/>
                         </Anchor>
                     </Anchors>
