@@ -143,15 +143,6 @@
             
             <Layer level="OVERLAY">
                 <!-- Weekly Progress Icons -->
-                <!-- Treatise Icon -->
-                <Texture parentKey="TreatiseIcon" file="Interface\Icons\inv_misc_profession_book_enchanting">
-                    <Size x="16" y="16"/>
-                    <Anchors>
-                        <Anchor point="TOPLEFT" relativeKey="$parent.Name" relativePoint="BOTTOMLEFT">
-                            <Offset x="0" y="-3"/>
-                        </Anchor>
-                    </Anchors>
-                </Texture>
                 
                 <!-- Crafting Order Icon -->
                 <Texture parentKey="CraftingOrderIcon" file="Interface\Icons\inv_crafting_orders">
@@ -179,6 +170,15 @@
                     <Anchors>
                         <Anchor point="LEFT" relativeKey="$parent.TreasuresIcon" relativePoint="RIGHT">
                             <Offset x="3" y="0"/>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                <!-- Treatise Icon -->
+                <Texture parentKey="TreatiseIcon" file="Interface\Icons\inv_misc_profession_book_enchanting">
+                    <Size x="16" y="16"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Name" relativePoint="BOTTOMLEFT">
+                            <Offset x="0" y="-3"/>
                         </Anchor>
                     </Anchors>
                 </Texture>
