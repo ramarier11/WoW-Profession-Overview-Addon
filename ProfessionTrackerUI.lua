@@ -27,6 +27,25 @@ local CLASS_COLORS = {
     EVOKER = {0.20, 0.58, 0.50},
 }
 
+-- Backdrop templates
+local DASHBOARD_BACKDROP = {
+    bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+    edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+    tile = true,
+    tileSize = 32,
+    edgeSize = 32,
+    insets = { left = 11, right = 12, top = 12, bottom = 11 }
+}
+
+local ENTRY_BACKDROP = {
+    bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+    edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+    tile = true,
+    tileSize = 16,
+    edgeSize = 16,
+    insets = { left = 4, right = 4, top = 4, bottom = 4 }
+}
+
 -- Pool for reusable frames
 local CharacterEntryPool = {}
 local ProfessionProgressPool = {}
@@ -40,6 +59,11 @@ local function AcquireCharacterEntry()
     if not frame then
         frame = CreateFrame("Frame", nil, ProfessionTrackerDashboardScrollFrameScrollChild, "CharacterEntryTemplate")
         frame.professionFrames = {}
+        
+        -- Apply backdrop using modern API
+        frame:SetBackdrop(ENTRY_BACKDROP)
+        frame:SetBackdropColor(0.1, 0.1, 0.1, 0.9)
+        frame:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)
     end
     frame:Show()
     return frame
@@ -298,6 +322,16 @@ end
 
 -- Initialize active entries table
 ProfessionTrackerDashboard.activeEntries = {}
+
+-- Apply dashboard backdrop on load
+ProfessionTrackerDashboard:SetScript("OnShow", function(self)
+    if not self.backdropApplied then
+        self:SetBackdrop(DASHBOARD_BACKDROP)
+        self:SetBackdropColor(0, 0, 0, 0.8)
+        self:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)
+        self.backdropApplied = true
+    end
+end)
 
 -- Register with ProfessionTracker
 if ProfessionTracker and ProfessionTracker.RegisterUI then
