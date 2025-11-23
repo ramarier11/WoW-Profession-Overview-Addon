@@ -123,7 +123,7 @@
         <Layers>
             <Layer level="ARTWORK">
                 <!-- Profession Name -->
-                <FontString parentKey="Name" inherits="GameFontNormal">
+                <FontString parentKey="Expansion" inherits="GameFontNormal">
                     <Anchors>
                         <Anchor point="TOPLEFT" relativePoint="TOPLEFT">
                             <Offset x="2" y="-2"/>
@@ -132,13 +132,13 @@
                 </FontString>
                 
                 <!-- Expansion Name -->
-                <FontString parentKey="Expansion" inherits="GameFontHighlight">
+                <!-- <FontString parentKey="Expansion" inherits="GameFontHighlight">
                     <Anchors>
                         <Anchor point="TOPLEFT" relativeKey="$parent.Name" relativePoint="BOTTOMLEFT">
                             <Offset x="0" y="-1"/>
                         </Anchor>
                     </Anchors>
-                </FontString>
+                </FontString> -->
             </Layer>
             
             <Layer level="OVERLAY">

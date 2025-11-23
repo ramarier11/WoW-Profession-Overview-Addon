@@ -251,7 +251,7 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     local frame = AcquireProfessionProgress()
     
     -- Set profession name
-    frame.Name:SetText(profName)
+    -- frame.Name:SetText(profName)
     
     -- Set expansion name
     frame.Expansion:SetText(expName)
