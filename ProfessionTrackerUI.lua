@@ -234,7 +234,7 @@ function ProfessionTrackerDashboard:CreateCharacterEntry(charKey, charData)
                         -- Wrap to next row if needed
                         if profIndex % maxProfessionsPerRow == 0 then
                             xOffset = 0
-                            yOffset = yOffset - 90  -- Height for each profession box plus spacing
+                            yOffset = yOffset - 105  -- Height for each profession box plus spacing
                             currentRow = currentRow + 1
                         end
                     end
@@ -245,13 +245,13 @@ function ProfessionTrackerDashboard:CreateCharacterEntry(charKey, charData)
     
     -- Calculate dynamic height based on number of professions
     -- Base height: 60 (header + padding)
-    -- Each row of professions: 90 pixels
+    -- Each row of professions: 105 pixels
     local rows = math.ceil(profCount / maxProfessionsPerRow)
-    local dynamicHeight = 60 + (rows * 90)
+    local dynamicHeight = 60 + (rows * 105)
     entry:SetHeight(dynamicHeight)
     
     -- Also adjust the profession container height
-    entry.ProfessionContainer:SetHeight((rows * 90) + 10)
+    entry.ProfessionContainer:SetHeight((rows * 105) + 10)
     
     return entry
 end
