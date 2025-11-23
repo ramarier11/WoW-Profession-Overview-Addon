@@ -324,7 +324,7 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     -- Crafting Order status
     table.insert(statusLines, GetStatusLine(
         craftingOrderIcon,
-        "Crafting Order",
+        "Profession Quest",
         weekly.craftingOrderQuest == true
     ))
     
