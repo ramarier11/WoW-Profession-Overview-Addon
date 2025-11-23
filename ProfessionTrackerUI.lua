@@ -46,6 +46,32 @@ local ENTRY_BACKDROP = {
     insets = { left = 4, right = 4, top = 4, bottom = 4 }
 }
 
+-- Helper function to calculate current concentration based on regen rate
+local function GetCurrentConcentration(expData)
+    if not expData.concentration or not expData.concentrationLastUpdated then
+        return expData.concentration, expData.maxConcentration
+    end
+    
+    local savedConc = expData.concentration
+    local maxConc = expData.maxConcentration or 1000
+    
+    -- If already at max, no calculation needed
+    if savedConc >= maxConc then
+        return maxConc, maxConc
+    end
+    
+    -- Calculate time elapsed since last update (in hours)
+    local currentTime = time()
+    local elapsedSeconds = currentTime - expData.concentrationLastUpdated
+    local elapsedHours = elapsedSeconds / 3600
+    
+    -- Calculate regenerated concentration (10 per hour)
+    local regenAmount = elapsedHours * 10
+    local currentConc = math.min(savedConc + regenAmount, maxConc)
+    
+    return math.floor(currentConc), maxConc
+end
+
 -- Pool for reusable frames
 local CharacterEntryPool = {}
 local ProfessionProgressPool = {}
@@ -376,8 +402,7 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     -- Concentration status (exclude for gathering professions)
     if not isGathering and expData.concentration then
         local concentrationIcon = "Interface\\Icons\\ui_concentration"
-        local currentConc = expData.concentration or 0
-        local maxConc = expData.maxConcentration or 1000
+        local currentConc, maxConc = GetCurrentConcentration(expData)
         local concentrationPct = (currentConc / maxConc) * 100
         
         -- Color code based on concentration level
@@ -473,8 +498,7 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
         -- Concentration info (exclude for gathering professions)
         if not isGathering and expData.concentration then
             GameTooltip:AddLine(" ")
-            local currentConc = expData.concentration or 0
-            local maxConc = expData.maxConcentration or 1000
+            local currentConc, maxConc = GetCurrentConcentration(expData)
             local concentrationPct = (currentConc / maxConc) * 100
             
             -- Color based on concentration level
