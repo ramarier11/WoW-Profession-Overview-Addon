@@ -8,3 +8,4 @@
 ProfessionTracker.lua
 ProfessionTrackerUI.xml
 ProfessionTrackerUI.lua
+CharacterDetailWindow.lua
