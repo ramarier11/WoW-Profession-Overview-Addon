@@ -252,6 +252,7 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     
     -- Set profession name
     frame.Name:SetText(profName)
+    frame.Name:SetTextColor(1,1,1,1) --profName to white
     
     -- Set expansion name
     -- frame.Expansion:SetText(expName)
