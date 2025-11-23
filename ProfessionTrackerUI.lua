@@ -236,7 +236,7 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     local isEnchanting = (profData and profData.name == "Enchanting")
     
     -- Get profession ID and expansion index for icon lookup
-    local profID = expData.skillLineID
+    local profID = expData.baseSkillLineID
     print(profID)
     local expIndex = expData.id
     

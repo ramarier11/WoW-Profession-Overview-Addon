@@ -1474,6 +1474,7 @@ local function UpdateCharacterProfessionData()
                             local expData = expansions[expName] or {}
                             expData.name = expName
                             expData.id = expID
+                            expData.baseSkillLineID = skillLine or 0
                             expData.skillLineID = exp.skillLineID or expData.skillLineID
                             expData.skillLevel = exp.skillLevel or expData.skillLevel or 0
                             expData.maxSkillLevel = exp.maxSkillLevel or expData.maxSkillLevel or 0
