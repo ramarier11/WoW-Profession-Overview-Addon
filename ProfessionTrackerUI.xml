@@ -118,7 +118,7 @@
     
     <!-- Profession Progress Template -->
     <Frame name="ProfessionProgressTemplate" virtual="true">
-        <Size x="200" y="65"/>
+        <Size x="200" y="80"/>
         
         <Layers>
             <Layer level="ARTWORK">
