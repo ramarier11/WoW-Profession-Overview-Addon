@@ -314,13 +314,6 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     -- Build status text
     local statusLines = {}
     
-    -- Treatise status
-    table.insert(statusLines, GetStatusLine(
-        treatiseIcon,
-        "Treatise",
-        weekly.treatise == true
-    ))
-    
     -- Crafting Order status
     table.insert(statusLines, GetStatusLine(
         craftingOrderIcon,
@@ -347,7 +340,13 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
             nodesComplete
         ))
     end
-    
+    -- Treatise status
+    table.insert(statusLines, GetStatusLine(
+        treatiseIcon,
+        "Treatise",
+        weekly.treatise == true
+    ))
+
     -- Create or update status text display
     if not frame.StatusText then
         frame.StatusText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
