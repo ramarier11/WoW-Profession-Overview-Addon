@@ -281,13 +281,18 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
         GameTooltip:AddLine(profName .. " - " .. expName, 1, 1, 1, true)
         GameTooltip:AddLine(" ")
         
+        -- Helper for status icons in tooltip
+        local function GetTooltipStatus(completed)
+            return completed 
+                and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t" 
+                or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
+        end
+        
         -- Treatise
-        local treatiseStatus = weekly.treatise and "|cff00ff00Completed|r" or "|cffff0000Not Completed|r"
-        GameTooltip:AddLine("Treatise: " .. treatiseStatus, 1, 1, 1)
+        GameTooltip:AddLine(GetTooltipStatus(weekly.treatise) .. " Treatise", 1, 1, 1)
         
         -- Crafting Order
-        local craftingStatus = weekly.craftingOrderQuest and "|cff00ff00Completed|r" or "|cffff0000Not Completed|r"
-        GameTooltip:AddLine("Crafting Order: " .. craftingStatus, 1, 1, 1)
+        GameTooltip:AddLine(GetTooltipStatus(weekly.craftingOrderQuest) .. " Crafting Order", 1, 1, 1)
         
         -- Treasures (exclude for gathering professions)
         if not isGathering then
@@ -295,12 +300,13 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
             if weekly.treasures and type(weekly.treasures) == "table" then
                 GameTooltip:AddLine("Weekly Treasures:", 1, 1, 1)
                 for i, treasure in ipairs(weekly.treasures) do
-                    local status = treasure.completed and "|cff00ff00✓|r" or "|cffff0000✗|r"
+                    local status = treasure.completed 
+                        and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t" 
+                        or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
                     GameTooltip:AddLine("  " .. status .. " " .. (treasure.label or "Treasure " .. i), 0.9, 0.9, 0.9)
                 end
             else
-                local treasureStatus = treasuresComplete and "|cff00ff00Completed|r" or "|cffff0000Not Completed|r"
-                GameTooltip:AddLine("Treasures: " .. treasureStatus, 1, 1, 1)
+                GameTooltip:AddLine(GetTooltipStatus(treasuresComplete) .. " Treasures", 1, 1, 1)
             end
         end
         
@@ -309,12 +315,14 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
             if weekly.gatherNodes and type(weekly.gatherNodes) == "table" then
                 GameTooltip:AddLine("Gather Nodes:", 1, 1, 1)
                 for i, node in ipairs(weekly.gatherNodes) do
-                    local status = node.completed and "|cff00ff00✓|r" or "|cffff0000✗|r"
+                    local status = node.completed 
+                        and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t" 
+                        or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
                     GameTooltip:AddLine("  " .. status .. " " .. (node.name or "Node " .. i) .. " (" .. (node.count or 0) .. ")", 0.9, 0.9, 0.9)
                 end
             else
-                local nodesStatus = weekly.gatherNodesAllComplete and "|cff00ff00Completed|r" or "|cffff0000Not Completed|r"
-                GameTooltip:AddLine("Gather Nodes: " .. nodesStatus, 1, 1, 1)
+                local nodesComplete = weekly.gatherNodesAllComplete == true
+                GameTooltip:AddLine(GetTooltipStatus(nodesComplete) .. " Gather Nodes", 1, 1, 1)
             end
         end
         
