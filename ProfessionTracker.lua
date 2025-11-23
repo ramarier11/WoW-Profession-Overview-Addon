@@ -805,7 +805,7 @@ KPReference = {
                     surveying = {
                         questID = 60001,
                         name = "Mining Survey Weekly",
-                        icon = "Interface\\Icons\\inv_misc_profession_book_mining"",
+                        icon = "Interface\\Icons\\inv_misc_profession_book_mining",
                     },
                     rareNodes = {
                         name = "Rare Ore Node KP",
