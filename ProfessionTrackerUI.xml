@@ -10,7 +10,7 @@
         <Layers>
             <!-- Title Text -->
             <Layer level="ARTWORK">
-                <FontString name="$parentTitle" inherits="GameFontNormalLarge">
+                <FontString parentKey="Title" inherits="GameFontNormalLarge">
                     <Anchors>
                         <Anchor point="TOP" relativePoint="TOP">
                             <Offset x="0" y="-20"/>
@@ -22,7 +22,7 @@
         
         <Frames>
             <!-- Close Button -->
-            <Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+            <Button parentKey="CloseButton" inherits="UIPanelCloseButton">
                 <Anchors>
                     <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT">
                         <Offset x="-5" y="-5"/>
@@ -31,7 +31,7 @@
             </Button>
             
             <!-- Scroll Frame for Character List -->
-            <ScrollFrame name="$parentScrollFrame" inherits="UIPanelScrollFrameTemplate">
+            <ScrollFrame parentKey="ScrollFrame" inherits="UIPanelScrollFrameTemplate">
                 <Size x="860" y="520"/>
                 <Anchors>
                     <Anchor point="TOPLEFT" relativePoint="TOPLEFT">
@@ -40,14 +40,14 @@
                 </Anchors>
                 
                 <ScrollChild>
-                    <Frame name="$parentScrollChild">
+                    <Frame parentKey="ScrollChild">
                         <Size x="840" y="1"/>
                     </Frame>
                 </ScrollChild>
             </ScrollFrame>
             
             <!-- Refresh Button -->
-            <Button name="$parentRefreshButton" inherits="UIPanelButtonTemplate">
+            <Button parentKey="RefreshButton" inherits="UIPanelButtonTemplate">
                 <Size x="100" y="25"/>
                 <Anchors>
                     <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT">
@@ -65,8 +65,8 @@
         <Scripts>
             <OnLoad>
                 self:RegisterForDrag("LeftButton")
-                ProfessionTrackerDashboardTitle:SetText("Profession Tracker Dashboard")
-                ProfessionTrackerDashboardRefreshButton:SetText("Refresh")
+                self.Title:SetText("Profession Tracker Dashboard")
+                self.RefreshButton:SetText("Refresh")
             </OnLoad>
             <OnDragStart>
                 self:StartMoving()
@@ -84,7 +84,7 @@
         <Layers>
             <Layer level="OVERLAY">
                 <!-- Character Name -->
-                <FontString name="$parentName" inherits="GameFontNormalLarge">
+                <FontString parentKey="Name" inherits="GameFontNormalLarge">
                     <Anchors>
                         <Anchor point="TOPLEFT" relativePoint="TOPLEFT">
                             <Offset x="10" y="-8"/>
@@ -93,7 +93,7 @@
                 </FontString>
                 
                 <!-- Character Info (Class, Level) -->
-                <FontString name="$parentInfo" inherits="GameFontNormal">
+                <FontString parentKey="Info" inherits="GameFontNormal">
                     <Anchors>
                         <Anchor point="TOPLEFT" relativeTo="$parentName" relativePoint="BOTTOMLEFT">
                             <Offset x="0" y="-2"/>
@@ -105,7 +105,7 @@
         
         <Frames>
             <!-- Profession Entry Container -->
-            <Frame name="$parentProfessionContainer">
+            <Frame parentKey="ProfessionContainer">
                 <Size x="820" y="70"/>
                 <Anchors>
                     <Anchor point="TOPLEFT" relativePoint="TOPLEFT">
@@ -123,7 +123,7 @@
         <Layers>
             <Layer level="ARTWORK">
                 <!-- Profession Name -->
-                <FontString name="$parentName" inherits="GameFontNormalSmall">
+                <FontString parentKey="Name" inherits="GameFontNormalSmall">
                     <Anchors>
                         <Anchor point="TOPLEFT" relativePoint="TOPLEFT">
                             <Offset x="2" y="-2"/>
@@ -132,7 +132,7 @@
                 </FontString>
                 
                 <!-- Expansion Name -->
-                <FontString name="$parentExpansion" inherits="GameFontHighlightSmall">
+                <FontString parentKey="Expansion" inherits="GameFontHighlightSmall">
                     <Anchors>
                         <Anchor point="TOPLEFT" relativeTo="$parentName" relativePoint="BOTTOMLEFT">
                             <Offset x="0" y="-1"/>
@@ -144,7 +144,7 @@
             <Layer level="OVERLAY">
                 <!-- Weekly Progress Icons -->
                 <!-- Treatise Icon -->
-                <Texture name="$parentTreatiseIcon" file="Interface\Icons\inv_misc_profession_book_enchanting">
+                <Texture parentKey="TreatiseIcon" file="Interface\Icons\inv_misc_profession_book_enchanting">
                     <Size x="16" y="16"/>
                     <Anchors>
                         <Anchor point="TOPLEFT" relativeTo="$parentExpansion" relativePoint="BOTTOMLEFT">
@@ -154,7 +154,7 @@
                 </Texture>
                 
                 <!-- Crafting Order Icon -->
-                <Texture name="$parentCraftingOrderIcon" file="Interface\Icons\inv_crafting_orders">
+                <Texture parentKey="CraftingOrderIcon" file="Interface\Icons\inv_crafting_orders">
                     <Size x="16" y="16"/>
                     <Anchors>
                         <Anchor point="LEFT" relativeTo="$parentTreatiseIcon" relativePoint="RIGHT">
@@ -164,7 +164,7 @@
                 </Texture>
                 
                 <!-- Treasures Icon -->
-                <Texture name="$parentTreasuresIcon" file="Interface\Icons\inv_misc_book_07">
+                <Texture parentKey="TreasuresIcon" file="Interface\Icons\inv_misc_book_07">
                     <Size x="16" y="16"/>
                     <Anchors>
                         <Anchor point="LEFT" relativeTo="$parentCraftingOrderIcon" relativePoint="RIGHT">
@@ -174,7 +174,7 @@
                 </Texture>
                 
                 <!-- Gather Nodes Icon (for gathering profs) -->
-                <Texture name="$parentGatherNodesIcon" file="Interface\Icons\inv_magic_swirl_color2">
+                <Texture parentKey="GatherNodesIcon" file="Interface\Icons\inv_magic_swirl_color2">
                     <Size x="16" y="16"/>
                     <Anchors>
                         <Anchor point="LEFT" relativeTo="$parentTreasuresIcon" relativePoint="RIGHT">

@@ -57,7 +57,7 @@ local ProfessionProgressPool = {}
 local function AcquireCharacterEntry()
     local frame = table.remove(CharacterEntryPool)
     if not frame then
-        frame = CreateFrame("Frame", nil, ProfessionTrackerDashboardScrollFrameScrollChild, "CharacterEntryTemplate")
+        frame = CreateFrame("Frame", nil, ProfessionTrackerDashboard.ScrollFrame.ScrollChild, "CharacterEntryTemplate")
         frame.professionFrames = {}
         
         -- Apply backdrop using modern API
@@ -104,7 +104,7 @@ end
 
 function ProfessionTrackerDashboard:Refresh()
     -- Clear existing entries
-    local scrollChild = ProfessionTrackerDashboardScrollFrameScrollChild
+    local scrollChild = self.ScrollFrame.ScrollChild
     for _, frame in ipairs(self.activeEntries or {}) do
         ReleaseCharacterEntry(frame)
     end
