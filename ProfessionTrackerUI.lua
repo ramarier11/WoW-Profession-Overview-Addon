@@ -329,7 +329,7 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     
     -- Crafting Order status
     table.insert(statusLines, GetStatusLine(
-        "RecurringAvailableQuestIcon",
+        craftingOrderIcon,
         "Crafting Order",
         weekly.craftingOrderQuest == true,
         true  -- isAtlas = true
