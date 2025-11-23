@@ -269,9 +269,7 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     
     -- Get icon references from KPReference table
     local treatiseIcon = "Interface\\Icons\\inv_misc_profession_book_enchanting"
-    local craftingOrderIcon = parent:CreateTexture(nil, "ARTWORK")
-    craftingOrderIcon:SetSize(16,16)
-    craftingOrderIcon:SetAtlas("RecurringAvailableQuestIcon")
+    local craftingOrderIcon = "Interface\\Gossipframe\\inv_crafting_orders"
     local treasuresIcon = "Interface\\Icons\\inv_misc_book_07"
     local gatherNodesIcon = "Interface\\Icons\\inv_magic_swirl_color2"
     
@@ -283,9 +281,13 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
             treatiseIcon = ref.weekly.treatise.icon
         end
         
-        -- Get crafting order icon
-        if ref.weekly and ref.weekly.craftingOrder and ref.weekly.craftingOrder.icon then
-            craftingOrderIcon = ref.weekly.craftingOrder.icon
+        -- Get crafting order icon - use atlas for crafting orders
+        if ref.weekly and ref.weekly.craftingOrder then
+            -- Use atlas texture instead of icon path
+            craftingOrderIcon = "|A:RecurringAvailableQuestIcon:16:16|a"
+        else
+            -- Fallback to regular icon if no crafting order data
+            craftingOrderIcon = "Interface\\Icons\\inv_crafting_orders"
         end
         
         -- Get treasures icon (use first treasure's icon if available)
@@ -306,11 +308,20 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     end
     
     -- Helper to create status line with icon, text, and check/x
-    local function GetStatusLine(icon, label, completed)
+    local function GetStatusLine(icon, label, completed, isAtlas)
         local statusIcon = completed 
             and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t" 
             or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
-        return string.format("|T%s:16:16|t %s %s", icon, label, statusIcon)
+        
+        -- Handle atlas textures differently from regular textures
+        local iconDisplay
+        if isAtlas then
+            iconDisplay = icon  -- Already formatted with |A:...|a
+        else
+            iconDisplay = string.format("|T%s:16:16|t", icon)
+        end
+        
+        return string.format("%s %s %s", iconDisplay, label, statusIcon)
     end
     
     -- Build status text
@@ -318,18 +329,19 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     
     -- Crafting Order status
     table.insert(statusLines, GetStatusLine(
-        craftingOrderIcon,
-        "Profession Quest",
-        weekly.craftingOrderQuest == true
+        "RecurringAvailableQuestIcon",
+        "Crafting Order",
+        weekly.craftingOrderQuest == true,
+        true  -- isAtlas = true
     ))
-    
     -- Treasures status (exclude for gathering professions, but include for enchanting)
     if not isGathering then
         local treasuresComplete = weekly.treasuresAllComplete == true
         table.insert(statusLines, GetStatusLine(
             treasuresIcon,
             "Treasures",
-            treasuresComplete
+            treasuresComplete,
+            false
         ))
     end
     
@@ -339,14 +351,16 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
         table.insert(statusLines, GetStatusLine(
             gatherNodesIcon,
             "Gather Nodes",
-            nodesComplete
+            nodesComplete,
+            false
         ))
     end
     -- Treatise status
     table.insert(statusLines, GetStatusLine(
         treatiseIcon,
         "Treatise",
-        weekly.treatise == true
+        weekly.treatise == true,
+        false
     ))
 
     -- Create or update status text display
