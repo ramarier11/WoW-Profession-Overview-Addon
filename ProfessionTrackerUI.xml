@@ -131,14 +131,14 @@
                     </Anchors>
                 </FontString>
                 
-                <!-- Expansion Name
+                <!-- Expansion Name -->
                 <FontString parentKey="Expansion" inherits="GameFontHighlight">
                     <Anchors>
                         <Anchor point="TOPLEFT" relativeKey="$parent.Name" relativePoint="BOTTOMLEFT">
                             <Offset x="0" y="-1"/>
                         </Anchor>
                     </Anchors>
-                </FontString> -->
+                </FontString>
             </Layer>
             
             <Layer level="OVERLAY">
