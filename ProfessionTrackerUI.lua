@@ -237,6 +237,7 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
     
     -- Get profession ID and expansion index for icon lookup
     local profID = expData.skillLineID
+    print(profID)
     local expIndex = expData.id
     
     -- Get icon references from KPReference table
