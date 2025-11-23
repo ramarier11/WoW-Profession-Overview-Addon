@@ -477,7 +477,7 @@ KPReference = {
                 treatise = {
                     questID = 12355,
                     name = "Treatise: Jewelcrafting",
-                    icon = "Interface\\Icons\\inv_inscription_treatise",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_jewelcrafting",
                 },
                 craftingOrder = {
                     questID = 12356,
@@ -805,7 +805,7 @@ KPReference = {
                     surveying = {
                         questID = 60001,
                         name = "Mining Survey Weekly",
-                        icon = "Interface\\Icons\\inv_pick_03",
+                        icon = "Interface\\Icons\\inv_misc_profession_book_mining"",
                     },
                     rareNodes = {
                         name = "Rare Ore Node KP",
