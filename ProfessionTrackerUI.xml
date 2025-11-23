@@ -1,7 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
     
     <!-- Main Dashboard Frame -->
-    <Frame name="ProfessionTrackerDashboard" parent="UIParent" movable="true" enableMouse="true" hidden="true">
+    <Frame name="ProfessionTrackerDashboard" parent="UIParent" movable="true" enableMouse="true" hidden="true" mixin="BackdropTemplateMixin" inherits="BackdropTemplate">
         <Size x="900" y="600"/>
         <Anchors>
             <Anchor point="CENTER"/>
@@ -78,7 +78,7 @@
     </Frame>
     
     <!-- Character Entry Template -->
-    <Frame name="CharacterEntryTemplate" virtual="true">
+    <Frame name="CharacterEntryTemplate" virtual="true" mixin="BackdropTemplateMixin" inherits="BackdropTemplate">
         <Size x="840" y="120"/>
         
         <Layers>
