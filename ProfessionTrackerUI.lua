@@ -375,7 +375,7 @@ function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profNa
 
     -- Concentration status (exclude for gathering professions)
     if not isGathering and expData.concentration then
-        local concentrationIcon = "Interface\\Icons\\ui_profession_concentration"
+        local concentrationIcon = "Interface\\Icons\\ui_concentration"
         local currentConc = expData.concentration or 0
         local maxConc = expData.maxConcentration or 1000
         local concentrationPct = (currentConc / maxConc) * 100
