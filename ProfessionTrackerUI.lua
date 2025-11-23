@@ -159,9 +159,14 @@ function ProfessionTrackerDashboard:CreateCharacterEntry(charKey, charData)
         charData.class or "Unknown"))
     
     -- Create profession progress indicators
+    local profCount = 0
+    local maxProfessionsPerRow = 4
+    
     if charData.professions then
         local profIndex = 0
         local xOffset = 0
+        local yOffset = 0
+        local currentRow = 0
         
         for profName, profData in pairs(charData.professions) do
             if profData.expansions then
@@ -183,20 +188,33 @@ function ProfessionTrackerDashboard:CreateCharacterEntry(charKey, charData)
                     local profFrame = self:CreateProfessionProgress(entry, profName, mostCurrentExp.name, mostCurrentExp.data, profData)
                     if profFrame then
                         profFrame:SetParent(entry.ProfessionContainer)
-                        profFrame:SetPoint("TOPLEFT", entry.ProfessionContainer, "TOPLEFT", xOffset, 0)
+                        profFrame:SetPoint("TOPLEFT", entry.ProfessionContainer, "TOPLEFT", xOffset, yOffset)
                         xOffset = xOffset + 205
                         table.insert(entry.professionFrames, profFrame)
                         profIndex = profIndex + 1
+                        profCount = profCount + 1
                         
                         -- Wrap to next row if needed
-                        if profIndex % 4 == 0 then
+                        if profIndex % maxProfessionsPerRow == 0 then
                             xOffset = 0
+                            yOffset = yOffset - 90  -- Height for each profession box plus spacing
+                            currentRow = currentRow + 1
                         end
                     end
                 end
             end
         end
     end
+    
+    -- Calculate dynamic height based on number of professions
+    -- Base height: 60 (header + padding)
+    -- Each row of professions: 90 pixels
+    local rows = math.ceil(profCount / maxProfessionsPerRow)
+    local dynamicHeight = 60 + (rows * 90)
+    entry:SetHeight(dynamicHeight)
+    
+    -- Also adjust the profession container height
+    entry.ProfessionContainer:SetHeight((rows * 90) + 10)
     
     return entry
 end
