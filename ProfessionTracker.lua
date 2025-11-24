@@ -1557,7 +1557,7 @@ local function UpdateCharacterProfessionData()
     -- This is the key: RecalculateOneTimeTreasures doesn't require TradeSkill UI.
     RecalculateOneTimeTreasures(charKey)
     RecalculateWeeklyKnowledgePoints()
-    UpdateKnowledgePointsIfApplicable(expData, expData.skillLineID)
+    UpdateKnowledgePointsIfApplicable(expData, ProfessionTrackerDB.characters[charKey].skillLineID)
 
 
 -- Find this section in your ProfessionTracker.lua (around line 750-780)
