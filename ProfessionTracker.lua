@@ -1533,14 +1533,25 @@ local function UpdateCharacterProfessionData()
     RecalculateWeeklyKnowledgePoints()
 
 
+-- Find this section in your ProfessionTracker.lua (around line 750-780)
+-- Replace the existing auto-refresh code with this:
+
     -- Auto-refresh UI if open (small delay to avoid racing other events)
     if ProfessionTracker.UI and ProfessionTracker.UI:IsShown() then
         C_Timer.After(0.25, function()
-            -- If your UI object uses :Refresh() use that; otherwise call the redraw helper
             if ProfessionTracker.UI.Refresh then
                 ProfessionTracker.UI:Refresh()
             elseif ProfessionTracker.UI.RedrawCharacterDetail then
                 ProfessionTracker.UI:RedrawCharacterDetail()
+            end
+        end)
+    end
+    
+    -- Refresh Character Detail Window if open
+    if ProfessionTrackerUI and ProfessionTrackerUI.CharacterDetailWindow then
+        C_Timer.After(0.25, function()
+            if ProfessionTrackerUI.CharacterDetailWindow.Refresh then
+                ProfessionTrackerUI.CharacterDetailWindow:Refresh()
             end
         end)
     end
