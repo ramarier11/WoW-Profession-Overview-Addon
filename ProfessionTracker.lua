@@ -1254,6 +1254,34 @@ local function CalculateMissingKnowledgePoints(skillLineID)
     return totalMissing
 end
 
+-- ========================================================
+-- Helper function to safely update knowledge points
+-- Only calculates if the expansion has a knowledge system
+-- ========================================================
+local function UpdateKnowledgePointsIfApplicable(expData, skillLineID)
+    if not expData or not skillLineID then return end
+    
+    -- Check if this expansion has a knowledge system
+    -- (only calculate if pointsUntilMaxKnowledge already exists or should exist)
+    local expIndex = expData.id
+    if not expIndex or expIndex < KNOWLEDGE_SYSTEM_START then
+        return
+    end
+    
+    -- Initialize knowledge tracking if not present
+    if not expData.knowledgePoints then
+        expData.knowledgePoints = 0
+    end
+    
+    -- Calculate current missing points
+    local missing = CalculateMissingKnowledgePoints(skillLineID)
+    if missing then
+        expData.pointsUntilMaxKnowledge = missing
+    elseif not expData.pointsUntilMaxKnowledge then
+        expData.pointsUntilMaxKnowledge = 0
+    end
+end
+
 local function RecalculateWeeklyKnowledgePoints()
     ForEachProfessionExpansion(function(
         charKey, charData,
@@ -1480,9 +1508,7 @@ local function UpdateCharacterProfessionData()
                             expData.maxSkillLevel = exp.maxSkillLevel or expData.maxSkillLevel or 0
 
                             if hasKnowledgeSystem and exp.skillLineID then
-                                local missing = CalculateMissingKnowledgePoints(exp.skillLineID)
-                                expData.pointsUntilMaxKnowledge = missing or expData.pointsUntilMaxKnowledge or 0
-                                expData.knowledgePoints = expData.knowledgePoints or 0
+                                UpdateKnowledgePointsIfApplicable(expData, exp.skillLineID)
 
                                 -- Get concentration currency info
                                 local concentrationCurrencyID = C_TradeSkillUI.GetConcentrationCurrencyID and C_TradeSkillUI.GetConcentrationCurrencyID(exp.skillLineID)
@@ -1531,6 +1557,7 @@ local function UpdateCharacterProfessionData()
     -- This is the key: RecalculateOneTimeTreasures doesn't require TradeSkill UI.
     RecalculateOneTimeTreasures(charKey)
     RecalculateWeeklyKnowledgePoints()
+    UpdateKnowledgePointsIfApplicable(expData, expData.skillLineID)
 
 
 -- Find this section in your ProfessionTracker.lua (around line 750-780)
