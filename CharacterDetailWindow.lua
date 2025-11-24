@@ -141,7 +141,7 @@ function CharacterDetailWindow:RefreshDisplay()
     
     -- Build detailed profession display (2-column layout)
     local yOffset = -10
-    local leftColumnX = 10
+    local leftColumnX = 4 -- reduced left padding
     -- Derive usable content width (fallback to frame width minus padding if not yet calculated)
     local contentWidth = self.Content:GetWidth()
     if not contentWidth or contentWidth == 0 then
@@ -364,7 +364,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
     
     -- Skill level (always shown)
     local skillText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    skillText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
+    skillText:SetPoint("TOPLEFT", xOffset + 6, yOffset)
     skillText:SetText(string.format("Skill: %d/%d", 
         expData.skillLevel or 0,
         expData.maxSkillLevel or 0))
@@ -379,7 +379,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
     -- Knowledge points (condensed, knowledge expansions only)
     if expData.pointsUntilMaxKnowledge then
         local kpText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-        kpText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
+        kpText:SetPoint("TOPLEFT", xOffset + 6, yOffset)
         local kpRemaining = math.max(0, expData.pointsUntilMaxKnowledge)
         kpText:SetText(string.format("Knowledge Remaining: %d", kpRemaining))
         if kpRemaining == 0 then
@@ -394,7 +394,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
         local concPct = (currentConc / maxConc) * 100
         local concentrationIcon = "Interface\\Icons\\ui_concentration"
         local concText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-        concText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
+        concText:SetPoint("TOPLEFT", xOffset + 6, yOffset)
         concText:SetText(string.format("|T%s:14:14|t Conc: %d/%d", concentrationIcon, currentConc, maxConc))
         
         if concPct >= 75 then
@@ -414,7 +414,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
     -- Helper for status display with icons
     local function CreateStatusLine(icon, label, completed, isAtlas)
         local statusText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-        statusText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
+        statusText:SetPoint("TOPLEFT", xOffset + 6, yOffset)
         
         local statusIcon = completed 
             and "|TInterface\\RaidFrame\\ReadyCheck-Ready:12:12|t" 
@@ -476,7 +476,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
     if hasKnowledgeSystem and expData.missingOneTimeTreasures and #expData.missingOneTimeTreasures > 0 then
         yOffset = yOffset - 3
         local treasureText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-        treasureText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
+        treasureText:SetPoint("TOPLEFT", xOffset + 6, yOffset)
         treasureText:SetText(string.format("|cffff8800One Time Missing: %d|r", 
             #expData.missingOneTimeTreasures))
         yOffset = yOffset - 16
@@ -484,7 +484,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
         -- Create smaller button
         local showTreasuresBtn = CreateFrame("Button", nil, self.Content, "UIPanelButtonTemplate")
         showTreasuresBtn:SetSize(100, 20)
-        showTreasuresBtn:SetPoint("TOPLEFT", xOffset + 10, yOffset)
+        showTreasuresBtn:SetPoint("TOPLEFT", xOffset + 6, yOffset)
         showTreasuresBtn:SetText("Show")
         showTreasuresBtn:SetScript("OnClick", function()
             self:ShowMissingTreasures(profName, expName, expData)
@@ -493,7 +493,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
     elseif hasKnowledgeSystem and expData.oneTimeCollectedAll then
         yOffset = yOffset - 3
         local completeText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-        completeText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
+        completeText:SetPoint("TOPLEFT", xOffset + 6, yOffset)
         completeText:SetText("|TInterface\\RaidFrame\\ReadyCheck-Ready:12:12|t All One Time Collected")
         completeText:SetTextColor(0, 1, 0, 1)
         yOffset = yOffset - 16
