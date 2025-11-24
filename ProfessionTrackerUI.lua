@@ -1,53 +1,16 @@
 -- ########################################################
--- ## Character Detail Window
+-- ## Profession Tracker: UI Handler (XML-Based)        ##
 -- ########################################################
 
--- Create the detail window frame
-local CharacterDetailWindow = CreateFrame("Frame", "ProfessionTrackerCharacterDetail", UIParent, "BackdropTemplate")
-CharacterDetailWindow:SetSize(700, 500)
-CharacterDetailWindow:SetPoint("CENTER")
-CharacterDetailWindow:Hide()
-CharacterDetailWindow:SetFrameStrata("DIALOG")
-CharacterDetailWindow:SetMovable(true)
-CharacterDetailWindow:EnableMouse(true)
-CharacterDetailWindow:RegisterForDrag("LeftButton")
-CharacterDetailWindow:SetScript("OnDragStart", function(self) self:StartMoving() end)
-CharacterDetailWindow:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
-
--- Apply backdrop
-local DETAIL_BACKDROP = {
-    bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-    edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
-    tile = true,
-    tileSize = 32,
-    edgeSize = 32,
-    insets = { left = 11, right = 12, top = 12, bottom = 11 }
+local GATHERING_PROFESSIONS = {
+    ["Herbalism"] = true,
+    ["Mining"] = true,
+    ["Skinning"] = true,
 }
-CharacterDetailWindow:SetBackdrop(DETAIL_BACKDROP)
-CharacterDetailWindow:SetBackdropColor(0, 0, 0, 0.9)
-CharacterDetailWindow:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)
 
--- Title
-CharacterDetailWindow.Title = CharacterDetailWindow:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-CharacterDetailWindow.Title:SetPoint("TOP", 0, -20)
+local ENCHANTING_ID = 333
 
--- Close Button
-CharacterDetailWindow.CloseButton = CreateFrame("Button", nil, CharacterDetailWindow, "UIPanelCloseButton")
-CharacterDetailWindow.CloseButton:SetPoint("TOPRIGHT", -5, -5)
-
--- Scroll Frame
-CharacterDetailWindow.ScrollFrame = CreateFrame("ScrollFrame", nil, CharacterDetailWindow, "UIPanelScrollFrameTemplate")
-CharacterDetailWindow.ScrollFrame:SetPoint("TOPLEFT", 20, -60)
-CharacterDetailWindow.ScrollFrame:SetPoint("BOTTOMRIGHT", -30, 20)
-
-CharacterDetailWindow.ScrollChild = CreateFrame("Frame", nil, CharacterDetailWindow.ScrollFrame)
-CharacterDetailWindow.ScrollChild:SetSize(640, 1)
-CharacterDetailWindow.ScrollFrame:SetScrollChild(CharacterDetailWindow.ScrollChild)
-
--- Store reference to current character
-CharacterDetailWindow.currentCharKey = nil
-
--- Class colors
+-- Class color table
 local CLASS_COLORS = {
     WARRIOR = {0.78, 0.61, 0.43},
     PALADIN = {0.96, 0.55, 0.73},
@@ -64,13 +27,26 @@ local CLASS_COLORS = {
     EVOKER = {0.20, 0.58, 0.50},
 }
 
-local GATHERING_PROFESSIONS = {
-    ["Herbalism"] = true,
-    ["Mining"] = true,
-    ["Skinning"] = true,
+-- Backdrop templates
+local DASHBOARD_BACKDROP = {
+    bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+    edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+    tile = true,
+    tileSize = 32,
+    edgeSize = 32,
+    insets = { left = 11, right = 12, top = 12, bottom = 11 }
 }
 
--- Helper to get current concentration with regen
+local ENTRY_BACKDROP = {
+    bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+    edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+    tile = true,
+    tileSize = 16,
+    edgeSize = 16,
+    insets = { left = 4, right = 4, top = 4, bottom = 4 }
+}
+
+-- Helper function to calculate current concentration based on regen rate
 local function GetCurrentConcentration(expData)
     if not expData.concentration or not expData.concentrationLastUpdated then
         return expData.concentration, expData.maxConcentration
@@ -79,83 +55,211 @@ local function GetCurrentConcentration(expData)
     local savedConc = expData.concentration
     local maxConc = expData.maxConcentration or 1000
     
+    -- If already at max, no calculation needed
     if savedConc >= maxConc then
         return maxConc, maxConc
     end
     
+    -- Calculate time elapsed since last update (in hours)
     local currentTime = time()
     local elapsedSeconds = currentTime - expData.concentrationLastUpdated
     local elapsedHours = elapsedSeconds / 3600
+    
+    -- Calculate regenerated concentration (10 per hour)
     local regenAmount = elapsedHours * 10
     local currentConc = math.min(savedConc + regenAmount, maxConc)
     
     return math.floor(currentConc), maxConc
 end
 
--- Show character details
-function CharacterDetailWindow:ShowCharacter(charKey, charData)
-    self.currentCharKey = charKey
+-- Pool for reusable frames
+local CharacterEntryPool = {}
+local ProfessionProgressPool = {}
+
+-- ========================================================
+-- Pool Management
+-- ========================================================
+
+local function AcquireCharacterEntry()
+    local frame = table.remove(CharacterEntryPool)
+    if not frame then
+        frame = CreateFrame("Frame", nil, ProfessionTrackerDashboard.ScrollFrame.ScrollChild, "CharacterEntryTemplate")
+        frame.professionFrames = {}
+        
+        -- Apply backdrop using modern API
+        frame:SetBackdrop(ENTRY_BACKDROP)
+        frame:SetBackdropColor(0.1, 0.1, 0.1, 0.9)
+        frame:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)
+        
+        -- Add hover highlight effect
+        frame:EnableMouse(true)
+        frame:SetScript("OnEnter", function(self)
+            self:SetBackdropBorderColor(1, 0.82, 0, 1)  -- Gold highlight
+        end)
+        frame:SetScript("OnLeave", function(self)
+            self:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)  -- Reset to normal
+        end)
+        -- Add hover highlight effect with cursor hint
+        frame:EnableMouse(true)
+        frame:SetScript("OnEnter", function(self)
+            self:SetBackdropBorderColor(1, 0.82, 0, 1)  -- Gold highlight
+            -- Show cursor as clickable
+            GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
+            GameTooltip:AddLine("Click to view detailed information", 1, 1, 1)
+            GameTooltip:Show()
+        end)
+        frame:SetScript("OnLeave", function(self)
+            self:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)  -- Reset to normal
+            GameTooltip:Hide()
+        end)
+    end
     
-    -- Set title with class color
+
+    frame:Show()
+    return frame
+end
+
+local function ReleaseCharacterEntry(frame)
+    frame:Hide()
+    frame:ClearAllPoints()
+    
+    -- Release profession frames
+    for _, profFrame in ipairs(frame.professionFrames) do
+        ReleaseProfessionProgress(profFrame)
+    end
+    wipe(frame.professionFrames)
+    
+    table.insert(CharacterEntryPool, frame)
+end
+
+local function AcquireProfessionProgress()
+    local frame = table.remove(ProfessionProgressPool)
+    if not frame then
+        frame = CreateFrame("Frame", nil, nil, "ProfessionProgressTemplate")
+    end
+    frame:Show()
+    return frame
+end
+
+function ReleaseProfessionProgress(frame)
+    frame:Hide()
+    frame:ClearAllPoints()
+    frame:SetParent(nil)
+    table.insert(ProfessionProgressPool, frame)
+end
+
+-- ========================================================
+-- UI Refresh Functions
+-- ========================================================
+
+function ProfessionTrackerDashboard:Refresh()
+    -- Clear existing entries
+    local scrollChild = self.ScrollFrame.ScrollChild
+    for _, frame in ipairs(self.activeEntries or {}) do
+        ReleaseCharacterEntry(frame)
+    end
+    self.activeEntries = {}
+    
+    -- Get all characters
+    local characters = ProfessionTracker:GetAllCharacters()
+    if not characters then
+        print("|cffff0000[Profession Tracker]|r No character data found")
+        return
+    end
+    
+    -- Sort characters by last login (most recent first)
+    local sortedChars = {}
+    for charKey, charData in pairs(characters) do
+        table.insert(sortedChars, {key = charKey, data = charData})
+    end
+    table.sort(sortedChars, function(a, b)
+        return (a.data.lastLogin or 0) > (b.data.lastLogin or 0)
+    end)
+    
+    -- Create entries in 2-column layout
+    local xOffset = 0
+    local yOffset = 0
+    local columnWidth = 420  -- Width of each character card plus spacing
+    local currentColumn = 0
+    local maxHeightInRow = 0
+    
+    for i, char in ipairs(sortedChars) do
+        local entry = self:CreateCharacterEntry(char.key, char.data)
+        if entry then
+            entry:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", xOffset, yOffset)
+            table.insert(self.activeEntries, entry)
+            
+            -- Track the tallest entry in this row
+            local entryHeight = entry:GetHeight()
+            if entryHeight > maxHeightInRow then
+                maxHeightInRow = entryHeight
+            end
+            
+            -- Move to next column or next row
+            currentColumn = currentColumn + 1
+            if currentColumn >= 2 then
+                -- Move to next row
+                currentColumn = 0
+                xOffset = 0
+                yOffset = yOffset - (maxHeightInRow + 10)
+                maxHeightInRow = 0
+            else
+                -- Move to next column
+                xOffset = xOffset + columnWidth
+            end
+        end
+    end
+    
+    -- Add one more row height if we ended mid-row
+    if currentColumn > 0 then
+        yOffset = yOffset - (maxHeightInRow + 10)
+    end
+    
+    -- Update scroll child height
+    scrollChild:SetHeight(math.abs(yOffset))
+end
+
+function ProfessionTrackerDashboard:CreateCharacterEntry(charKey, charData)
+    local entry = AcquireCharacterEntry()
+    
+    -- Set character name with class color
     local classColor = CLASS_COLORS[charData.class] or {1, 1, 1}
-    self.Title:SetText(string.format("|cff%02x%02x%02x%s-%s|r",
+    entry.Name:SetText(string.format("|cff%02x%02x%02x%s-%s|r",
         classColor[1] * 255,
         classColor[2] * 255,
         classColor[3] * 255,
         charData.name or "Unknown",
         charData.realm or "Unknown"))
-    
-    -- Clear existing content (frames and font strings)
-    local children = {self.ScrollChild:GetChildren()}
-    for _, child in ipairs(children) do
-        child:Hide()
-        child:ClearAllPoints()
-        child:SetParent(nil)
-    end
-    
-    -- Clear font strings
-    local regions = {self.ScrollChild:GetRegions()}
-    for _, region in ipairs(regions) do
-        if region:GetObjectType() == "FontString" then
-            region:Hide()
-            region:SetText("")
-            region:ClearAllPoints()
+    -- Make entry clickable to show detail window
+    entry:SetScript("OnMouseUp", function(self, button)
+        if button == "LeftButton" then
+            if ProfessionTrackerUI and ProfessionTrackerUI.CharacterDetailWindow then
+                ProfessionTrackerUI.CharacterDetailWindow:ShowCharacter(charKey, charData)
+            end
         end
-    end
+    end)
+
+    -- Store character data for reference
+    entry.charKey = charKey
+    entry.charData = charData
+    -- Set character info
+    entry.Info:SetText(string.format("Level %d %s", 
+        charData.level or 0,
+        charData.class or "Unknown"))
     
-    -- Build detailed profession display (2-column layout)
-    local yOffset = -10
-    local leftColumnX = 10
-    local rightColumnX = 340
-    local currentColumn = 0
-    local maxHeightInRow = 0
-    local columnStartY = yOffset
+    -- Create profession progress indicators
+    local profCount = 0
+    local maxProfessionsPerRow = 2  -- Changed from 4 to 2 for narrower cards
     
     if charData.professions then
-        -- Sort professions alphabetically for consistent layout
-        local sortedProfs = {}
-        for profName, profData in pairs(charData.professions) do
-            table.insert(sortedProfs, {name = profName, data = profData})
-        end
-        table.sort(sortedProfs, function(a, b) return a.name < b.name end)
+        local profIndex = 0
+        local xOffset = 0
+        local yOffset = 0
+        local currentRow = 0
         
-        for _, prof in ipairs(sortedProfs) do
-            local profName = prof.name
-            local profData = prof.data
-            
-            -- Determine column position
-            local xOffset = (currentColumn == 0) and leftColumnX or rightColumnX
-            local startY = yOffset
-            
-            -- Create profession header
-            local profHeader = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-            profHeader:SetPoint("TOPLEFT", xOffset, yOffset)
-            profHeader:SetText(profName)
-            profHeader:SetTextColor(1, 0.82, 0, 1)
-            yOffset = yOffset - 30
-            
+        for profName, profData in pairs(charData.professions) do
             if profData.expansions then
-                -- Find only the most current expansion (highest ID)
+                -- Find the most current expansion (highest ID)
                 local mostCurrentExp = nil
                 local highestExpID = 0
                 
@@ -168,262 +272,359 @@ function CharacterDetailWindow:ShowCharacter(charKey, charData)
                     end
                 end
                 
-                -- Display only the most current expansion
+                -- Only show the most current expansion
                 if mostCurrentExp then
-                    yOffset = self:CreateExpansionSection(mostCurrentExp.name, mostCurrentExp.data, profName, yOffset, xOffset)
+                    local profFrame = self:CreateProfessionProgress(entry, profName, mostCurrentExp.name, mostCurrentExp.data, profData)
+                    if profFrame then
+                        profFrame:SetParent(entry.ProfessionContainer)
+                        profFrame:SetPoint("TOPLEFT", entry.ProfessionContainer, "TOPLEFT", xOffset, yOffset)
+                        xOffset = xOffset + 195  -- Adjusted for 2-column layout
+                        table.insert(entry.professionFrames, profFrame)
+                        profIndex = profIndex + 1
+                        profCount = profCount + 1
+                        
+                        -- Wrap to next row if needed
+                        if profIndex % maxProfessionsPerRow == 0 then
+                            xOffset = 0
+                            yOffset = yOffset - 105  -- Height for each profession box plus spacing
+                            currentRow = currentRow + 1
+                        end
+                    end
                 end
             end
-            
-            -- Calculate height used by this profession
-            local profHeight = math.abs(startY - yOffset)
-            if profHeight > maxHeightInRow then
-                maxHeightInRow = profHeight
-            end
-            
-            -- Move to next column or next row
-            currentColumn = currentColumn + 1
-            if currentColumn >= 2 then
-                -- Move to next row
-                currentColumn = 0
-                yOffset = columnStartY - maxHeightInRow - 20
-                columnStartY = yOffset
-                maxHeightInRow = 0
-            else
-                -- Reset to top of current row for next column
-                yOffset = columnStartY
-            end
         end
     end
     
-    -- Update scroll child height
-    self.ScrollChild:SetHeight(math.abs(yOffset) + 50)
+    -- Calculate dynamic height based on number of professions
+    -- Base height: 60 (header + padding)
+    -- Each row of professions: 105 pixels
+    local rows = math.ceil(profCount / maxProfessionsPerRow)
+    local dynamicHeight = 60 + (rows * 105)
+    entry:SetHeight(dynamicHeight)
     
-    self:Show()
+    -- Also adjust the profession container height
+    entry.ProfessionContainer:SetHeight((rows * 105) + 10)
+    
+    return entry
 end
 
-function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName, yOffset, xOffset)
+function ProfessionTrackerDashboard:CreateProfessionProgress(parentEntry, profName, expName, expData, profData)
+    local frame = AcquireProfessionProgress()
+    
+    -- Set profession name
+    frame.Name:SetText(profName)
+    frame.Name:SetTextColor(1,1,1,1) --profName to white
+    
+    -- Set expansion name
+    -- frame.Expansion:SetText(expName)
+    
+    -- Get weekly progress data
     local weekly = expData.weeklyKnowledgePoints or {}
+    
+    -- Check if this is a gathering profession or enchanting
     local isGathering = GATHERING_PROFESSIONS[profName]
-    local isEnchanting = (profName == "Enchanting")
+    local isEnchanting = (profData and profData.name == "Enchanting")
     
-    xOffset = xOffset or 20 -- Default indent if not specified
+    -- Get profession ID and expansion index for icon lookup
+    local profID = expData.baseSkillLineID
+    local expIndex = expData.id
     
-    -- Expansion name
-    local expHeader = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    expHeader:SetPoint("TOPLEFT", xOffset, yOffset)
-    expHeader:SetText(expName)
-    expHeader:SetTextColor(0.8, 0.8, 1, 1)
-    yOffset = yOffset - 20
+    -- Get icon references from KPReference table
+    local treatiseIcon = "Interface\\Icons\\inv_misc_profession_book_enchanting"
+    local craftingOrderIcon = "Interface\\Gossipframe\\inv_crafting_orders"
+    local treasuresIcon = "Interface\\Icons\\inv_misc_book_07"
+    local gatherNodesIcon = "Interface\\Icons\\inv_magic_swirl_color2"
     
-    -- Skill level
-    local skillText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    skillText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
-    skillText:SetText(string.format("Skill: %d / %d", 
-        expData.skillLevel or 0,
-        expData.maxSkillLevel or 0))
-    yOffset = yOffset - 18
-    
-    -- Knowledge points
-    if expData.pointsUntilMaxKnowledge then
-        local kpText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        kpText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
-        kpText:SetText(string.format("Knowledge Remaining: %d", expData.pointsUntilMaxKnowledge))
-        if expData.pointsUntilMaxKnowledge == 0 then
-            kpText:SetTextColor(0, 1, 0, 1)
+    if profID and expIndex and KPReference and KPReference[profID] and KPReference[profID][expIndex] then
+        local ref = KPReference[profID][expIndex]
+        
+        -- Get treatise icon
+        if ref.weekly and ref.weekly.treatise and ref.weekly.treatise.icon then
+            treatiseIcon = ref.weekly.treatise.icon
         end
-        yOffset = yOffset - 18
-    end
-    
-    -- Concentration (exclude for gathering)
-    if not isGathering and expData.concentration then
-        local currentConc, maxConc = GetCurrentConcentration(expData)
-        local concPct = (currentConc / maxConc) * 100
         
-        local concText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        concText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
-        concText:SetText(string.format("Concentration: %d / %d (%.0f%%)", 
-            currentConc, maxConc, concPct))
-        
-        if concPct >= 75 then
-            concText:SetTextColor(0, 1, 0, 1)
-        elseif concPct >= 50 then
-            concText:SetTextColor(1, 1, 0, 1)
-        elseif concPct >= 25 then
-            concText:SetTextColor(1, 0.53, 0, 1)
+        -- Get crafting order icon - use atlas for crafting orders
+        if ref.weekly and ref.weekly.craftingOrder then
+            -- Use atlas texture instead of icon path
+            craftingOrderIcon = "|A:RecurringAvailableQuestIcon:16:16|a"
         else
-            concText:SetTextColor(1, 0, 0, 1)
+            -- Fallback to regular icon if no crafting order data
+            craftingOrderIcon = "Interface\\Icons\\inv_crafting_orders"
         end
-        yOffset = yOffset - 18
+        
+        -- Get treasures icon (use first treasure's icon if available)
+        if ref.weekly and ref.weekly.treasures then
+            if type(ref.weekly.treasures) == "table" and ref.weekly.treasures[1] and ref.weekly.treasures[1].icon then
+                treasuresIcon = ref.weekly.treasures[1].icon
+            elseif ref.weekly.treasures.icon then
+                treasuresIcon = ref.weekly.treasures.icon
+            end
+        end
+        
+        -- Get gather nodes icon (use first node's icon if available)
+        if ref.weekly and ref.weekly.gatherNodes then
+            if type(ref.weekly.gatherNodes) == "table" and ref.weekly.gatherNodes[1] and ref.weekly.gatherNodes[1].icon then
+                gatherNodesIcon = ref.weekly.gatherNodes[1].icon
+            end
+        end
     end
     
-    -- Weekly activities header
-    local weeklyHeader = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    weeklyHeader:SetPoint("TOPLEFT", xOffset + 10, yOffset)
-    weeklyHeader:SetText("Weekly Activities:")
-    yOffset = yOffset - 20
-    
-    -- Helper for status display
-    local function CreateStatusLine(label, completed, indent)
-        indent = indent or (xOffset + 20)
-        local statusText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        statusText:SetPoint("TOPLEFT", indent, yOffset)
-        
-        local icon = completed 
+    -- Helper to create status line with icon, text, and check/x
+    local function GetStatusLine(icon, label, completed, isAtlas)
+        local statusIcon = completed 
             and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t" 
             or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
         
-        statusText:SetText(string.format("%s %s", icon, label))
-        yOffset = yOffset - 18
-        return statusText
+        -- Handle atlas textures differently from regular textures
+        local iconDisplay
+        if isAtlas then
+            iconDisplay = icon  -- Already formatted with |A:...|a
+        else
+            iconDisplay = string.format("|T%s:16:16|t", icon)
+        end
+        
+        return string.format("%s %s %s", iconDisplay, label, statusIcon)
     end
     
-    -- Treatise
-    CreateStatusLine("Treatise", weekly.treatise == true)
+    -- Build status text
+    local statusLines = {}
     
-    -- Crafting Order
-    CreateStatusLine("Crafting Order", weekly.craftingOrderQuest == true)
-    
-    -- Treasures (detailed breakdown, exclude for gathering)
+    -- Crafting Order status
+    table.insert(statusLines, GetStatusLine(
+        craftingOrderIcon,
+        "Profession Quest",
+        weekly.craftingOrderQuest == true,
+        true  -- isAtlas = true
+    ))
+    -- Treasures status (exclude for gathering professions, but include for enchanting)
     if not isGathering then
-        if weekly.treasures and type(weekly.treasures) == "table" then
-            CreateStatusLine("Treasures:", weekly.treasuresAllComplete == true)
-            for i, treasure in ipairs(weekly.treasures) do
-                CreateStatusLine(treasure.label or ("Treasure " .. i), treasure.completed, xOffset + 30)
-            end
-        else
-            CreateStatusLine("Treasures", weekly.treasuresAllComplete == true)
-        end
+        local treasuresComplete = weekly.treasuresAllComplete == true
+        table.insert(statusLines, GetStatusLine(
+            treasuresIcon,
+            "Treasures",
+            treasuresComplete,
+            false
+        ))
     end
     
-    -- Gather Nodes (detailed breakdown)
+    -- Gather Nodes status (for gathering professions and enchanting)
     if isGathering or isEnchanting then
-        if weekly.gatherNodes and type(weekly.gatherNodes) == "table" then
-            CreateStatusLine("Gather Nodes:", weekly.gatherNodesAllComplete == true)
-            for i, node in ipairs(weekly.gatherNodes) do
-                CreateStatusLine(
-                    string.format("%s (%d)", node.name or ("Node " .. i), node.count or 0),
-                    node.completed,
-                    xOffset + 30
-                )
-            end
+        local nodesComplete = weekly.gatherNodesAllComplete == true
+        table.insert(statusLines, GetStatusLine(
+            gatherNodesIcon,
+            "Gather Nodes",
+            nodesComplete,
+            false
+        ))
+    end
+    -- Treatise status
+    table.insert(statusLines, GetStatusLine(
+        treatiseIcon,
+        "Treatise",
+        weekly.treatise == true,
+        false
+    ))
+
+    -- Concentration status (exclude for gathering professions)
+    if not isGathering and expData.concentration then
+        local concentrationIcon = "Interface\\Icons\\ui_concentration"
+        local currentConc, maxConc = GetCurrentConcentration(expData)
+        local concentrationPct = (currentConc / maxConc) * 100
+        
+        -- Color code based on concentration level
+        local color
+        if concentrationPct >= 75 then
+            color = "|cff00ff00"  -- Green
+        elseif concentrationPct >= 50 then
+            color = "|cffffff00"  -- Yellow
+        elseif concentrationPct >= 25 then
+            color = "|cffff8800"  -- Orange
         else
-            CreateStatusLine("Gather Nodes", weekly.gatherNodesAllComplete == true)
+            color = "|cffff0000"  -- Red
         end
-    end
-    
-    -- One-time treasures section
-    if expData.missingOneTimeTreasures and #expData.missingOneTimeTreasures > 0 then
-        yOffset = yOffset - 5
-        local treasureHeader = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        treasureHeader:SetPoint("TOPLEFT", xOffset + 10, yOffset)
-        treasureHeader:SetText(string.format("Missing One-Time Treasures: %d", 
-            #expData.missingOneTimeTreasures))
-        treasureHeader:SetTextColor(1, 0.5, 0, 1)
-        yOffset = yOffset - 20
         
-        -- Create clickable button to show treasure locations
-        local showTreasuresBtn = CreateFrame("Button", nil, self.ScrollChild, "UIPanelButtonTemplate")
-        showTreasuresBtn:SetSize(150, 25)
-        showTreasuresBtn:SetPoint("TOPLEFT", xOffset + 20, yOffset)
-        showTreasuresBtn:SetText("Show Locations")
-        showTreasuresBtn:SetScript("OnClick", function()
-            self:ShowMissingTreasures(profName, expName, expData)
-        end)
-        yOffset = yOffset - 30
-    elseif expData.oneTimeCollectedAll then
-        yOffset = yOffset - 5
-        local completeText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        completeText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
-        completeText:SetText("|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t All One-Time Treasures Collected")
-        completeText:SetTextColor(0, 1, 0, 1)
-        yOffset = yOffset - 20
+        local concentrationText = string.format("%s|T%s:16:16|t Concentration: %s%d/%d|r",
+            "",
+            concentrationIcon,
+            color,
+            currentConc,
+            maxConc)
+        
+        table.insert(statusLines, concentrationText)
+    end
+
+    -- Create or update status text display
+    if not frame.StatusText then
+        frame.StatusText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        frame.StatusText:SetPoint("TOPLEFT", frame.Name, "BOTTOMLEFT", 0, -5)
+        frame.StatusText:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -5, -25)
+        frame.StatusText:SetJustifyH("LEFT")
+        frame.StatusText:SetJustifyV("TOP")
+        frame.StatusText:SetSpacing(2)
     end
     
-    yOffset = yOffset - 10
-    return yOffset
+    frame.StatusText:SetText(table.concat(statusLines, "\n"))
+    
+    -- Add tooltip functionality to the entire frame
+    frame:EnableMouse(true)
+    frame:SetScript("OnEnter", function(self)
+        -- Keep parent card highlighted
+        if parentEntry then
+            parentEntry:SetBackdropBorderColor(1, 0.82, 0, 1)
+        end
+
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:AddLine(profName .. " - " .. expName, 1, 1, 1, true)
+        GameTooltip:AddLine(" ")
+        
+        -- Helper for status icons in tooltip
+        local function GetTooltipStatus(completed)
+            return completed 
+                and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t" 
+                or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
+        end
+        
+        -- Treatise
+        GameTooltip:AddLine(GetTooltipStatus(weekly.treatise) .. " Treatise", 1, 1, 1)
+        
+        -- Crafting Order
+        GameTooltip:AddLine(GetTooltipStatus(weekly.craftingOrderQuest) .. " Crafting Order", 1, 1, 1)
+        
+        -- Treasures (exclude for gathering professions)
+        if not isGathering then
+            local treasuresComplete = weekly.treasuresAllComplete == true
+            if weekly.treasures and type(weekly.treasures) == "table" then
+                GameTooltip:AddLine("Weekly Treasures:", 1, 1, 1)
+                for i, treasure in ipairs(weekly.treasures) do
+                    local status = treasure.completed 
+                        and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t" 
+                        or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
+                    GameTooltip:AddLine("  " .. status .. " " .. (treasure.label or "Treasure " .. i), 0.9, 0.9, 0.9)
+                end
+            else
+                GameTooltip:AddLine(GetTooltipStatus(treasuresComplete) .. " Treasures", 1, 1, 1)
+            end
+        end
+        
+        -- Gather Nodes
+        if isGathering or isEnchanting then
+            if weekly.gatherNodes and type(weekly.gatherNodes) == "table" then
+                GameTooltip:AddLine("Gather Nodes:", 1, 1, 1)
+                for i, node in ipairs(weekly.gatherNodes) do
+                    local status = node.completed 
+                        and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t" 
+                        or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
+                    GameTooltip:AddLine("  " .. status .. " " .. (node.name or "Node " .. i) .. " (" .. (node.count or 0) .. ")", 0.9, 0.9, 0.9)
+                end
+            else
+                local nodesComplete = weekly.gatherNodesAllComplete == true
+                GameTooltip:AddLine(GetTooltipStatus(nodesComplete) .. " Gather Nodes", 1, 1, 1)
+            end
+        end
+        -- Concentration info (exclude for gathering professions)
+        if not isGathering and expData.concentration then
+            GameTooltip:AddLine(" ")
+            local currentConc, maxConc = GetCurrentConcentration(expData)
+            local concentrationPct = (currentConc / maxConc) * 100
+            
+            -- Color based on concentration level
+            local r, g, b
+            if concentrationPct >= 75 then
+                r, g, b = 0, 1, 0  -- Green
+            elseif concentrationPct >= 50 then
+                r, g, b = 1, 1, 0  -- Yellow
+            elseif concentrationPct >= 25 then
+                r, g, b = 1, 0.53, 0  -- Orange
+            else
+                r, g, b = 1, 0, 0  -- Red
+            end
+            
+            GameTooltip:AddLine(string.format("Concentration: %d/%d (%.0f%%)", currentConc, maxConc, concentrationPct), r, g, b)
+            
+            -- Calculate time to full recovery (10 concentration per hour)
+            if currentConc < maxConc then
+                local missingConc = maxConc - currentConc
+                local hoursToFull = missingConc / 10
+                local daysToFull = math.floor(hoursToFull / 24)
+                local remainingHours = math.floor(hoursToFull % 24)
+                local remainingMinutes = math.floor((hoursToFull % 1) * 60)
+                
+                local timeText = ""
+                if daysToFull > 0 then
+                    timeText = string.format("%dd %dh %dm", daysToFull, remainingHours, remainingMinutes)
+                elseif remainingHours > 0 then
+                    timeText = string.format("%dh %dm", remainingHours, remainingMinutes)
+                else
+                    timeText = string.format("%dm", remainingMinutes)
+                end
+                
+                GameTooltip:AddLine(string.format("Time to full: %s", timeText), 0.7, 0.7, 0.7)
+            else
+                GameTooltip:AddLine("Concentration at maximum", 0, 1, 0)
+            end
+        end
+        
+        GameTooltip:Show()
+    end)
+    frame:SetScript("OnLeave", function(self) 
+        GameTooltip:Hide()
+        
+        -- Reset parent card highlight only if mouse truly left the card
+        if parentEntry and not MouseIsOver(parentEntry) then
+            parentEntry:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)
+        end
+    end)
+    
+    -- Hide the old icon textures since we're now embedding them in text
+    frame.TreatiseIcon:Hide()
+    frame.CraftingOrderIcon:Hide()
+    frame.TreasuresIcon:Hide()
+    frame.GatherNodesIcon:Hide()
+    
+    return frame
 end
 
--- Show missing treasures window
-function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
-    if not expData.missingOneTimeTreasures or #expData.missingOneTimeTreasures == 0 then
-        return
+-- ========================================================
+-- Slash Commands & Initialization
+-- ========================================================
+
+SLASH_PROFESSIONTRACKER1 = "/pt"
+SLASH_PROFESSIONTRACKER2 = "/proftracker"
+SlashCmdList["PROFESSIONTRACKER"] = function(msg)
+    msg = string.lower(msg or "")
+    
+    if msg == "show" or msg == "" then
+        ProfessionTrackerDashboard:Show()
+        ProfessionTrackerDashboard:Refresh()
+    elseif msg == "hide" then
+        ProfessionTrackerDashboard:Hide()
+    elseif msg == "refresh" then
+        ProfessionTrackerDashboard:Refresh()
+        print("|cff00ff00[Profession Tracker]|r Dashboard refreshed")
+    else
+        print("|cff00ff00[Profession Tracker]|r Commands:")
+        print("  /pt show - Show dashboard")
+        print("  /pt hide - Hide dashboard")
+        print("  /pt refresh - Refresh data")
     end
-    
-    -- Create or reuse treasure window
-    if not self.missingTreasureWindow then
-        local treasureWin = CreateFrame("Frame", "ProfessionTrackerMissingTreasures", UIParent, "BackdropTemplate")
-        treasureWin:SetSize(500, 400)
-        treasureWin:SetPoint("CENTER")
-        treasureWin:SetFrameStrata("TOOLTIP")
-        treasureWin:SetMovable(true)
-        treasureWin:EnableMouse(true)
-        treasureWin:RegisterForDrag("LeftButton")
-        treasureWin:SetScript("OnDragStart", function(self) self:StartMoving() end)
-        treasureWin:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
-        
-        treasureWin:SetBackdrop(DETAIL_BACKDROP)
-        treasureWin:SetBackdropColor(0, 0, 0, 0.95)
-        treasureWin:SetBackdropBorderColor(0.8, 0.6, 0, 1)
-        
-        treasureWin.Title = treasureWin:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-        treasureWin.Title:SetPoint("TOP", 0, -15)
-        
-        treasureWin.CloseButton = CreateFrame("Button", nil, treasureWin, "UIPanelCloseButton")
-        treasureWin.CloseButton:SetPoint("TOPRIGHT", -5, -5)
-        
-        treasureWin.ScrollFrame = CreateFrame("ScrollFrame", nil, treasureWin, "UIPanelScrollFrameTemplate")
-        treasureWin.ScrollFrame:SetPoint("TOPLEFT", 15, -45)
-        treasureWin.ScrollFrame:SetPoint("BOTTOMRIGHT", -30, 15)
-        
-        treasureWin.ScrollChild = CreateFrame("Frame", nil, treasureWin.ScrollFrame)
-        treasureWin.ScrollChild:SetSize(450, 1)
-        treasureWin.ScrollFrame:SetScrollChild(treasureWin.ScrollChild)
-        
-        self.missingTreasureWindow = treasureWin
-    end
-    
-    local treasureWin = self.missingTreasureWindow
-    treasureWin.Title:SetText(string.format("Missing Treasures - %s (%s)", profName, expName))
-    
-    -- Clear existing content
-    for _, child in ipairs({treasureWin.ScrollChild:GetChildren()}) do
-        child:Hide()
-        child:SetParent(nil)
-    end
-    
-    local yOffset = -10
-    
-    for i, treasure in ipairs(expData.missingOneTimeTreasures) do
-        -- Treasure name
-        local nameText = treasureWin.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        nameText:SetPoint("TOPLEFT", 10, yOffset)
-        nameText:SetText(treasure.name)
-        nameText:SetTextColor(1, 0.82, 0, 1)
-        yOffset = yOffset - 18
-        
-        -- Location info
-        local locText = treasureWin.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        locText:SetPoint("TOPLEFT", 20, yOffset)
-        locText:SetText(string.format("Map ID: %d, Coords: %.1f, %.1f", 
-            treasure.mapID or 0,
-            treasure.x or 0,
-            treasure.y or 0))
-        yOffset = yOffset - 18
-        
-        -- Quest ID (for reference)
-        local questText = treasureWin.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-        questText:SetPoint("TOPLEFT", 20, yOffset)
-        questText:SetText(string.format("Quest ID: %d", treasure.questID or 0))
-        questText:SetTextColor(0.7, 0.7, 0.7, 1)
-        yOffset = yOffset - 20
-    end
-    
-    treasureWin.ScrollChild:SetHeight(math.abs(yOffset) + 20)
-    treasureWin:Show()
 end
 
--- Make globally accessible
-ProfessionTrackerUI = ProfessionTrackerUI or {}
-ProfessionTrackerUI.CharacterDetailWindow = CharacterDetailWindow
+-- Initialize active entries table
+ProfessionTrackerDashboard.activeEntries = {}
 
-print("|cff00ff00[Profession Tracker]|r Character detail window loaded.")
+-- Apply dashboard backdrop on load
+ProfessionTrackerDashboard:SetScript("OnShow", function(self)
+    if not self.backdropApplied then
+        self:SetBackdrop(DASHBOARD_BACKDROP)
+        self:SetBackdropColor(0, 0, 0, 0.8)
+        self:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)
+        self.backdropApplied = true
+    end
+end)
+
+-- Register with ProfessionTracker
+if ProfessionTracker and ProfessionTracker.RegisterUI then
+    ProfessionTracker:RegisterUI(ProfessionTrackerDashboard)
+end
+
+print("|cff00ff00[Profession Tracker]|r UI loaded. Type /pt to open dashboard.")

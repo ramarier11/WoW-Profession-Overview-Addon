@@ -123,14 +123,33 @@ function CharacterDetailWindow:ShowCharacter(charKey, charData)
         end
     end
     
-    -- Build detailed profession display
+    -- Build detailed profession display (2-column layout)
     local yOffset = -10
+    local leftColumnX = 10
+    local rightColumnX = 340
+    local currentColumn = 0
+    local maxHeightInRow = 0
+    local columnStartY = yOffset
     
     if charData.professions then
+        -- Sort professions alphabetically for consistent layout
+        local sortedProfs = {}
         for profName, profData in pairs(charData.professions) do
+            table.insert(sortedProfs, {name = profName, data = profData})
+        end
+        table.sort(sortedProfs, function(a, b) return a.name < b.name end)
+        
+        for _, prof in ipairs(sortedProfs) do
+            local profName = prof.name
+            local profData = prof.data
+            
+            -- Determine column position
+            local xOffset = (currentColumn == 0) and leftColumnX or rightColumnX
+            local startY = yOffset
+            
             -- Create profession header
             local profHeader = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-            profHeader:SetPoint("TOPLEFT", 10, yOffset)
+            profHeader:SetPoint("TOPLEFT", xOffset, yOffset)
             profHeader:SetText(profName)
             profHeader:SetTextColor(1, 0.82, 0, 1)
             yOffset = yOffset - 30
@@ -151,11 +170,28 @@ function CharacterDetailWindow:ShowCharacter(charKey, charData)
                 
                 -- Display only the most current expansion
                 if mostCurrentExp then
-                    yOffset = self:CreateExpansionSection(mostCurrentExp.name, mostCurrentExp.data, profName, yOffset)
+                    yOffset = self:CreateExpansionSection(mostCurrentExp.name, mostCurrentExp.data, profName, yOffset, xOffset)
                 end
             end
             
-            yOffset = yOffset - 20 -- Space between professions
+            -- Calculate height used by this profession
+            local profHeight = math.abs(startY - yOffset)
+            if profHeight > maxHeightInRow then
+                maxHeightInRow = profHeight
+            end
+            
+            -- Move to next column or next row
+            currentColumn = currentColumn + 1
+            if currentColumn >= 2 then
+                -- Move to next row
+                currentColumn = 0
+                yOffset = columnStartY - maxHeightInRow - 20
+                columnStartY = yOffset
+                maxHeightInRow = 0
+            else
+                -- Reset to top of current row for next column
+                yOffset = columnStartY
+            end
         end
     end
     
@@ -165,21 +201,23 @@ function CharacterDetailWindow:ShowCharacter(charKey, charData)
     self:Show()
 end
 
-function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName, yOffset)
+function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName, yOffset, xOffset)
     local weekly = expData.weeklyKnowledgePoints or {}
     local isGathering = GATHERING_PROFESSIONS[profName]
     local isEnchanting = (profName == "Enchanting")
     
+    xOffset = xOffset or 20 -- Default indent if not specified
+    
     -- Expansion name
     local expHeader = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    expHeader:SetPoint("TOPLEFT", 20, yOffset)
+    expHeader:SetPoint("TOPLEFT", xOffset, yOffset)
     expHeader:SetText(expName)
     expHeader:SetTextColor(0.8, 0.8, 1, 1)
     yOffset = yOffset - 20
     
     -- Skill level
     local skillText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    skillText:SetPoint("TOPLEFT", 30, yOffset)
+    skillText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
     skillText:SetText(string.format("Skill: %d / %d", 
         expData.skillLevel or 0,
         expData.maxSkillLevel or 0))
@@ -188,7 +226,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
     -- Knowledge points
     if expData.pointsUntilMaxKnowledge then
         local kpText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        kpText:SetPoint("TOPLEFT", 30, yOffset)
+        kpText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
         kpText:SetText(string.format("Knowledge Remaining: %d", expData.pointsUntilMaxKnowledge))
         if expData.pointsUntilMaxKnowledge == 0 then
             kpText:SetTextColor(0, 1, 0, 1)
@@ -202,7 +240,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
         local concPct = (currentConc / maxConc) * 100
         
         local concText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        concText:SetPoint("TOPLEFT", 30, yOffset)
+        concText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
         concText:SetText(string.format("Concentration: %d / %d (%.0f%%)", 
             currentConc, maxConc, concPct))
         
@@ -220,13 +258,13 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
     
     -- Weekly activities header
     local weeklyHeader = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    weeklyHeader:SetPoint("TOPLEFT", 30, yOffset)
+    weeklyHeader:SetPoint("TOPLEFT", xOffset + 10, yOffset)
     weeklyHeader:SetText("Weekly Activities:")
     yOffset = yOffset - 20
     
     -- Helper for status display
     local function CreateStatusLine(label, completed, indent)
-        indent = indent or 40
+        indent = indent or (xOffset + 20)
         local statusText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
         statusText:SetPoint("TOPLEFT", indent, yOffset)
         
@@ -250,7 +288,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
         if weekly.treasures and type(weekly.treasures) == "table" then
             CreateStatusLine("Treasures:", weekly.treasuresAllComplete == true)
             for i, treasure in ipairs(weekly.treasures) do
-                CreateStatusLine(treasure.label or ("Treasure " .. i), treasure.completed, 50)
+                CreateStatusLine(treasure.label or ("Treasure " .. i), treasure.completed, xOffset + 30)
             end
         else
             CreateStatusLine("Treasures", weekly.treasuresAllComplete == true)
@@ -265,7 +303,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
                 CreateStatusLine(
                     string.format("%s (%d)", node.name or ("Node " .. i), node.count or 0),
                     node.completed,
-                    50
+                    xOffset + 30
                 )
             end
         else
@@ -277,7 +315,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
     if expData.missingOneTimeTreasures and #expData.missingOneTimeTreasures > 0 then
         yOffset = yOffset - 5
         local treasureHeader = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        treasureHeader:SetPoint("TOPLEFT", 30, yOffset)
+        treasureHeader:SetPoint("TOPLEFT", xOffset + 10, yOffset)
         treasureHeader:SetText(string.format("Missing One-Time Treasures: %d", 
             #expData.missingOneTimeTreasures))
         treasureHeader:SetTextColor(1, 0.5, 0, 1)
@@ -286,7 +324,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
         -- Create clickable button to show treasure locations
         local showTreasuresBtn = CreateFrame("Button", nil, self.ScrollChild, "UIPanelButtonTemplate")
         showTreasuresBtn:SetSize(150, 25)
-        showTreasuresBtn:SetPoint("TOPLEFT", 40, yOffset)
+        showTreasuresBtn:SetPoint("TOPLEFT", xOffset + 20, yOffset)
         showTreasuresBtn:SetText("Show Locations")
         showTreasuresBtn:SetScript("OnClick", function()
             self:ShowMissingTreasures(profName, expName, expData)
@@ -295,7 +333,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
     elseif expData.oneTimeCollectedAll then
         yOffset = yOffset - 5
         local completeText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        completeText:SetPoint("TOPLEFT", 30, yOffset)
+        completeText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
         completeText:SetText("|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t All One-Time Treasures Collected")
         completeText:SetTextColor(0, 1, 0, 1)
         yOffset = yOffset - 20
