@@ -45,6 +45,13 @@ CharacterDetailWindow.Content:SetSize(540, 1)
 CharacterDetailWindow.expansionSelection = CharacterDetailWindow.expansionSelection or {}
 local KNOWLEDGE_SYSTEM_START = 10
 
+-- Truncation helper to prevent overflow into adjacent column
+local function TruncateText(text, maxLen)
+    if not text then return "" end
+    if #text <= maxLen then return text end
+    return string.sub(text, 1, maxLen - 1) .. "."
+end
+
 -- Store reference to current character
 CharacterDetailWindow.currentCharKey = nil
 
@@ -429,7 +436,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
             iconDisplay = string.format("|T%s:14:14|t", icon)
         end
         
-        statusText:SetText(string.format("%s %s %s", iconDisplay, label, statusIcon))
+        statusText:SetText(string.format("%s %s %s", iconDisplay, TruncateText(label, 22), statusIcon))
         yOffset = yOffset - 16
         return statusText
     end
