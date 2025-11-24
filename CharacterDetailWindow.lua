@@ -141,7 +141,7 @@ function CharacterDetailWindow:RefreshDisplay()
     -- Build detailed profession display (2-column layout)
     local yOffset = -10
     local leftColumnX = 10
-    local rightColumnX = 290
+    local rightColumnX = 200
     local currentColumn = 0
     local maxHeightInRow = 0
     local columnStartY = yOffset
