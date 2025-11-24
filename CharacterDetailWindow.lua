@@ -105,10 +105,22 @@ function CharacterDetailWindow:ShowCharacter(charKey, charData)
         charData.name or "Unknown",
         charData.realm or "Unknown"))
     
-    -- Clear existing content
-    for _, child in ipairs({self.ScrollChild:GetChildren()}) do
+    -- Clear existing content (frames and font strings)
+    local children = {self.ScrollChild:GetChildren()}
+    for _, child in ipairs(children) do
         child:Hide()
+        child:ClearAllPoints()
         child:SetParent(nil)
+    end
+    
+    -- Clear font strings
+    local regions = {self.ScrollChild:GetRegions()}
+    for _, region in ipairs(regions) do
+        if region:GetObjectType() == "FontString" then
+            region:Hide()
+            region:SetText("")
+            region:ClearAllPoints()
+        end
     end
     
     -- Build detailed profession display
