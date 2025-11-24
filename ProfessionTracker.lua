@@ -1024,6 +1024,34 @@ for _, p in ipairs(ProfessionData) do
     ProfessionNameToID[p.name] = p.id
 end
 
+------------------------------------------------------------
+-- Helper: Update most current expansion's skill values
+-- Uses the highest numeric expansion id present for a profession.
+-- Called even when TradeSkill UI is closed so long as GetProfessionInfo
+-- gave us a skillLevel/maxSkillLevel (only reflects current expansion).
+------------------------------------------------------------
+local function UpdateMostCurrentExpansionSkill(profession, skillLevel, maxSkillLevel)
+    if not profession or not profession.expansions then return end
+    if not skillLevel or not maxSkillLevel then return end
+
+    local latest
+    for _, expData in pairs(profession.expansions) do
+        local id = expData.id or 0
+        if not latest or (id > (latest.id or 0)) then
+            latest = expData
+        end
+    end
+    if latest then
+        -- Only overwrite if new value differs to avoid churn
+        if latest.skillLevel ~= skillLevel then
+            latest.skillLevel = skillLevel
+        end
+        if latest.maxSkillLevel ~= maxSkillLevel then
+            latest.maxSkillLevel = maxSkillLevel
+        end
+    end
+end
+
 
 -- ========================================================
 -- Utility Functions
@@ -1550,6 +1578,9 @@ local function UpdateCharacterProfessionData()
                         -- This preserves previously stored expansion entries so RecalculateOneTimeTreasures can still work.
                         -- (No-op)
                     end
+
+                    -- Always update the most current expansion's skill values using generic profession skillLevel/maxSkillLevel.
+                    UpdateMostCurrentExpansionSkill(profession, skillLevel, maxSkillLevel)
                 end
             end
         end
