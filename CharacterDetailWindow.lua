@@ -36,13 +36,13 @@ CharacterDetailWindow.CloseButton = CreateFrame("Button", nil, CharacterDetailWi
 CharacterDetailWindow.CloseButton:SetPoint("TOPRIGHT", -5, -5)
 
 -- Scroll Frame
--- CharacterDetailWindow.ScrollFrame = CreateFrame("ScrollFrame", nil, CharacterDetailWindow, "UIPanelScrollFrameTemplate")
--- CharacterDetailWindow.ScrollFrame:SetPoint("TOPLEFT", 20, -60)
--- CharacterDetailWindow.ScrollFrame:SetPoint("BOTTOMRIGHT", -30, 20)
+CharacterDetailWindow.ScrollFrame = CreateFrame("ScrollFrame", nil, CharacterDetailWindow, "UIPanelScrollFrameTemplate")
+CharacterDetailWindow.ScrollFrame:SetPoint("TOPLEFT", 20, -60)
+CharacterDetailWindow.ScrollFrame:SetPoint("BOTTOMRIGHT", -30, 20)
 
--- CharacterDetailWindow.ScrollChild = CreateFrame("Frame", nil, CharacterDetailWindow.ScrollFrame)
--- CharacterDetailWindow.ScrollChild:SetSize(540, 1)
--- CharacterDetailWindow.ScrollFrame:SetScrollChild(CharacterDetailWindow.ScrollChild)
+CharacterDetailWindow.ScrollChild = CreateFrame("Frame", nil, CharacterDetailWindow.ScrollFrame)
+CharacterDetailWindow.ScrollChild:SetSize(540, 1)
+CharacterDetailWindow.ScrollFrame:SetScrollChild(CharacterDetailWindow.ScrollChild)
 
 -- Store reference to current character
 CharacterDetailWindow.currentCharKey = nil
