@@ -233,7 +233,7 @@ function CharacterDetailWindow:RefreshDisplay()
             end
 
             -- Centered expansion title with left/right arrows
-            local centerX = xOffset + math.floor(columnWidth/2)
+            local centerX = math.floor(columnWidth/2)
             local expTitle = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
             expTitle:SetPoint("TOP", self.Content, "TOP", centerX, yOffset)
             expTitle:SetText(selectedExpName or "")
