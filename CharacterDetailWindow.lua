@@ -457,7 +457,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
         yOffset = yOffset - 3
         local treasureText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
         treasureText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
-        treasureText:SetText(string.format("|cffff8800Missing: %d|r", 
+        treasureText:SetText(string.format("|cffff8800One Time Missing: %d|r", 
             #expData.missingOneTimeTreasures))
         yOffset = yOffset - 16
         
