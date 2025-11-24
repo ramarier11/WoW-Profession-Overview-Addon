@@ -95,6 +95,21 @@ end
 -- Show character details
 function CharacterDetailWindow:ShowCharacter(charKey, charData)
     self.currentCharKey = charKey
+    self:RefreshDisplay()
+    self:Show()
+end
+
+-- Refresh the current character's display
+function CharacterDetailWindow:RefreshDisplay()
+    if not self.currentCharKey then return end
+    
+    -- Get fresh character data
+    local characters = ProfessionTracker:GetAllCharacters()
+    if not characters or not characters[self.currentCharKey] then
+        return
+    end
+    
+    local charData = characters[self.currentCharKey]
     
     -- Set title with class color
     local classColor = CLASS_COLORS[charData.class] or {1, 1, 1}
@@ -197,8 +212,13 @@ function CharacterDetailWindow:ShowCharacter(charKey, charData)
     
     -- Update scroll child height
     self.ScrollChild:SetHeight(math.abs(yOffset) + 50)
-    
-    self:Show()
+end
+
+-- Refresh method to update with latest data
+function CharacterDetailWindow:Refresh()
+    if self:IsShown() and self.currentCharKey then
+        self:RefreshDisplay()
+    end
 end
 
 function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName, yOffset, xOffset)
