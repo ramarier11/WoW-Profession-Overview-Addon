@@ -297,10 +297,10 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
     if not isGathering and expData.concentration then
         local currentConc, maxConc = GetCurrentConcentration(expData)
         local concPct = (currentConc / maxConc) * 100
-        
+        local concentrationIcon = "Interface\\Icons\\ui_concentration"
         local concText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
         concText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
-        concText:SetText(string.format("Conc: %d/%d", currentConc, maxConc))
+        concText:SetText(string.format("|T%s:14:14|t Conc: %d/%d", concentrationIcon, currentConc, maxConc))
         
         if concPct >= 75 then
             concText:SetTextColor(0, 1, 0, 1)
