@@ -176,7 +176,7 @@ function CharacterDetailWindow:RefreshDisplay()
             profHeader:SetPoint("TOPLEFT", xOffset, yOffset)
             profHeader:SetText(profName)
             profHeader:SetTextColor(1, 0.82, 0, 1)
-            yOffset = yOffset - 22
+            yOffset = yOffset - 24
 
             -- Build list of ALL expansions from saved data (no knowledge filter)
             local availableExpIDs = {}
