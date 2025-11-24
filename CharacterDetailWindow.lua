@@ -41,6 +41,9 @@ CharacterDetailWindow.Content:SetPoint("TOPLEFT", 20, -35)
 CharacterDetailWindow.Content:SetPoint("BOTTOMRIGHT", -30, 20)
 CharacterDetailWindow.Content:SetSize(540, 1)
 
+-- Per-character, per-profession expansion selection state
+CharacterDetailWindow.expansionSelection = CharacterDetailWindow.expansionSelection or {}
+
 -- Store reference to current character
 CharacterDetailWindow.currentCharKey = nil
 
@@ -139,6 +142,7 @@ function CharacterDetailWindow:RefreshDisplay()
     local yOffset = -10
     local leftColumnX = 10
     local rightColumnX = 200
+    local columnWidth = 180
     local currentColumn = 0
     local maxHeightInRow = 0
     local columnStartY = yOffset
@@ -164,7 +168,111 @@ function CharacterDetailWindow:RefreshDisplay()
             profHeader:SetPoint("TOPLEFT", xOffset, yOffset)
             profHeader:SetText(profName)
             profHeader:SetTextColor(1, 0.82, 0, 1)
-            yOffset = yOffset - 30
+            yOffset = yOffset - 22
+
+            -- Build available expansions for this profession using KPReference
+            local availableExpIDs = {}
+            local expNameByID = {}
+            local profIDFromData
+            if profData and profData.expansions then
+                for expName, expData in pairs(profData.expansions) do
+                    if expData.id then
+                        expNameByID[expData.id] = expName
+                        if not profIDFromData then
+                            profIDFromData = expData.baseSkillLineID or expData.skillLineID
+                        end
+                    end
+                end
+            end
+
+            if profIDFromData and KPReference and KPReference[profIDFromData] then
+                for expIndex, _ in pairs(KPReference[profIDFromData]) do
+                    if type(expIndex) == "number" and expIndex >= 10 then
+                        table.insert(availableExpIDs, expIndex)
+                    end
+                end
+                table.sort(availableExpIDs)
+            end
+
+            -- Determine selected expansion id for this character+profession
+            local charKey = self.currentCharKey
+            self.expansionSelection[charKey] = self.expansionSelection[charKey] or {}
+            local selectedExpID = self.expansionSelection[charKey][profName]
+            if not selectedExpID or (availableExpIDs[1] and not tContains(availableExpIDs, selectedExpID)) then
+                -- default to highest available ID if list exists; else highest in character data
+                if #availableExpIDs > 0 then
+                    selectedExpID = availableExpIDs[#availableExpIDs]
+                else
+                    local highestID = 0
+                    if profData and profData.expansions then
+                        for _, expData in pairs(profData.expansions) do
+                            if expData.id and expData.id > highestID then highestID = expData.id end
+                        end
+                    end
+                    selectedExpID = highestID
+                end
+                self.expansionSelection[charKey][profName] = selectedExpID
+            end
+
+            -- Resolve selected expansion name and data
+            local selectedExpName = expNameByID[selectedExpID]
+            local selectedExpData
+            if selectedExpName and profData.expansions[selectedExpName] then
+                selectedExpData = profData.expansions[selectedExpName]
+            else
+                -- Fallback: find by id match
+                if profData and profData.expansions then
+                    for n, e in pairs(profData.expansions) do
+                        if e.id == selectedExpID then
+                            selectedExpName = n
+                            selectedExpData = e
+                            break
+                        end
+                    end
+                end
+            end
+
+            -- Centered expansion title with left/right arrows
+            local centerX = xOffset + math.floor(columnWidth/2)
+            local expTitle = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+            expTitle:SetPoint("TOP", self.Content, "TOP", centerX, yOffset)
+            expTitle:SetText(selectedExpName or "")
+            expTitle:SetTextColor(0.8, 0.8, 0.9, 1)
+
+            local leftBtn = CreateFrame("Button", nil, self.Content, "UIPanelButtonTemplate")
+            leftBtn:SetSize(18, 18)
+            leftBtn:SetText("<")
+            leftBtn:SetPoint("RIGHT", expTitle, "LEFT", -6, 0)
+
+            local rightBtn = CreateFrame("Button", nil, self.Content, "UIPanelButtonTemplate")
+            rightBtn:SetSize(18, 18)
+            rightBtn:SetText(">")
+            rightBtn:SetPoint("LEFT", expTitle, "RIGHT", 6, 0)
+
+            if #availableExpIDs <= 1 then
+                leftBtn:Disable()
+                rightBtn:Disable()
+            end
+
+            -- Find index of current selection in availableExpIDs
+            local currentIdx = 1
+            for i, id in ipairs(availableExpIDs) do if id == selectedExpID then currentIdx = i break end end
+
+            leftBtn:SetScript("OnClick", function()
+                if #availableExpIDs == 0 then return end
+                currentIdx = math.max(1, currentIdx - 1)
+                self.expansionSelection[charKey][profName] = availableExpIDs[currentIdx]
+                self:RefreshDisplay()
+            end)
+
+            rightBtn:SetScript("OnClick", function()
+                if #availableExpIDs == 0 then return end
+                currentIdx = math.min(#availableExpIDs, currentIdx + 1)
+                self.expansionSelection[charKey][profName] = availableExpIDs[currentIdx]
+                self:RefreshDisplay()
+            end)
+
+            yOffset = yOffset - 24
             
             if profData.expansions then
                 -- Find only the most current expansion (highest ID)
@@ -180,8 +288,10 @@ function CharacterDetailWindow:RefreshDisplay()
                     end
                 end
                 
-                -- Display only the most current expansion
-                if mostCurrentExp then
+                -- Display selected expansion
+                if selectedExpData and selectedExpName then
+                    yOffset = self:CreateExpansionSection(selectedExpName, selectedExpData, profName, yOffset, xOffset)
+                elseif mostCurrentExp then
                     yOffset = self:CreateExpansionSection(mostCurrentExp.name, mostCurrentExp.data, profName, yOffset, xOffset)
                 end
             end
