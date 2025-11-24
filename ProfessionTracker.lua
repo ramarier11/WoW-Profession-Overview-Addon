@@ -1254,17 +1254,24 @@ local function CalculateMissingKnowledgePoints(skillLineID)
     return totalMissing
 end
 
+
 -- ========================================================
 -- Helper function to safely update knowledge points
 -- Only calculates if the expansion has a knowledge system
+-- Uses stored skillLineID from expData (populated during initialization)
 -- ========================================================
-local function UpdateKnowledgePointsIfApplicable(expData, skillLineID)
-    if not expData or not skillLineID then return end
+local function UpdateKnowledgePointsIfApplicable(expData)
+    if not expData then return end
     
     -- Check if this expansion has a knowledge system
-    -- (only calculate if pointsUntilMaxKnowledge already exists or should exist)
     local expIndex = expData.id
     if not expIndex or expIndex < KNOWLEDGE_SYSTEM_START then
+        return
+    end
+    
+    -- Need skillLineID to calculate - must have been stored during initialization
+    local skillLineID = expData.skillLineID
+    if not skillLineID then
         return
     end
     
@@ -1508,7 +1515,11 @@ local function UpdateCharacterProfessionData()
                             expData.maxSkillLevel = exp.maxSkillLevel or expData.maxSkillLevel or 0
 
                             if hasKnowledgeSystem and exp.skillLineID then
-                                UpdateKnowledgePointsIfApplicable(expData, exp.skillLineID)
+                                -- IMPORTANT: Store skillLineID for later use outside this loop
+                                expData.skillLineID = exp.skillLineID
+                                
+                                -- Update knowledge points
+                                UpdateKnowledgePointsIfApplicable(expData)
 
                                 -- Get concentration currency info
                                 local concentrationCurrencyID = C_TradeSkillUI.GetConcentrationCurrencyID and C_TradeSkillUI.GetConcentrationCurrencyID(exp.skillLineID)
@@ -1550,14 +1561,22 @@ local function UpdateCharacterProfessionData()
         end
     end
 
-
+    -- Iterate through all stored professions and update their knowledge points
+    for profName, profData in pairs(professions) do
+        if profData.expansions then
+            for expName, expData in pairs(profData.expansions) do
+                -- Update knowledge points using stored skillLineID
+                -- This works even when tradeskill window is closed
+                UpdateKnowledgePointsIfApplicable(expData)
+            end
+        end
+    end
 
 
     -- ===== ALWAYS re-evaluate one-time treasures AFTER we've merged/kept expansion structure =====
     -- This is the key: RecalculateOneTimeTreasures doesn't require TradeSkill UI.
     RecalculateOneTimeTreasures(charKey)
     RecalculateWeeklyKnowledgePoints()
-    UpdateKnowledgePointsIfApplicable(expData, ProfessionTrackerDB.characters[charKey].skillLineID)
 
 
 -- Find this section in your ProfessionTracker.lua (around line 750-780)
