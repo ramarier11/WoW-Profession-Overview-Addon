@@ -124,18 +124,22 @@ function CharacterDetailWindow:ShowCharacter(charKey, charData)
             yOffset = yOffset - 30
             
             if profData.expansions then
-                -- Sort expansions by ID (most recent first)
-                local sortedExps = {}
+                -- Find only the most current expansion (highest ID)
+                local mostCurrentExp = nil
+                local highestExpID = 0
+                
                 for expName, expData in pairs(profData.expansions) do
-                    if expData.id and expData.id >= 10 then
-                        table.insert(sortedExps, {name = expName, data = expData})
+                    if expData.id and expData.id >= 10 then -- Only knowledge system expansions
+                        if expData.id > highestExpID then
+                            highestExpID = expData.id
+                            mostCurrentExp = {name = expName, data = expData}
+                        end
                     end
                 end
-                table.sort(sortedExps, function(a, b) return a.data.id > b.data.id end)
                 
-                -- Display each expansion
-                for _, exp in ipairs(sortedExps) do
-                    yOffset = self:CreateExpansionSection(exp.name, exp.data, profName, yOffset)
+                -- Display only the most current expansion
+                if mostCurrentExp then
+                    yOffset = self:CreateExpansionSection(mostCurrentExp.name, mostCurrentExp.data, profName, yOffset)
                 end
             end
             
