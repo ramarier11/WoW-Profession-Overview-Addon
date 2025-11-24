@@ -378,7 +378,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
         local kpText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
         kpText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
         local kpRemaining = math.max(0, expData.pointsUntilMaxKnowledge)
-        kpText:SetText(string.format("KP: %d", kpRemaining))
+        kpText:SetText(string.format("Knowledge Remaining: %d", kpRemaining))
         if kpRemaining == 0 then
             kpText:SetTextColor(0, 1, 0, 1)
         end
