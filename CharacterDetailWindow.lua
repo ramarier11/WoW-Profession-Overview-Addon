@@ -43,6 +43,7 @@ CharacterDetailWindow.Content:SetSize(540, 1)
 
 -- Per-character, per-profession expansion selection state
 CharacterDetailWindow.expansionSelection = CharacterDetailWindow.expansionSelection or {}
+local KNOWLEDGE_SYSTEM_START = 10
 
 -- Store reference to current character
 CharacterDetailWindow.currentCharKey = nil
@@ -170,25 +171,14 @@ function CharacterDetailWindow:RefreshDisplay()
             profHeader:SetTextColor(1, 0.82, 0, 1)
             yOffset = yOffset - 22
 
-            -- Build available expansions for this profession using KPReference
+            -- Build list of ALL expansions from saved data (no knowledge filter)
             local availableExpIDs = {}
             local expNameByID = {}
-            local profIDFromData
             if profData and profData.expansions then
                 for expName, expData in pairs(profData.expansions) do
                     if expData.id then
                         expNameByID[expData.id] = expName
-                        if not profIDFromData then
-                            profIDFromData = expData.baseSkillLineID or expData.skillLineID
-                        end
-                    end
-                end
-            end
-
-            if profIDFromData and KPReference and KPReference[profIDFromData] then
-                for expIndex, _ in pairs(KPReference[profIDFromData]) do
-                    if type(expIndex) == "number" and expIndex >= 10 then
-                        table.insert(availableExpIDs, expIndex)
+                        table.insert(availableExpIDs, expData.id)
                     end
                 end
                 table.sort(availableExpIDs)
@@ -199,19 +189,10 @@ function CharacterDetailWindow:RefreshDisplay()
             self.expansionSelection[charKey] = self.expansionSelection[charKey] or {}
             local selectedExpID = self.expansionSelection[charKey][profName]
             if not selectedExpID or (availableExpIDs[1] and not tContains(availableExpIDs, selectedExpID)) then
-                -- default to highest available ID if list exists; else highest in character data
                 if #availableExpIDs > 0 then
-                    selectedExpID = availableExpIDs[#availableExpIDs]
-                else
-                    local highestID = 0
-                    if profData and profData.expansions then
-                        for _, expData in pairs(profData.expansions) do
-                            if expData.id and expData.id > highestID then highestID = expData.id end
-                        end
-                    end
-                    selectedExpID = highestID
+                    selectedExpID = availableExpIDs[#availableExpIDs] -- default highest id
+                    self.expansionSelection[charKey][profName] = selectedExpID
                 end
-                self.expansionSelection[charKey][profName] = selectedExpID
             end
 
             -- Resolve selected expansion name and data
@@ -233,7 +214,7 @@ function CharacterDetailWindow:RefreshDisplay()
             end
 
             -- Centered expansion title with left/right arrows
-            local centerX = math.floor(columnWidth/2)
+            local centerX = xOffset + math.floor(columnWidth/2)
             local expTitle = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
             expTitle:SetPoint("TOP", self.Content, "TOP", centerX, yOffset)
             expTitle:SetText(selectedExpName or "")
@@ -274,26 +255,8 @@ function CharacterDetailWindow:RefreshDisplay()
 
             yOffset = yOffset - 24
             
-            if profData.expansions then
-                -- Find only the most current expansion (highest ID)
-                local mostCurrentExp = nil
-                local highestExpID = 0
-                
-                for expName, expData in pairs(profData.expansions) do
-                    if expData.id and expData.id >= 10 then -- Only knowledge system expansions
-                        if expData.id > highestExpID then
-                            highestExpID = expData.id
-                            mostCurrentExp = {name = expName, data = expData}
-                        end
-                    end
-                end
-                
-                -- Display selected expansion
-                if selectedExpData and selectedExpName then
-                    yOffset = self:CreateExpansionSection(selectedExpName, selectedExpData, profName, yOffset, xOffset)
-                elseif mostCurrentExp then
-                    yOffset = self:CreateExpansionSection(mostCurrentExp.name, mostCurrentExp.data, profName, yOffset, xOffset)
-                end
+            if profData.expansions and selectedExpData and selectedExpName then
+                yOffset = self:CreateExpansionSection(selectedExpName, selectedExpData, profName, yOffset, xOffset)
             end
             
             -- Calculate height used by this profession
@@ -340,13 +303,15 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
     local profID = expData.baseSkillLineID or expData.skillLineID
     local expIndex = expData.id
     
-    -- Get icon references from KPReference table
+    local hasKnowledgeSystem = expData.id and expData.id >= KNOWLEDGE_SYSTEM_START
+
+    -- Get icon references from KPReference table (only meaningful for knowledge expansions)
     local treatiseIcon = "Interface\\Icons\\inv_misc_profession_book_enchanting"
     local craftingOrderIcon = "Interface\\Icons\\inv_crafting_orders"
     local treasuresIcon = "Interface\\Icons\\inv_misc_book_07"
     local gatherNodesIcon = "Interface\\Icons\\inv_magic_swirl_color2"
     
-    if profID and expIndex and KPReference and KPReference[profID] and KPReference[profID][expIndex] then
+    if hasKnowledgeSystem and profID and expIndex and KPReference and KPReference[profID] and KPReference[profID][expIndex] then
         local ref = KPReference[profID][expIndex]
         
         -- Get treatise icon
@@ -383,7 +348,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
     expHeader:SetTextColor(0.7, 0.7, 0.8, 1)
     yOffset = yOffset - 16
     
-    -- Skill level (condensed)
+    -- Skill level (always shown)
     local skillText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     skillText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
     skillText:SetText(string.format("Skill: %d/%d", 
@@ -391,7 +356,13 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
         expData.maxSkillLevel or 0))
     yOffset = yOffset - 14
     
-    -- Knowledge points (condensed)
+    -- For expansions without knowledge system, stop after skill
+    if not hasKnowledgeSystem then
+        yOffset = yOffset - 5
+        return yOffset
+    end
+
+    -- Knowledge points (condensed, knowledge expansions only)
     if expData.pointsUntilMaxKnowledge then
         local kpText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
         kpText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
@@ -403,8 +374,8 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
         yOffset = yOffset - 14
     end
     
-    -- Concentration (condensed, exclude for gathering)
-    if not isGathering and expData.concentration then
+    -- Concentration (condensed, exclude for gathering) only if knowledge system
+    if hasKnowledgeSystem and not isGathering and expData.concentration then
         local currentConc, maxConc = GetCurrentConcentration(expData)
         local concPct = (currentConc / maxConc) * 100
         local concentrationIcon = "Interface\\Icons\\ui_concentration"
@@ -448,28 +419,30 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
         return statusText
     end
     
-    -- Crafting Order
-    local isCraftingOrderAtlas = (craftingOrderIcon == "Interface\\Icons\\inv_crafting_orders")
-    if isCraftingOrderAtlas then
-        craftingOrderIcon = "|A:RecurringAvailableQuestIcon:14:14|a"
-    end
-    CreateStatusLine(craftingOrderIcon, "Order", weekly.craftingOrderQuest == true, isCraftingOrderAtlas)
-    
-    -- Treatise
-    CreateStatusLine(treatiseIcon, "Treatise", weekly.treatise == true, false)
-    
-    -- Treasures (exclude for gathering)
-    if not isGathering then
-        CreateStatusLine(treasuresIcon, "Treasures", weekly.treasuresAllComplete == true, false)
-    end
-    
-    -- Gather Nodes
-    if isGathering or isEnchanting then
-        CreateStatusLine(gatherNodesIcon, "Nodes", weekly.gatherNodesAllComplete == true, false)
+    if hasKnowledgeSystem then
+        -- Crafting Order
+        local isCraftingOrderAtlas = (craftingOrderIcon == "Interface\\Icons\\inv_crafting_orders")
+        if isCraftingOrderAtlas then
+            craftingOrderIcon = "|A:RecurringAvailableQuestIcon:14:14|a"
+        end
+        CreateStatusLine(craftingOrderIcon, "Order", weekly.craftingOrderQuest == true, isCraftingOrderAtlas)
+        
+        -- Treatise
+        CreateStatusLine(treatiseIcon, "Treatise", weekly.treatise == true, false)
+        
+        -- Treasures (exclude for gathering)
+        if not isGathering then
+            CreateStatusLine(treasuresIcon, "Treasures", weekly.treasuresAllComplete == true, false)
+        end
+        
+        -- Gather Nodes (gathering or enchanting special case)
+        if isGathering or isEnchanting then
+            CreateStatusLine(gatherNodesIcon, "Nodes", weekly.gatherNodesAllComplete == true, false)
+        end
     end
     
     -- One-time treasures section (condensed)
-    if expData.missingOneTimeTreasures and #expData.missingOneTimeTreasures > 0 then
+    if hasKnowledgeSystem and expData.missingOneTimeTreasures and #expData.missingOneTimeTreasures > 0 then
         yOffset = yOffset - 3
         local treasureText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
         treasureText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
@@ -486,7 +459,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
             self:ShowMissingTreasures(profName, expName, expData)
         end)
         yOffset = yOffset - 25
-    elseif expData.oneTimeCollectedAll then
+    elseif hasKnowledgeSystem and expData.oneTimeCollectedAll then
         yOffset = yOffset - 3
         local completeText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
         completeText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
