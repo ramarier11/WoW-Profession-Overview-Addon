@@ -441,14 +441,28 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
         -- Treatise
         CreateStatusLine(treatiseIcon, "Treatise", weekly.treatise == true, false)
         
-        -- Treasures (exclude for gathering)
-        if not isGathering then
-            CreateStatusLine(treasuresIcon, "Treasures", weekly.treasuresAllComplete == true, false)
+        -- Detailed Treasures list (exclude for gathering professions)
+        if not isGathering and ref and ref.weekly and type(ref.weekly.treasures) == "table" then
+            for i, tDef in ipairs(ref.weekly.treasures) do
+                local completed = weekly.treasures and weekly.treasures[i] and weekly.treasures[i].completed
+                local icon = tDef.icon or treasuresIcon
+                local label = tDef.name or tDef.label or ("Treasure " .. i)
+                CreateStatusLine(icon, label, completed == true, false)
+            end
         end
-        
-        -- Gather Nodes (gathering or enchanting special case)
-        if isGathering or isEnchanting then
-            CreateStatusLine(gatherNodesIcon, "Nodes", weekly.gatherNodesAllComplete == true, false)
+
+        -- Detailed Gather Nodes list (gathering or enchanting special case)
+        if (isGathering or isEnchanting) and weekly.gatherNodes and ref and ref.weekly and type(ref.weekly.gatherNodes) == "table" then
+            for i, nodeDef in ipairs(ref.weekly.gatherNodes) do
+                local nodeStatus = weekly.gatherNodes[i]
+                local icon = nodeDef.icon or gatherNodesIcon
+                local name = nodeStatus and nodeStatus.name or (nodeDef.name or ("Node " .. i))
+                local count = nodeStatus and nodeStatus.count or 0
+                local total = nodeStatus and nodeStatus.total or 0
+                local label = total > 0 and string.format("%s (%d/%d)", name, count, total) or name
+                local completed = nodeStatus and nodeStatus.completed == true
+                CreateStatusLine(icon, label, completed, false)
+            end
         end
     end
     

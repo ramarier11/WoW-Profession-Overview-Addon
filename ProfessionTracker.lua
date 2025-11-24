@@ -1393,6 +1393,7 @@ local function RecalculateWeeklyKnowledgePoints()
                 wk.gatherNodes[i] = {
                     name = entry.name or ("Node " .. i),
                     count = completedCount,
+                    total = totalCount,
                     completed = (completedCount == totalCount)
                 }
 
