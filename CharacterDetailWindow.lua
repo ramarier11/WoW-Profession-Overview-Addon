@@ -142,8 +142,15 @@ function CharacterDetailWindow:RefreshDisplay()
     -- Build detailed profession display (2-column layout)
     local yOffset = -10
     local leftColumnX = 10
-    local rightColumnX = 200
-    local columnWidth = 180
+    -- Derive usable content width (fallback to frame width minus padding if not yet calculated)
+    local contentWidth = self.Content:GetWidth()
+    if not contentWidth or contentWidth == 0 then
+        contentWidth = (self:GetWidth() or 380) - 50 -- approximate interior width
+    end
+    -- Compute column width to keep two columns inside content frame
+    local columnWidth = math.floor((contentWidth - leftColumnX - 10) / 2)
+    if columnWidth < 140 then columnWidth = 140 end -- enforce a reasonable minimum
+    local rightColumnX = leftColumnX + columnWidth + 10
     local currentColumn = 0
     local maxHeightInRow = 0
     local columnStartY = yOffset
@@ -244,14 +251,16 @@ function CharacterDetailWindow:RefreshDisplay()
 
             leftBtn:SetScript("OnClick", function()
                 if #availableExpIDs == 0 then return end
-                currentIdx = math.max(1, currentIdx - 1)
+                currentIdx = currentIdx - 1
+                if currentIdx < 1 then currentIdx = #availableExpIDs end -- loop to end
                 self.expansionSelection[charKey][profName] = availableExpIDs[currentIdx]
                 self:RefreshDisplay()
             end)
 
             rightBtn:SetScript("OnClick", function()
                 if #availableExpIDs == 0 then return end
-                currentIdx = math.min(#availableExpIDs, currentIdx + 1)
+                currentIdx = currentIdx + 1
+                if currentIdx > #availableExpIDs then currentIdx = 1 end -- loop to start
                 self.expansionSelection[charKey][profName] = availableExpIDs[currentIdx]
                 self:RefreshDisplay()
             end)
@@ -344,12 +353,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
         end
     end
     
-    -- Expansion name (smaller)
-    local expHeader = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    expHeader:SetPoint("TOPLEFT", xOffset, yOffset)
-    expHeader:SetText(expName)
-    expHeader:SetTextColor(0.7, 0.7, 0.8, 1)
-    yOffset = yOffset - 16
+    -- (Expansion header removed per request; start directly with skill line)
     
     -- Skill level (always shown)
     local skillText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
