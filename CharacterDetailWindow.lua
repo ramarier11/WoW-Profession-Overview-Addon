@@ -298,11 +298,10 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
         return statusText
     end
     
-    -- Treatise
-    CreateStatusLine("Treatise", weekly.treatise == true)
+    
     
     -- Crafting Order
-    CreateStatusLine("Crafting Order", weekly.craftingOrderQuest == true)
+    CreateStatusLine("Profession Quest", weekly.craftingOrderQuest == true)
     
     -- Treasures (detailed breakdown, exclude for gathering)
     if not isGathering then
@@ -331,6 +330,8 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
             CreateStatusLine("Gather Nodes", weekly.gatherNodesAllComplete == true)
         end
     end
+    -- Treatise
+    CreateStatusLine("Treatise", weekly.treatise == true)
     
     -- One-time treasures section
     if expData.missingOneTimeTreasures and #expData.missingOneTimeTreasures > 0 then
