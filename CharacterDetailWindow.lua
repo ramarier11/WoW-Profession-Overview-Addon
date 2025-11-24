@@ -37,7 +37,7 @@ CharacterDetailWindow.CloseButton:SetPoint("TOPRIGHT", -5, -5)
 
 -- Static content container (non-scrollable)
 CharacterDetailWindow.Content = CreateFrame("Frame", nil, CharacterDetailWindow)
-CharacterDetailWindow.Content:SetPoint("TOPLEFT", 20, -60)
+CharacterDetailWindow.Content:SetPoint("TOPLEFT", 20, -30)
 CharacterDetailWindow.Content:SetPoint("BOTTOMRIGHT", -30, 20)
 CharacterDetailWindow.Content:SetSize(540, 1)
 
