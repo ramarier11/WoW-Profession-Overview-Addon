@@ -4,7 +4,7 @@
 
 -- Create the detail window frame
 local CharacterDetailWindow = CreateFrame("Frame", "ProfessionTrackerCharacterDetail", UIParent, "BackdropTemplate")
-CharacterDetailWindow:SetSize(700, 500)
+CharacterDetailWindow:SetSize(600, 450)
 CharacterDetailWindow:SetPoint("CENTER")
 CharacterDetailWindow:Hide()
 CharacterDetailWindow:SetFrameStrata("DIALOG")
@@ -41,7 +41,7 @@ CharacterDetailWindow.ScrollFrame:SetPoint("TOPLEFT", 20, -60)
 CharacterDetailWindow.ScrollFrame:SetPoint("BOTTOMRIGHT", -30, 20)
 
 CharacterDetailWindow.ScrollChild = CreateFrame("Frame", nil, CharacterDetailWindow.ScrollFrame)
-CharacterDetailWindow.ScrollChild:SetSize(640, 1)
+CharacterDetailWindow.ScrollChild:SetSize(540, 1)
 CharacterDetailWindow.ScrollFrame:SetScrollChild(CharacterDetailWindow.ScrollChild)
 
 -- Store reference to current character
@@ -141,7 +141,7 @@ function CharacterDetailWindow:RefreshDisplay()
     -- Build detailed profession display (2-column layout)
     local yOffset = -10
     local leftColumnX = 10
-    local rightColumnX = 340
+    local rightColumnX = 290
     local currentColumn = 0
     local maxHeightInRow = 0
     local columnStartY = yOffset
@@ -228,42 +228,81 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
     
     xOffset = xOffset or 20 -- Default indent if not specified
     
-    -- Expansion name
-    local expHeader = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    expHeader:SetPoint("TOPLEFT", xOffset, yOffset)
-    expHeader:SetText(expName)
-    expHeader:SetTextColor(0.8, 0.8, 1, 1)
-    yOffset = yOffset - 20
+    -- Get profession ID and expansion index for icon lookup
+    local profID = expData.baseSkillLineID or expData.skillLineID
+    local expIndex = expData.id
     
-    -- Skill level
-    local skillText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    skillText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
-    skillText:SetText(string.format("Skill: %d / %d", 
-        expData.skillLevel or 0,
-        expData.maxSkillLevel or 0))
-    yOffset = yOffset - 18
+    -- Get icon references from KPReference table
+    local treatiseIcon = "Interface\\Icons\\inv_misc_profession_book_enchanting"
+    local craftingOrderIcon = "Interface\\Icons\\inv_crafting_orders"
+    local treasuresIcon = "Interface\\Icons\\inv_misc_book_07"
+    local gatherNodesIcon = "Interface\\Icons\\inv_magic_swirl_color2"
     
-    -- Knowledge points
-    if expData.pointsUntilMaxKnowledge then
-        local kpText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        kpText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
-        local kpRemaining = math.max(0, expData.pointsUntilMaxKnowledge) -- Filter negative values
-        kpText:SetText(string.format("Knowledge Remaining: %d", kpRemaining))
-        if kpRemaining >= 100 then
-            kpText:SetTextColor(0, 1, 0, 1)
+    if profID and expIndex and KPReference and KPReference[profID] and KPReference[profID][expIndex] then
+        local ref = KPReference[profID][expIndex]
+        
+        -- Get treatise icon
+        if ref.weekly and ref.weekly.treatise and ref.weekly.treatise.icon then
+            treatiseIcon = ref.weekly.treatise.icon
         end
-        yOffset = yOffset - 18
+        
+        -- Get crafting order icon
+        if ref.weekly and ref.weekly.craftingOrder and ref.weekly.craftingOrder.icon then
+            craftingOrderIcon = ref.weekly.craftingOrder.icon
+        end
+        
+        -- Get treasures icon (use first treasure's icon if available)
+        if ref.weekly and ref.weekly.treasures then
+            if type(ref.weekly.treasures) == "table" and ref.weekly.treasures[1] and ref.weekly.treasures[1].icon then
+                treasuresIcon = ref.weekly.treasures[1].icon
+            elseif ref.weekly.treasures.icon then
+                treasuresIcon = ref.weekly.treasures.icon
+            end
+        end
+        
+        -- Get gather nodes icon (use first node's icon if available)
+        if ref.weekly and ref.weekly.gatherNodes then
+            if type(ref.weekly.gatherNodes) == "table" and ref.weekly.gatherNodes[1] and ref.weekly.gatherNodes[1].icon then
+                gatherNodesIcon = ref.weekly.gatherNodes[1].icon
+            end
+        end
     end
     
-    -- Concentration (exclude for gathering)
+    -- Expansion name (smaller)
+    local expHeader = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    expHeader:SetPoint("TOPLEFT", xOffset, yOffset)
+    expHeader:SetText(expName)
+    expHeader:SetTextColor(0.7, 0.7, 0.8, 1)
+    yOffset = yOffset - 16
+    
+    -- Skill level (condensed)
+    local skillText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    skillText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
+    skillText:SetText(string.format("Skill: %d/%d", 
+        expData.skillLevel or 0,
+        expData.maxSkillLevel or 0))
+    yOffset = yOffset - 14
+    
+    -- Knowledge points (condensed)
+    if expData.pointsUntilMaxKnowledge then
+        local kpText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        kpText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
+        local kpRemaining = math.max(0, expData.pointsUntilMaxKnowledge)
+        kpText:SetText(string.format("KP: %d", kpRemaining))
+        if kpRemaining == 0 then
+            kpText:SetTextColor(0, 1, 0, 1)
+        end
+        yOffset = yOffset - 14
+    end
+    
+    -- Concentration (condensed, exclude for gathering)
     if not isGathering and expData.concentration then
         local currentConc, maxConc = GetCurrentConcentration(expData)
         local concPct = (currentConc / maxConc) * 100
         
-        local concText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+        local concText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
         concText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
-        concText:SetText(string.format("Concentration: %d / %d (%.0f%%)", 
-            currentConc, maxConc, concPct))
+        concText:SetText(string.format("Conc: %d/%d", currentConc, maxConc))
         
         if concPct >= 75 then
             concText:SetTextColor(0, 1, 0, 1)
@@ -274,94 +313,81 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
         else
             concText:SetTextColor(1, 0, 0, 1)
         end
-        yOffset = yOffset - 18
+        yOffset = yOffset - 14
     end
     
-    -- Weekly activities header
-    local weeklyHeader = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    weeklyHeader:SetPoint("TOPLEFT", xOffset + 10, yOffset)
-    weeklyHeader:SetText("Weekly Activities:")
-    yOffset = yOffset - 20
+    yOffset = yOffset - 3
     
-    -- Helper for status display
-    local function CreateStatusLine(label, completed, indent)
-        indent = indent or (xOffset + 20)
-        local statusText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        statusText:SetPoint("TOPLEFT", indent, yOffset)
+    -- Helper for status display with icons
+    local function CreateStatusLine(icon, label, completed, isAtlas)
+        local statusText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        statusText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
         
-        local icon = completed 
-            and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t" 
-            or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
+        local statusIcon = completed 
+            and "|TInterface\\RaidFrame\\ReadyCheck-Ready:12:12|t" 
+            or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:12:12|t"
         
-        statusText:SetText(string.format("%s %s", icon, label))
-        yOffset = yOffset - 18
+        -- Handle atlas textures differently from regular textures
+        local iconDisplay
+        if isAtlas then
+            iconDisplay = icon  -- Already formatted with |A:...|a
+        else
+            iconDisplay = string.format("|T%s:14:14|t", icon)
+        end
+        
+        statusText:SetText(string.format("%s %s", iconDisplay, statusIcon))
+        yOffset = yOffset - 16
         return statusText
     end
     
-    
-    
     -- Crafting Order
-    CreateStatusLine("Profession Quest", weekly.craftingOrderQuest == true)
-    
-    -- Treasures (detailed breakdown, exclude for gathering)
-    if not isGathering then
-        if weekly.treasures and type(weekly.treasures) == "table" then
-            CreateStatusLine("Treasures:", weekly.treasuresAllComplete == true)
-            for i, treasure in ipairs(weekly.treasures) do
-                CreateStatusLine(treasure.label or ("Treasure " .. i), treasure.completed, xOffset + 30)
-            end
-        else
-            CreateStatusLine("Treasures", weekly.treasuresAllComplete == true)
-        end
+    local isCraftingOrderAtlas = (craftingOrderIcon == "Interface\\Icons\\inv_crafting_orders")
+    if isCraftingOrderAtlas then
+        craftingOrderIcon = "|A:RecurringAvailableQuestIcon:14:14|a"
     end
+    CreateStatusLine(craftingOrderIcon, "Order", weekly.craftingOrderQuest == true, isCraftingOrderAtlas)
     
-    -- Gather Nodes (detailed breakdown)
-    if isGathering or isEnchanting then
-        if weekly.gatherNodes and type(weekly.gatherNodes) == "table" then
-            CreateStatusLine("Gather Nodes:", weekly.gatherNodesAllComplete == true)
-            for i, node in ipairs(weekly.gatherNodes) do
-                CreateStatusLine(
-                    string.format("%s (%d)", node.name or ("Node " .. i), node.count or 0),
-                    node.completed,
-                    xOffset + 30
-                )
-            end
-        else
-            CreateStatusLine("Gather Nodes", weekly.gatherNodesAllComplete == true)
-        end
-    end
     -- Treatise
-    CreateStatusLine("Treatise", weekly.treatise == true)
+    CreateStatusLine(treatiseIcon, "Treatise", weekly.treatise == true, false)
     
-    -- One-time treasures section
+    -- Treasures (exclude for gathering)
+    if not isGathering then
+        CreateStatusLine(treasuresIcon, "Treasures", weekly.treasuresAllComplete == true, false)
+    end
+    
+    -- Gather Nodes
+    if isGathering or isEnchanting then
+        CreateStatusLine(gatherNodesIcon, "Nodes", weekly.gatherNodesAllComplete == true, false)
+    end
+    
+    -- One-time treasures section (condensed)
     if expData.missingOneTimeTreasures and #expData.missingOneTimeTreasures > 0 then
-        yOffset = yOffset - 5
-        local treasureHeader = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        treasureHeader:SetPoint("TOPLEFT", xOffset + 10, yOffset)
-        treasureHeader:SetText(string.format("Missing One-Time Treasures: %d", 
+        yOffset = yOffset - 3
+        local treasureText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        treasureText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
+        treasureText:SetText(string.format("|cffff8800Missing: %d|r", 
             #expData.missingOneTimeTreasures))
-        treasureHeader:SetTextColor(1, 0.5, 0, 1)
-        yOffset = yOffset - 20
+        yOffset = yOffset - 16
         
-        -- Create clickable button to show treasure locations
+        -- Create smaller button
         local showTreasuresBtn = CreateFrame("Button", nil, self.ScrollChild, "UIPanelButtonTemplate")
-        showTreasuresBtn:SetSize(150, 25)
-        showTreasuresBtn:SetPoint("TOPLEFT", xOffset + 20, yOffset)
-        showTreasuresBtn:SetText("Show Locations")
+        showTreasuresBtn:SetSize(100, 20)
+        showTreasuresBtn:SetPoint("TOPLEFT", xOffset + 10, yOffset)
+        showTreasuresBtn:SetText("Show")
         showTreasuresBtn:SetScript("OnClick", function()
             self:ShowMissingTreasures(profName, expName, expData)
         end)
-        yOffset = yOffset - 30
+        yOffset = yOffset - 25
     elseif expData.oneTimeCollectedAll then
-        yOffset = yOffset - 5
-        local completeText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+        yOffset = yOffset - 3
+        local completeText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
         completeText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
-        completeText:SetText("|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t All One-Time Treasures Collected")
+        completeText:SetText("|TInterface\\RaidFrame\\ReadyCheck-Ready:12:12|t All Collected")
         completeText:SetTextColor(0, 1, 0, 1)
-        yOffset = yOffset - 20
+        yOffset = yOffset - 16
     end
     
-    yOffset = yOffset - 10
+    yOffset = yOffset - 5
     return yOffset
 end
 
