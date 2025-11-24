@@ -171,9 +171,11 @@ function CharacterDetailWindow:RefreshDisplay()
             local xOffset = (currentColumn == 0) and leftColumnX or rightColumnX
             local startY = yOffset
             
-            -- Create profession header
+            -- Create profession header (centered within column)
             local profHeader = self.Content:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-            profHeader:SetPoint("TOPLEFT", xOffset, yOffset)
+            profHeader:SetPoint("TOPLEFT", self.Content, "TOPLEFT", xOffset, yOffset)
+            profHeader:SetPoint("TOPRIGHT", self.Content, "TOPLEFT", xOffset + columnWidth, yOffset)
+            profHeader:SetJustifyH("CENTER")
             profHeader:SetText(profName)
             profHeader:SetTextColor(1, 0.82, 0, 1)
             yOffset = yOffset - 20
