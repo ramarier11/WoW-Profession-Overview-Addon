@@ -49,7 +49,27 @@ local KNOWLEDGE_SYSTEM_START = 10
 local function TruncateText(text, maxLen)
     if not text then return "" end
     if #text <= maxLen then return text end
-    return string.sub(text, 1, maxLen - 1) .. "."
+
+    -- Preserve trailing progress pattern like "(0/5)" if present
+    local prefix, suffix = text:match("^(.-)%s(%(%d+/%d+%))$")
+    if suffix then
+        local suffixTotalLen = #suffix + 1 -- space + suffix
+        -- If suffix itself would almost fill available space, fallback simple truncation
+        if suffixTotalLen >= maxLen - 1 then
+            return text:sub(1, maxLen - 1) .. "."
+        end
+        local allowedPrefixLen = maxLen - suffixTotalLen
+        if allowedPrefixLen < 2 then -- need room for at least one char + dot
+            return text:sub(1, maxLen - 1) .. "."
+        end
+        local truncatedPrefix = prefix:sub(1, allowedPrefixLen - 1) -- leave space for dot
+        if #truncatedPrefix < #prefix then
+            truncatedPrefix = truncatedPrefix .. "."
+        end
+        return truncatedPrefix .. " " .. suffix
+    end
+
+    return text:sub(1, maxLen - 1) .. "."
 end
 
 -- Store reference to current character
