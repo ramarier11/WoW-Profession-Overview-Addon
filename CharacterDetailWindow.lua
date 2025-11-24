@@ -288,7 +288,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
         local kpText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
         kpText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
         local kpRemaining = math.max(0, expData.pointsUntilMaxKnowledge)
-        kpText:SetText(string.format("Knowledge Remaining: %d", kpRemaining))
+        kpText:SetText(string.format("KP: %d", kpRemaining))
         if kpRemaining == 0 then
             kpText:SetTextColor(0, 1, 0, 1)
         end
@@ -302,7 +302,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
         
         local concText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
         concText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
-        concText:SetText(string.format("Concentration: %d/%d", currentConc, maxConc))
+        concText:SetText(string.format("Conc: %d/%d", currentConc, maxConc))
         
         if concPct >= 75 then
             concText:SetTextColor(0, 1, 0, 1)
@@ -335,7 +335,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
             iconDisplay = string.format("|T%s:14:14|t", icon)
         end
         
-        statusText:SetText(string.format("%s %s", iconDisplay, statusIcon))
+        statusText:SetText(string.format("%s %s %s", iconDisplay, label, statusIcon))
         yOffset = yOffset - 16
         return statusText
     end
