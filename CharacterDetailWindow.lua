@@ -4,7 +4,7 @@
 
 -- Create the detail window frame
 local CharacterDetailWindow = CreateFrame("Frame", "ProfessionTrackerCharacterDetail", UIParent, "BackdropTemplate")
-CharacterDetailWindow:SetSize(400, 260)
+CharacterDetailWindow:SetSize(400, 265)
 CharacterDetailWindow:SetPoint("CENTER")
 CharacterDetailWindow:Hide()
 CharacterDetailWindow:SetFrameStrata("DIALOG")
@@ -37,7 +37,7 @@ CharacterDetailWindow.CloseButton:SetPoint("TOPRIGHT", -5, -5)
 
 -- Static content container (non-scrollable)
 CharacterDetailWindow.Content = CreateFrame("Frame", nil, CharacterDetailWindow)
-CharacterDetailWindow.Content:SetPoint("TOPLEFT", 20, -40)
+CharacterDetailWindow.Content:SetPoint("TOPLEFT", 20, -35)
 CharacterDetailWindow.Content:SetPoint("BOTTOMRIGHT", -30, 20)
 CharacterDetailWindow.Content:SetSize(540, 1)
 
