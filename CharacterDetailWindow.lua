@@ -38,7 +38,7 @@ CharacterDetailWindow.CloseButton:SetPoint("TOPRIGHT", -5, -5)
 -- Static content container (non-scrollable)
 CharacterDetailWindow.Content = CreateFrame("Frame", nil, CharacterDetailWindow)
 CharacterDetailWindow.Content:SetPoint("TOPLEFT", 20, -35)
-CharacterDetailWindow.Content:SetPoint("BOTTOMRIGHT", -30, 20)
+CharacterDetailWindow.Content:SetPoint("BOTTOMRIGHT", -24, 20) -- reduced right padding
 CharacterDetailWindow.Content:SetSize(540, 1)
 
 -- Per-character, per-profession expansion selection state
@@ -147,10 +147,11 @@ function CharacterDetailWindow:RefreshDisplay()
     if not contentWidth or contentWidth == 0 then
         contentWidth = (self:GetWidth() or 380) - 50 -- approximate interior width
     end
-    -- Compute column width to keep two columns inside content frame
-    local columnWidth = math.floor((contentWidth - leftColumnX - 10) / 2)
+    -- Compute column width with reduced inter-column spacing
+    local interColumnSpacing = 6
+    local columnWidth = math.floor((contentWidth - leftColumnX - interColumnSpacing) / 2)
     if columnWidth < 140 then columnWidth = 140 end -- enforce a reasonable minimum
-    local rightColumnX = leftColumnX + columnWidth + 10
+    local rightColumnX = leftColumnX + columnWidth + interColumnSpacing
     local currentColumn = 0
     local maxHeightInRow = 0
     local columnStartY = yOffset
