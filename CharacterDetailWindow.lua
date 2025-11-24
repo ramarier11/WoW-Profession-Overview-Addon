@@ -175,7 +175,6 @@ function CharacterDetailWindow:RefreshDisplay()
             local profHeader = self.Content:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
             profHeader:SetPoint("TOPLEFT", xOffset, yOffset)
             profHeader:SetText(profName)
-            profHeader:SetJustifyH("CENTER")
             profHeader:SetTextColor(1, 0.82, 0, 1)
             yOffset = yOffset - 20
 
