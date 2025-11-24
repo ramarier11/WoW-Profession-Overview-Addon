@@ -247,8 +247,9 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
     if expData.pointsUntilMaxKnowledge then
         local kpText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
         kpText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
-        kpText:SetText(string.format("Knowledge Remaining: %d", expData.pointsUntilMaxKnowledge))
-        if expData.pointsUntilMaxKnowledge == 0 then
+        local kpRemaining = math.max(0, expData.pointsUntilMaxKnowledge) -- Filter negative values
+        kpText:SetText(string.format("Knowledge Remaining: %d", kpRemaining))
+        if kpRemaining >= 100 then
             kpText:SetTextColor(0, 1, 0, 1)
         end
         yOffset = yOffset - 18
