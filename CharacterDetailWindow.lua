@@ -326,9 +326,10 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
     local craftingOrderIcon = "Interface\\Icons\\inv_crafting_orders"
     local treasuresIcon = "Interface\\Icons\\inv_misc_book_07"
     local gatherNodesIcon = "Interface\\Icons\\inv_magic_swirl_color2"
+    local ref -- make ref visible to later treasure/node loops
     
     if hasKnowledgeSystem and profID and expIndex and KPReference and KPReference[profID] and KPReference[profID][expIndex] then
-        local ref = KPReference[profID][expIndex]
+        ref = KPReference[profID][expIndex]
         
         -- Get treatise icon
         if ref.weekly and ref.weekly.treatise and ref.weekly.treatise.icon then
@@ -449,6 +450,9 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
                 local label = tDef.name or tDef.label or ("Treasure " .. i)
                 CreateStatusLine(icon, label, completed == true, false)
             end
+        elseif not isGathering and ref and ref.weekly and ref.weekly.treasures == nil then
+            -- No treasures defined in reference
+            -- (Optional: could show a placeholder; keep silent to avoid clutter)
         end
 
         -- Detailed Gather Nodes list (gathering or enchanting special case)
