@@ -35,14 +35,11 @@ CharacterDetailWindow.Title:SetPoint("TOP", 0, -20)
 CharacterDetailWindow.CloseButton = CreateFrame("Button", nil, CharacterDetailWindow, "UIPanelCloseButton")
 CharacterDetailWindow.CloseButton:SetPoint("TOPRIGHT", -5, -5)
 
--- Scroll Frame
-CharacterDetailWindow.ScrollFrame = CreateFrame("ScrollFrame", nil, CharacterDetailWindow, "UIPanelScrollFrameTemplate")
-CharacterDetailWindow.ScrollFrame:SetPoint("TOPLEFT", 20, -60)
-CharacterDetailWindow.ScrollFrame:SetPoint("BOTTOMRIGHT", -30, 20)
-
-CharacterDetailWindow.ScrollChild = CreateFrame("Frame", nil, CharacterDetailWindow.ScrollFrame)
-CharacterDetailWindow.ScrollChild:SetSize(540, 1)
-CharacterDetailWindow.ScrollFrame:SetScrollChild(CharacterDetailWindow.ScrollChild)
+-- Static content container (non-scrollable)
+CharacterDetailWindow.Content = CreateFrame("Frame", nil, CharacterDetailWindow)
+CharacterDetailWindow.Content:SetPoint("TOPLEFT", 20, -60)
+CharacterDetailWindow.Content:SetPoint("BOTTOMRIGHT", -30, 20)
+CharacterDetailWindow.Content:SetSize(540, 1)
 
 -- Store reference to current character
 CharacterDetailWindow.currentCharKey = nil
@@ -121,7 +118,7 @@ function CharacterDetailWindow:RefreshDisplay()
         charData.realm or "Unknown"))
     
     -- Clear existing content (frames and font strings)
-    local children = {self.ScrollChild:GetChildren()}
+    local children = {self.Content:GetChildren()}
     for _, child in ipairs(children) do
         child:Hide()
         child:ClearAllPoints()
@@ -129,7 +126,7 @@ function CharacterDetailWindow:RefreshDisplay()
     end
     
     -- Clear font strings
-    local regions = {self.ScrollChild:GetRegions()}
+    local regions = {self.Content:GetRegions()}
     for _, region in ipairs(regions) do
         if region:GetObjectType() == "FontString" then
             region:Hide()
@@ -163,7 +160,7 @@ function CharacterDetailWindow:RefreshDisplay()
             local startY = yOffset
             
             -- Create profession header
-            local profHeader = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+            local profHeader = self.Content:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
             profHeader:SetPoint("TOPLEFT", xOffset, yOffset)
             profHeader:SetText(profName)
             profHeader:SetTextColor(1, 0.82, 0, 1)
@@ -211,7 +208,8 @@ function CharacterDetailWindow:RefreshDisplay()
     end
     
     -- Update scroll child height
-    self.ScrollChild:SetHeight(math.abs(yOffset) + 50)
+    -- No scroll height adjustment needed; content is fixed
+    self.Content:SetHeight(math.abs(yOffset) + 50)
 end
 
 -- Refresh method to update with latest data
@@ -269,14 +267,14 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
     end
     
     -- Expansion name (smaller)
-    local expHeader = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    local expHeader = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     expHeader:SetPoint("TOPLEFT", xOffset, yOffset)
     expHeader:SetText(expName)
     expHeader:SetTextColor(0.7, 0.7, 0.8, 1)
     yOffset = yOffset - 16
     
     -- Skill level (condensed)
-    local skillText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    local skillText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     skillText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
     skillText:SetText(string.format("Skill: %d/%d", 
         expData.skillLevel or 0,
@@ -285,7 +283,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
     
     -- Knowledge points (condensed)
     if expData.pointsUntilMaxKnowledge then
-        local kpText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        local kpText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
         kpText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
         local kpRemaining = math.max(0, expData.pointsUntilMaxKnowledge)
         kpText:SetText(string.format("KP: %d", kpRemaining))
@@ -300,7 +298,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
         local currentConc, maxConc = GetCurrentConcentration(expData)
         local concPct = (currentConc / maxConc) * 100
         
-        local concText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        local concText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
         concText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
         concText:SetText(string.format("Conc: %d/%d", currentConc, maxConc))
         
@@ -320,7 +318,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
     
     -- Helper for status display with icons
     local function CreateStatusLine(icon, label, completed, isAtlas)
-        local statusText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        local statusText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
         statusText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
         
         local statusIcon = completed 
@@ -363,14 +361,14 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
     -- One-time treasures section (condensed)
     if expData.missingOneTimeTreasures and #expData.missingOneTimeTreasures > 0 then
         yOffset = yOffset - 3
-        local treasureText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        local treasureText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
         treasureText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
         treasureText:SetText(string.format("|cffff8800Missing: %d|r", 
             #expData.missingOneTimeTreasures))
         yOffset = yOffset - 16
         
         -- Create smaller button
-        local showTreasuresBtn = CreateFrame("Button", nil, self.ScrollChild, "UIPanelButtonTemplate")
+        local showTreasuresBtn = CreateFrame("Button", nil, self.Content, "UIPanelButtonTemplate")
         showTreasuresBtn:SetSize(100, 20)
         showTreasuresBtn:SetPoint("TOPLEFT", xOffset + 10, yOffset)
         showTreasuresBtn:SetText("Show")
@@ -380,7 +378,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
         yOffset = yOffset - 25
     elseif expData.oneTimeCollectedAll then
         yOffset = yOffset - 3
-        local completeText = self.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        local completeText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
         completeText:SetPoint("TOPLEFT", xOffset + 10, yOffset)
         completeText:SetText("|TInterface\\RaidFrame\\ReadyCheck-Ready:12:12|t All Collected")
         completeText:SetTextColor(0, 1, 0, 1)
