@@ -213,19 +213,22 @@ function CharacterDetailWindow:RefreshDisplay()
                 end
             end
 
-            -- Centered expansion title with left/right arrows
-            local centerX = xOffset + math.floor(columnWidth/2)
-            local expTitle = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-            expTitle:SetPoint("TOP", self.Content, "TOP", centerX, yOffset)
+            -- Column container to properly center expansion title within its column
+            local columnFrame = CreateFrame("Frame", nil, self.Content)
+            columnFrame:SetSize(columnWidth, 20)
+            columnFrame:SetPoint("TOPLEFT", self.Content, "TOPLEFT", xOffset, yOffset)
+
+            local expTitle = columnFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+            expTitle:SetPoint("TOP", columnFrame, "TOP", 0, 0)
             expTitle:SetText(selectedExpName or "")
             expTitle:SetTextColor(0.8, 0.8, 0.9, 1)
 
-            local leftBtn = CreateFrame("Button", nil, self.Content, "UIPanelButtonTemplate")
+            local leftBtn = CreateFrame("Button", nil, columnFrame, "UIPanelButtonTemplate")
             leftBtn:SetSize(18, 18)
             leftBtn:SetText("<")
             leftBtn:SetPoint("RIGHT", expTitle, "LEFT", -6, 0)
 
-            local rightBtn = CreateFrame("Button", nil, self.Content, "UIPanelButtonTemplate")
+            local rightBtn = CreateFrame("Button", nil, columnFrame, "UIPanelButtonTemplate")
             rightBtn:SetSize(18, 18)
             rightBtn:SetText(">")
             rightBtn:SetPoint("LEFT", expTitle, "RIGHT", 6, 0)
