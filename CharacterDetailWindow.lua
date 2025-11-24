@@ -225,20 +225,24 @@ function CharacterDetailWindow:RefreshDisplay()
             columnFrame:SetSize(columnWidth, 20)
             columnFrame:SetPoint("TOPLEFT", self.Content, "TOPLEFT", xOffset, yOffset)
 
-            local expTitle = columnFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-            expTitle:SetPoint("TOP", columnFrame, "TOP", 0, 0)
-            expTitle:SetText(selectedExpName or "")
-            expTitle:SetTextColor(0.8, 0.8, 0.9, 1)
-
+            -- Static arrow positions at left/right edges; title stretches between
             local leftBtn = CreateFrame("Button", nil, columnFrame, "UIPanelButtonTemplate")
             leftBtn:SetSize(18, 18)
             leftBtn:SetText("<")
-            leftBtn:SetPoint("RIGHT", expTitle, "LEFT", -6, 0)
+            leftBtn:SetPoint("LEFT", columnFrame, "LEFT", 0, 0)
 
             local rightBtn = CreateFrame("Button", nil, columnFrame, "UIPanelButtonTemplate")
             rightBtn:SetSize(18, 18)
             rightBtn:SetText(">")
-            rightBtn:SetPoint("LEFT", expTitle, "RIGHT", 6, 0)
+            rightBtn:SetPoint("RIGHT", columnFrame, "RIGHT", 0, 0)
+
+            local expTitle = columnFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+            expTitle:SetPoint("LEFT", leftBtn, "RIGHT", 4, 0)
+            expTitle:SetPoint("RIGHT", rightBtn, "LEFT", -4, 0)
+            expTitle:SetPoint("TOP", columnFrame, "TOP", 0, 0)
+            expTitle:SetJustifyH("CENTER")
+            expTitle:SetText(selectedExpName or "")
+            expTitle:SetTextColor(0.8, 0.8, 0.9, 1)
 
             if #availableExpIDs <= 1 then
                 leftBtn:Disable()
