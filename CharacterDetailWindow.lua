@@ -148,7 +148,7 @@ function CharacterDetailWindow:RefreshDisplay()
         contentWidth = (self:GetWidth() or 380) - 50 -- approximate interior width
     end
     -- Compute column width with reduced inter-column spacing
-    local interColumnSpacing = 6
+    local interColumnSpacing = 20
     local columnWidth = math.floor((contentWidth - leftColumnX - interColumnSpacing) / 2)
     if columnWidth < 140 then columnWidth = 140 end -- enforce a reasonable minimum
     local rightColumnX = leftColumnX + columnWidth + interColumnSpacing
