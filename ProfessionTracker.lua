@@ -1078,6 +1078,98 @@ local function EnsureTable(t, key)
 end
 
 -- ========================================================
+-- Weekly Reset Helpers (run once per reset across entire DB)
+-- ========================================================
+
+local WEEK_SECONDS = 7 * 24 * 60 * 60
+
+-- Returns a stable token that changes each weekly reset.
+-- Prefers Blizzard's weekly reset API; falls back to coarse week bucket.
+local function GetWeeklyResetToken()
+    local now = time()
+    if C_DateAndTime and C_DateAndTime.GetSecondsUntilWeeklyReset then
+        local untilNext = C_DateAndTime.GetSecondsUntilWeeklyReset()
+        if type(untilNext) == "number" and untilNext >= 0 then
+            local nextReset = now + untilNext
+            local lastReset = nextReset - WEEK_SECONDS
+            return math.floor(lastReset / WEEK_SECONDS)
+        end
+    end
+    -- Fallback: coarse week bucket (not region-specific but stable)
+    return math.floor(now / WEEK_SECONDS)
+end
+
+-- Clears weekly-computed flags so UI shows fresh state after reset
+local function ResetWeeklyStateIfNeeded()
+    if not ProfessionTrackerDB then return end
+    ProfessionTrackerDB.meta = ProfessionTrackerDB.meta or {}
+    local meta = ProfessionTrackerDB.meta
+    local token = GetWeeklyResetToken()
+
+    -- Already reset for this weekly token
+    if meta.lastWeeklyResetToken == token then
+        return
+    end
+
+    -- Iterate entire DB and reset weekly state
+    if ProfessionTrackerDB.characters then
+        for _, charData in pairs(ProfessionTrackerDB.characters) do
+            if type(charData) == "table" and charData.professions then
+                for _, profData in pairs(charData.professions) do
+                    if type(profData) == "table" and profData.expansions then
+                        for _, expData in pairs(profData.expansions) do
+                            if type(expData) == "table" then
+                                -- Legacy/manual progress table
+                                if type(expData.weeklyKnowledgeProgress) == "table" then
+                                    for k, v in pairs(expData.weeklyKnowledgeProgress) do
+                                        if type(v) == "table" then
+                                            v.completed = false
+                                            v.lastCompleted = nil
+                                            v.count = 0
+                                        elseif type(v) == "boolean" then
+                                            expData.weeklyKnowledgeProgress[k] = false
+                                        end
+                                    end
+                                end
+
+                                -- Computed snapshot used by UI
+                                if type(expData.weeklyKnowledgePoints) == "table" then
+                                    local wk = expData.weeklyKnowledgePoints
+                                    if type(wk.treatise) == "boolean" then wk.treatise = false end
+                                    if type(wk.craftingOrderQuest) == "boolean" then wk.craftingOrderQuest = false end
+
+                                    if type(wk.treasures) == "table" then
+                                        for _, t in ipairs(wk.treasures) do
+                                            if type(t) == "table" then
+                                                t.completed = false
+                                            end
+                                        end
+                                        wk.treasuresAllComplete = false
+                                    end
+
+                                    if type(wk.gatherNodes) == "table" then
+                                        for _, n in ipairs(wk.gatherNodes) do
+                                            if type(n) == "table" then
+                                                n.count = 0
+                                                n.completed = false
+                                            end
+                                        end
+                                        wk.gatherNodesAllComplete = false
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    meta.lastWeeklyResetToken = token
+    meta.lastWeeklyResetAt = time()
+end
+
+-- ========================================================
 -- Helper Functions
 -- ========================================================
 
@@ -1491,6 +1583,9 @@ local function UpdateCharacterProfessionData()
             characters = {},
         }
     end
+
+    -- One-time weekly reset across entire DB (before any recalculations)
+    ResetWeeklyStateIfNeeded()
 
     local currentTime = time()
     local charKey = GetCharacterKey()
