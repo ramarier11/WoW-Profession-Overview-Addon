@@ -1024,6 +1024,34 @@ for _, p in ipairs(ProfessionData) do
     ProfessionNameToID[p.name] = p.id
 end
 
+------------------------------------------------------------
+-- Helper: Update most current expansion's skill values
+-- Uses the highest numeric expansion id present for a profession.
+-- Called even when TradeSkill UI is closed so long as GetProfessionInfo
+-- gave us a skillLevel/maxSkillLevel (only reflects current expansion).
+------------------------------------------------------------
+local function UpdateMostCurrentExpansionSkill(profession, skillLevel, maxSkillLevel)
+    if not profession or not profession.expansions then return end
+    if not skillLevel or not maxSkillLevel then return end
+
+    local latest
+    for _, expData in pairs(profession.expansions) do
+        local id = expData.id or 0
+        if not latest or (id > (latest.id or 0)) then
+            latest = expData
+        end
+    end
+    if latest then
+        -- Only overwrite if new value differs to avoid churn
+        if latest.skillLevel ~= skillLevel then
+            latest.skillLevel = skillLevel
+        end
+        if latest.maxSkillLevel ~= maxSkillLevel then
+            latest.maxSkillLevel = maxSkillLevel
+        end
+    end
+end
+
 
 -- ========================================================
 -- Utility Functions
@@ -1047,6 +1075,98 @@ end
 local function EnsureTable(t, key)
     if not t[key] then t[key] = {} end
     return t[key]
+end
+
+-- ========================================================
+-- Weekly Reset Helpers (run once per reset across entire DB)
+-- ========================================================
+
+local WEEK_SECONDS = 7 * 24 * 60 * 60
+
+-- Returns a stable token that changes each weekly reset.
+-- Prefers Blizzard's weekly reset API; falls back to coarse week bucket.
+local function GetWeeklyResetToken()
+    local now = time()
+    if C_DateAndTime and C_DateAndTime.GetSecondsUntilWeeklyReset then
+        local untilNext = C_DateAndTime.GetSecondsUntilWeeklyReset()
+        if type(untilNext) == "number" and untilNext >= 0 then
+            local nextReset = now + untilNext
+            local lastReset = nextReset - WEEK_SECONDS
+            return math.floor(lastReset / WEEK_SECONDS)
+        end
+    end
+    -- Fallback: coarse week bucket (not region-specific but stable)
+    return math.floor(now / WEEK_SECONDS)
+end
+
+-- Clears weekly-computed flags so UI shows fresh state after reset
+local function ResetWeeklyStateIfNeeded()
+    if not ProfessionTrackerDB then return end
+    ProfessionTrackerDB.meta = ProfessionTrackerDB.meta or {}
+    local meta = ProfessionTrackerDB.meta
+    local token = GetWeeklyResetToken()
+
+    -- Already reset for this weekly token
+    if meta.lastWeeklyResetToken == token then
+        return
+    end
+
+    -- Iterate entire DB and reset weekly state
+    if ProfessionTrackerDB.characters then
+        for _, charData in pairs(ProfessionTrackerDB.characters) do
+            if type(charData) == "table" and charData.professions then
+                for _, profData in pairs(charData.professions) do
+                    if type(profData) == "table" and profData.expansions then
+                        for _, expData in pairs(profData.expansions) do
+                            if type(expData) == "table" then
+                                -- Legacy/manual progress table
+                                if type(expData.weeklyKnowledgeProgress) == "table" then
+                                    for k, v in pairs(expData.weeklyKnowledgeProgress) do
+                                        if type(v) == "table" then
+                                            v.completed = false
+                                            v.lastCompleted = nil
+                                            v.count = 0
+                                        elseif type(v) == "boolean" then
+                                            expData.weeklyKnowledgeProgress[k] = false
+                                        end
+                                    end
+                                end
+
+                                -- Computed snapshot used by UI
+                                if type(expData.weeklyKnowledgePoints) == "table" then
+                                    local wk = expData.weeklyKnowledgePoints
+                                    if type(wk.treatise) == "boolean" then wk.treatise = false end
+                                    if type(wk.craftingOrderQuest) == "boolean" then wk.craftingOrderQuest = false end
+
+                                    if type(wk.treasures) == "table" then
+                                        for _, t in ipairs(wk.treasures) do
+                                            if type(t) == "table" then
+                                                t.completed = false
+                                            end
+                                        end
+                                        wk.treasuresAllComplete = false
+                                    end
+
+                                    if type(wk.gatherNodes) == "table" then
+                                        for _, n in ipairs(wk.gatherNodes) do
+                                            if type(n) == "table" then
+                                                n.count = 0
+                                                n.completed = false
+                                            end
+                                        end
+                                        wk.gatherNodesAllComplete = false
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    meta.lastWeeklyResetToken = token
+    meta.lastWeeklyResetAt = time()
 end
 
 -- ========================================================
@@ -1254,6 +1374,41 @@ local function CalculateMissingKnowledgePoints(skillLineID)
     return totalMissing
 end
 
+
+-- ========================================================
+-- Helper function to safely update knowledge points
+-- Only calculates if the expansion has a knowledge system
+-- Uses stored skillLineID from expData (populated during initialization)
+-- ========================================================
+local function UpdateKnowledgePointsIfApplicable(expData)
+    if not expData then return end
+    
+    -- Check if this expansion has a knowledge system
+    local expIndex = expData.id
+    if not expIndex or expIndex < KNOWLEDGE_SYSTEM_START then
+        return
+    end
+    
+    -- Need skillLineID to calculate - must have been stored during initialization
+    local skillLineID = expData.skillLineID
+    if not skillLineID then
+        return
+    end
+    
+    -- Initialize knowledge tracking if not present
+    if not expData.knowledgePoints then
+        expData.knowledgePoints = 0
+    end
+    
+    -- Calculate current missing points
+    local missing = CalculateMissingKnowledgePoints(skillLineID)
+    if missing then
+        expData.pointsUntilMaxKnowledge = missing
+    elseif not expData.pointsUntilMaxKnowledge then
+        expData.pointsUntilMaxKnowledge = 0
+    end
+end
+
 local function RecalculateWeeklyKnowledgePoints()
     ForEachProfessionExpansion(function(
         charKey, charData,
@@ -1358,6 +1513,7 @@ local function RecalculateWeeklyKnowledgePoints()
                 wk.gatherNodes[i] = {
                     name = entry.name or ("Node " .. i),
                     count = completedCount,
+                    total = totalCount,
                     completed = (completedCount == totalCount)
                 }
 
@@ -1428,6 +1584,9 @@ local function UpdateCharacterProfessionData()
         }
     end
 
+    -- One-time weekly reset across entire DB (before any recalculations)
+    ResetWeeklyStateIfNeeded()
+
     local currentTime = time()
     local charKey = GetCharacterKey()
     local charData = EnsureTable(ProfessionTrackerDB.characters, charKey)
@@ -1480,9 +1639,11 @@ local function UpdateCharacterProfessionData()
                             expData.maxSkillLevel = exp.maxSkillLevel or expData.maxSkillLevel or 0
 
                             if hasKnowledgeSystem and exp.skillLineID then
-                                local missing = CalculateMissingKnowledgePoints(exp.skillLineID)
-                                expData.pointsUntilMaxKnowledge = missing or expData.pointsUntilMaxKnowledge or 0
-                                expData.knowledgePoints = expData.knowledgePoints or 0
+                                -- IMPORTANT: Store skillLineID for later use outside this loop
+                                expData.skillLineID = exp.skillLineID
+                                
+                                -- Update knowledge points
+                                UpdateKnowledgePointsIfApplicable(expData)
 
                                 -- Get concentration currency info
                                 local concentrationCurrencyID = C_TradeSkillUI.GetConcentrationCurrencyID and C_TradeSkillUI.GetConcentrationCurrencyID(exp.skillLineID)
@@ -1512,6 +1673,9 @@ local function UpdateCharacterProfessionData()
                         -- This preserves previously stored expansion entries so RecalculateOneTimeTreasures can still work.
                         -- (No-op)
                     end
+
+                    -- Always update the most current expansion's skill values using generic profession skillLevel/maxSkillLevel.
+                    UpdateMostCurrentExpansionSkill(profession, skillLevel, maxSkillLevel)
                 end
             end
         end
@@ -1524,7 +1688,16 @@ local function UpdateCharacterProfessionData()
         end
     end
 
-
+    -- Iterate through all stored professions and update their knowledge points
+    for profName, profData in pairs(professions) do
+        if profData.expansions then
+            for expName, expData in pairs(profData.expansions) do
+                -- Update knowledge points using stored skillLineID
+                -- This works even when tradeskill window is closed
+                UpdateKnowledgePointsIfApplicable(expData)
+            end
+        end
+    end
 
 
     -- ===== ALWAYS re-evaluate one-time treasures AFTER we've merged/kept expansion structure =====
@@ -1533,14 +1706,25 @@ local function UpdateCharacterProfessionData()
     RecalculateWeeklyKnowledgePoints()
 
 
+-- Find this section in your ProfessionTracker.lua (around line 750-780)
+-- Replace the existing auto-refresh code with this:
+
     -- Auto-refresh UI if open (small delay to avoid racing other events)
     if ProfessionTracker.UI and ProfessionTracker.UI:IsShown() then
         C_Timer.After(0.25, function()
-            -- If your UI object uses :Refresh() use that; otherwise call the redraw helper
             if ProfessionTracker.UI.Refresh then
                 ProfessionTracker.UI:Refresh()
             elseif ProfessionTracker.UI.RedrawCharacterDetail then
                 ProfessionTracker.UI:RedrawCharacterDetail()
+            end
+        end)
+    end
+    
+    -- Refresh Character Detail Window if open
+    if ProfessionTrackerUI and ProfessionTrackerUI.CharacterDetailWindow then
+        C_Timer.After(0.25, function()
+            if ProfessionTrackerUI.CharacterDetailWindow.Refresh then
+                ProfessionTrackerUI.CharacterDetailWindow:Refresh()
             end
         end)
     end
