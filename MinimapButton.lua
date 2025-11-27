@@ -100,8 +100,8 @@ local function UpdatePosition()
     end
     
     local angle = math.rad(config.angle)
-    local x = math.cos(angle) * 80
-    local y = math.sin(angle) * 80
+    local x = math.cos(angle) * 78
+    local y = math.sin(angle) * 78
     
     minimapButton:ClearAllPoints()
     minimapButton:SetPoint("CENTER", Minimap, "CENTER", x, y)
