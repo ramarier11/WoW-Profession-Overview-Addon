@@ -1583,6 +1583,11 @@ local function UpdateCharacterProfessionData()
             characters = {},
         }
     end
+    
+    -- Ensure characters table exists
+    if not ProfessionTrackerDB.characters then
+        ProfessionTrackerDB.characters = {}
+    end
 
     -- One-time weekly reset across entire DB (before any recalculations)
     ResetWeeklyStateIfNeeded()
