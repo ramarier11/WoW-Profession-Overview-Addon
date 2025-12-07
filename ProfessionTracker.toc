@@ -1,4 +1,4 @@
-## Interface: 110205
+## Interface: 110207, 120000
 ## Version: 1.0.0
 ## Title: Profession Tracker
 ## Notes: My first addon
