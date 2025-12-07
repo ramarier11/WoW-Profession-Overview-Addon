@@ -178,7 +178,7 @@ function CharacterDetailWindow:RefreshDisplay()
         faireInfo:SetPoint("TOPLEFT", faireHeader, "BOTTOMLEFT", 0, -3)
         
         -- Display quest information for each profession
-        local currentY = -45
+        local currentY = -20
         local charData = characters[self.currentCharKey]
         if charData and charData.professions then
             for profName, profData in pairs(charData.professions) do
