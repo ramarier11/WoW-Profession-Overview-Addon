@@ -2066,6 +2066,51 @@ function ProfessionTracker:GetCharacterDarkmoonFaireData()
     return charData.darkmoonFaireData
 end
 
+-- Returns Darkmoon Faire quest information for a specific profession
+-- @param professionName - The name of the profession (e.g., "Alchemy", "Blacksmithing")
+-- @return table with questID, questName, x, y, mapID, and completion status, or nil if not found
+function ProfessionTracker:GetDarkmoonFaireQuestForProfession(professionName)
+    -- Get profession ID from name
+    local profID = ProfessionNameToID[professionName]
+    if not profID then return nil end
+    
+    -- Get Darkmoon Faire data from KPReference
+    local faireData = KPReference[profID] and KPReference[profID].darkmoonFaire
+    if not faireData then return nil end
+    
+    -- Get quest name from Blizzard API
+    local questName = C_QuestLog.GetTitleForQuestID(faireData.questID)
+    
+    -- Check if quest is completed
+    local isCompleted = C_QuestLog.IsQuestFlaggedCompleted(faireData.questID)
+    
+    return {
+        questID = faireData.questID,
+        questName = questName or "Unknown Quest",
+        x = faireData.x,
+        y = faireData.y,
+        mapID = faireData.mapID,
+        isCompleted = isCompleted,
+    }
+end
+
+-- Returns Darkmoon Faire quest information for all character's professions
+-- @return table indexed by profession name with quest information
+function ProfessionTracker:GetDarkmoonFaireQuestsForCharacter()
+    local charData = self:GetCharacterData()
+    if not charData or not charData.professions then return {} end
+    
+    local quests = {}
+    for profName, _ in pairs(charData.professions) do
+        local questInfo = self:GetDarkmoonFaireQuestForProfession(profName)
+        if questInfo then
+            quests[profName] = questInfo
+        end
+    end
+    
+    return quests
+end
+
 -- ========================================================
 -- Weekly Activity Tracking
 -- ========================================================
