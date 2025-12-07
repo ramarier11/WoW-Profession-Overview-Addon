@@ -1976,13 +1976,21 @@ function ProfessionTracker:GetDarkmoonFaireStatus()
     local nextStart = GetNextDarkmoonFaireStart()
     local secondsUntilNext = GetSecondsUntilDarkmoonFaire()
     
+    -- Format dates using date table instead of format strings
+    local currentDate = date("*t", currentStart)
+    local nextDate = date("*t", nextStart)
+    
+    local monthNames = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
+    local currentFormatted = string.format("%s %d, %d", monthNames[currentDate.month], currentDate.day, currentDate.year)
+    local nextFormatted = string.format("%s %d, %d", monthNames[nextDate.month], nextDate.day, nextDate.year)
+    
     return {
         isActive = isActive,
         currentStart = currentStart,
         nextStart = nextStart,
         secondsUntilNext = secondsUntilNext,
-        currentStartFormatted = date("%B %d, %Y", currentStart),
-        nextStartFormatted = date("%B %d, %Y", nextStart),
+        currentStartFormatted = currentFormatted,
+        nextStartFormatted = nextFormatted,
     }
 end
 
