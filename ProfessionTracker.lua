@@ -1312,6 +1312,7 @@ local function ResetDarkmoonFaireStateIfNeeded()
     
     meta.lastDarkmoonFaireToken = token
     meta.lastDarkmoonFaireResetAt = time()
+    print(meta.lastDarkmoonFaireToken)
 end
 
 -- ========================================================
