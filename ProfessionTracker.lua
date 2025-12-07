@@ -2070,36 +2070,36 @@ end)
 -- Debug Commands
 -- ========================================================
 
-function ProfessionTracker:PrintCharacterData()
-    local charData = self:GetCharacterData()
-    if not charData then
-        --print("|cffff0000[Profession Tracker]|r No data found for this character")
-        return
-    end
+-- function ProfessionTracker:PrintCharacterData()
+--     local charData = self:GetCharacterData()
+--     if not charData then
+--         --print("|cffff0000[Profession Tracker]|r No data found for this character")
+--         return
+--     end
     
-    --print("|cff00ff00[Profession Tracker]|r Character Data:")
-    --print(string.format("  Name: %s-%s", charData.name or "Unknown", charData.realm or "Unknown"))
-    --print(string.format("  Class: %s, Level: %d", charData.class or "Unknown", charData.level or 0))
+--     --print("|cff00ff00[Profession Tracker]|r Character Data:")
+--     --print(string.format("  Name: %s-%s", charData.name or "Unknown", charData.realm or "Unknown"))
+--     --print(string.format("  Class: %s, Level: %d", charData.class or "Unknown", charData.level or 0))
     
-    if charData.professions then
-        --print("  Professions:")
-        for profName, profData in pairs(charData.professions) do
-            --  print(string.format("    - %s", profName))
-            if profData.expansions then
-                for expName, expData in pairs(profData.expansions) do
-                    local knowledgeInfo = ""
-                    if expData.knowledgePoints then
-                        knowledgeInfo = string.format(" [Knowledge: %d Remaining %d]",
-                            expData.knowledgePoints or 0,
-                            expData.pointsUntilMaxKnowledge or 0)
-                    end
-                    --print(string.format("      %s: %d/%d%s",
-                        expName,
-                        expData.skillLevel or 0,
-                        expData.maxSkillLevel or 0,
-                        knowledgeInfo))
-                end
-            end
-        end
-    end
-end
+--     if charData.professions then
+--         --print("  Professions:")
+--         for profName, profData in pairs(charData.professions) do
+--             --  print(string.format("    - %s", profName))
+--             if profData.expansions then
+--                 for expName, expData in pairs(profData.expansions) do
+--                     local knowledgeInfo = ""
+--                     if expData.knowledgePoints then
+--                         knowledgeInfo = string.format(" [Knowledge: %d Remaining %d]",
+--                             expData.knowledgePoints or 0,
+--                             expData.pointsUntilMaxKnowledge or 0)
+--                     end
+--                     -- --print(string.format("      %s: %d/%d%s",
+--                     --     expName,
+--                     --     expData.skillLevel or 0,
+--                     --     expData.maxSkillLevel or 0,
+--                     --     knowledgeInfo))
+--                 end
+--             end
+--         end
+--     end
+-- end
