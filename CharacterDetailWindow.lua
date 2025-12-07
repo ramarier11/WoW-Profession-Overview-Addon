@@ -166,8 +166,30 @@ function CharacterDetailWindow:RefreshDisplay()
         end
     end
     
+    -- Check Darkmoon Faire status and show section if active
+    local faireStatus = ProfessionTracker:GetDarkmoonFaireStatus()
+    if faireStatus and faireStatus.isActive then
+        local faireHeader = self.Content:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+        faireHeader:SetPoint("TOPLEFT", 10, -10)
+        faireHeader:SetText("|cff00ff00🎪 Darkmoon Faire Active|r")
+        
+        local daysRemaining = math.ceil((faireStatus.nextStart - time()) / 86400)
+        local faireInfo = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+        faireInfo:SetPoint("TOPLEFT", faireHeader, "BOTTOMLEFT", 0, -3)
+        faireInfo:SetText(string.format("Started: %s | %d days remaining", 
+            faireStatus.currentStartFormatted, daysRemaining))
+        
+        -- Add separator line
+        local separator = self.Content:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        separator:SetPoint("TOPLEFT", faireInfo, "BOTTOMLEFT", 0, -5)
+        separator:SetText("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        separator:SetTextColor(0.5, 0.5, 0.5, 1)
+        
+        yOffset = -70
+    end
+    
     -- Build detailed profession display (2-column layout)
-    local yOffset = -10
+    local yOffset = yOffset or -10
     local leftColumnX = 4 -- reduced left padding
     -- Derive usable content width (fallback to frame width minus padding if not yet calculated)
     local contentWidth = self.Content:GetWidth()

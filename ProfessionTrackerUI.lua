@@ -160,6 +160,21 @@ function ProfessionTrackerDashboard:Refresh()
     end
     self.activeEntries = {}
     
+    -- Check Darkmoon Faire status and show banner if active
+    local faireStatus = ProfessionTracker:GetDarkmoonFaireStatus()
+    if faireStatus and faireStatus.isActive then
+        if not self.DarkmoonFaireBanner then
+            self.DarkmoonFaireBanner = self:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+            self.DarkmoonFaireBanner:SetPoint("TOP", self, "TOP", 0, -45)
+        end
+        
+        local daysRemaining = math.ceil((faireStatus.nextStart - time()) / 86400)
+        self.DarkmoonFaireBanner:SetText(string.format("|cff00ff00🎪 Darkmoon Faire Active!|r (%d days remaining)", daysRemaining))
+        self.DarkmoonFaireBanner:Show()
+    elseif self.DarkmoonFaireBanner then
+        self.DarkmoonFaireBanner:Hide()
+    end
+    
     -- Get all characters
     local characters = ProfessionTracker:GetAllCharacters()
     if not characters then
