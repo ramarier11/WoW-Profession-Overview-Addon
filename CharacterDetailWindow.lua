@@ -182,7 +182,7 @@ function CharacterDetailWindow:RefreshDisplay()
         -- Add separator line
         local separator = self.Content:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         separator:SetPoint("TOPLEFT", faireInfo, "BOTTOMLEFT", 0, -5)
-        separator:SetText("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        --separator:SetText("----------------------------------")
         separator:SetTextColor(0.5, 0.5, 0.5, 1)
         
         yOffset = -70
