@@ -176,16 +176,39 @@ function CharacterDetailWindow:RefreshDisplay()
         local daysRemaining = math.ceil((faireStatus.nextStart - time()) / 86400)
         local faireInfo = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
         faireInfo:SetPoint("TOPLEFT", faireHeader, "BOTTOMLEFT", 0, -3)
-        faireInfo:SetText(string.format("Started: %s | %d days remaining", 
-            faireStatus.currentStartFormatted, daysRemaining))
+        faireInfo:SetText(string.format("Days remaining: %d", daysRemaining))
+        
+        -- Display quest information for each profession
+        local currentY = -45
+        local charData = characters[self.currentCharKey]
+        if charData and charData.professions then
+            for profName, profData in pairs(charData.professions) do
+                if profData.darkmoonFaire and profData.darkmoonFaire.questID then
+                    local questID = profData.darkmoonFaire.questID
+                    local questName = ProfessionTracker:GetQuestName(questID)
+                    local isComplete = profData.darkmoonFaire.completed or false
+                    
+                    -- Create quest line with profession name, quest name, and status icon
+                    local questText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+                    questText:SetPoint("TOPLEFT", 20, currentY)
+                    
+                    local statusIcon = isComplete 
+                        and "|cff00ff00✓|r" 
+                        or "|cffff0000✗|r"
+                    
+                    questText:SetText(string.format("%s: %s %s", profName, questName, statusIcon))
+                    currentY = currentY - 16
+                end
+            end
+        end
         
         -- Add separator line
         local separator = self.Content:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        separator:SetPoint("TOPLEFT", faireInfo, "BOTTOMLEFT", 0, -5)
-        --separator:SetText("----------------------------------")
+        separator:SetPoint("TOPLEFT", 20, currentY - 5)
+        separator:SetText("----------------------------------")
         separator:SetTextColor(0.5, 0.5, 0.5, 1)
         CharacterDetailWindow:SetSize(400, characterDetailWindowHeight + 30)
-        yOffset = -50
+        yOffset = currentY - 20
     end
     
     -- Build detailed profession display (2-column layout)

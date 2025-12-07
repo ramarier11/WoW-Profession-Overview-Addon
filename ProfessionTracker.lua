@@ -1509,6 +1509,17 @@ local function WeeklyQuestCompleted(questID)
     return false
 end
 
+-- Helper: Get quest name from questID
+local function GetQuestName(questID)
+    if not questID then return "Unknown Quest" end
+    
+    local questInfo = C_QuestLog.GetTitleForQuestID(questID)
+    if questInfo and questInfo.name then
+        return questInfo.name
+    end
+    return "Unknown Quest"
+end
+
 -- ========================================================
 -- Profession Data Retrieval
 -- ========================================================
@@ -2152,6 +2163,12 @@ function ProfessionTracker:GetProfessionDarkmoonFaireData(professionName)
     }
     
     return profData.darkmoonFaire
+end
+
+-- Get quest name for a given questID
+function ProfessionTracker:GetQuestName(questID)
+    return GetQuestName(questID)
+
 end
 
 -- ========================================================
