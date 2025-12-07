@@ -1,10 +1,10 @@
 -- ########################################################
 -- ## Character Detail Window
 -- ########################################################
-
+local characterDetailWindowHeight = 285
 -- Create the detail window frame
 local CharacterDetailWindow = CreateFrame("Frame", "ProfessionTrackerCharacterDetail", UIParent, "BackdropTemplate")
-CharacterDetailWindow:SetSize(400, 300)
+CharacterDetailWindow:SetSize(400, characterDetailWindowHeight)
 CharacterDetailWindow:SetPoint("CENTER")
 CharacterDetailWindow:Hide()
 CharacterDetailWindow:SetFrameStrata("DIALOG")
