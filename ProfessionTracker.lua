@@ -1515,8 +1515,7 @@ local function GetQuestName(questID)
     if not questID then return "Unknown Quest" end
     
     local questInfo = C_QuestLog.GetTitleForQuestID(questID)
-    
-    if questInfo and questInfo.title then
+    if questInfo then
         return questInfo.title
     end
     return "Unknown Quest"
