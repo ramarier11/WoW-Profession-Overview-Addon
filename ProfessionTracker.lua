@@ -1184,14 +1184,18 @@ local function GetNextDarkmoonFaireStart()
     local month = dateTable.month
     local day = 1
     
-    -- Find the first Sunday
+    -- Find the first Sunday (day 0 in WoW's %w)
     while day <= 31 do
         local checkStr = string.format("%04d-%02d-%02d", year, month, day)
-        local weekday = tonumber(date("%w", checkStr))  -- 0 = Sunday in WoW
+        local weekdayStr = date("%w", checkStr)
+        local weekday = tonumber(weekdayStr) or 0
         
         if weekday == 0 then
             -- Found first Sunday of the month
-            return tonumber(date("%s", checkStr))
+            local timestamp = tonumber(date("%s", checkStr)) or 0
+            if timestamp > 0 then
+                return timestamp
+            end
         end
         
         day = day + 1
@@ -1214,15 +1218,16 @@ local function GetCurrentDarkmoonFaireStart()
     -- Find first Sunday of current month
     while day <= 31 do
         local checkStr = string.format("%04d-%02d-%02d", year, month, day)
-        local weekday = tonumber(date("%w", checkStr))
+        local weekdayStr = date("%w", checkStr)
+        local weekday = tonumber(weekdayStr) or 0
         
         if weekday == 0 then
             -- Found first Sunday
-            local timestamp = tonumber(date("%s", checkStr))
-            if timestamp <= now then
+            local timestamp = tonumber(date("%s", checkStr)) or 0
+            if timestamp > 0 and timestamp <= now then
                 -- This month's event has started or is current
                 return timestamp
-            else
+            elseif timestamp > now then
                 -- Haven't reached this month's event yet, return last month's
                 month = month - 1
                 if month == 0 then
@@ -1234,10 +1239,14 @@ local function GetCurrentDarkmoonFaireStart()
                 day = 1
                 while day <= 31 do
                     checkStr = string.format("%04d-%02d-%02d", year, month, day)
-                    weekday = tonumber(date("%w", checkStr))
+                    weekdayStr = date("%w", checkStr)
+                    weekday = tonumber(weekdayStr) or 0
                     
                     if weekday == 0 then
-                        return tonumber(date("%s", checkStr))
+                        local prevTimestamp = tonumber(date("%s", checkStr)) or 0
+                        if prevTimestamp > 0 then
+                            return prevTimestamp
+                        end
                     end
                     day = day + 1
                 end
