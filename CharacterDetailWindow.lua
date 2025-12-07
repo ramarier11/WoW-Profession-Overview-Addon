@@ -169,14 +169,13 @@ function CharacterDetailWindow:RefreshDisplay()
     -- Check Darkmoon Faire status and show section if active
     local faireStatus = ProfessionTracker:GetDarkmoonFaireStatus()
     if faireStatus and faireStatus.isActive then
-        local faireHeader = self.Content:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+        local faireHeader = self.Content:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         faireHeader:SetPoint("TOPLEFT", 10, -10)
         faireHeader:SetText("|cff00ff00Darkmoon Faire Active|r")
         
         local daysRemaining = math.ceil((faireStatus.nextStart - time()) / 86400)
         local faireInfo = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
         faireInfo:SetPoint("TOPLEFT", faireHeader, "BOTTOMLEFT", 0, -3)
-        faireInfo:SetText(string.format("Days remaining: %d", daysRemaining))
         
         -- Display quest information for each profession
         local currentY = -45
