@@ -184,7 +184,7 @@ function CharacterDetailWindow:RefreshDisplay()
         separator:SetPoint("TOPLEFT", faireInfo, "BOTTOMLEFT", 0, -5)
         --separator:SetText("----------------------------------")
         separator:SetTextColor(0.5, 0.5, 0.5, 1)
-        
+        characterDetailWindowHeight = characterDetailWindowHeight + 50
         yOffset = -50
     end
     
