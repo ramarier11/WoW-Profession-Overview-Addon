@@ -1400,20 +1400,26 @@ local function ResetDarkmoonFaireStateIfNeeded()
         return
     end
     
-    -- Iterate entire DB and reset Darkmoon Faire state
+    -- Iterate entire DB and reset Darkmoon Faire state at profession level
     if ProfessionTrackerDB.characters then
         for _, charData in pairs(ProfessionTrackerDB.characters) do
-            if type(charData) == "table" then
-                charData.darkmoonFaireData = charData.darkmoonFaireData or {}
-                charData.darkmoonFaireData.questsCompleted = {}
-                charData.darkmoonFaireData.lastReset = time()
+            if type(charData) == "table" and charData.professions then
+                for profName, profData in pairs(charData.professions) do
+                    if type(profData) == "table" then
+                        -- Initialize darkmoonFaire table if it doesn't exist
+                        profData.darkmoonFaire = profData.darkmoonFaire or {}
+                        -- Clear quest completion data for new month
+                        profData.darkmoonFaire.questsCompleted = {}
+                        profData.darkmoonFaire.lastReset = time()
+                    end
+                end
             end
         end
     end
     
     meta.lastDarkmoonFaireToken = token
     meta.lastDarkmoonFaireResetAt = time()
-    print(meta.lastDarkmoonFaireToken)
+    print("Darkmoon Faire reset token:", meta.lastDarkmoonFaireToken)
 end
 
 -- ========================================================
@@ -2062,8 +2068,34 @@ end
 
 function ProfessionTracker:GetCharacterDarkmoonFaireData()
     local charData = self:GetCharacterData()
-    if not charData then return nil end
-    return charData.darkmoonFaireData
+    if not charData or not charData.professions then return {} end
+    
+    -- Collect Darkmoon Faire data from all professions
+    local faireData = {}
+    for profName, profData in pairs(charData.professions) do
+        if profData.darkmoonFaire then
+            faireData[profName] = profData.darkmoonFaire
+        end
+    end
+    
+    return faireData
+end
+
+-- Get Darkmoon Faire data for a specific profession
+function ProfessionTracker:GetProfessionDarkmoonFaireData(professionName)
+    local charData = self:GetCharacterData()
+    if not charData or not charData.professions then return nil end
+    
+    local profData = charData.professions[professionName]
+    if not profData then return nil end
+    
+    -- Initialize if not present
+    profData.darkmoonFaire = profData.darkmoonFaire or {
+        questsCompleted = {},
+        lastReset = 0
+    }
+    
+    return profData.darkmoonFaire
 end
 
 -- ========================================================
