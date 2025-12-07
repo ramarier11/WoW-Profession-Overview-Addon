@@ -110,6 +110,12 @@ KPReference = {
                     }
                 }
             }
+        },
+        darkmoonFaire = {
+            questID = 29506,
+            x = 51,
+            y = 69.2,
+            mapID = 407,
         }
     },
 
@@ -198,6 +204,12 @@ KPReference = {
                     }
                 }
             }
+        },
+        darkmoonFaire = {
+            questID = 29508,
+            x = 51,
+            y = 81.8,
+            mapID = 407,
         }
 
     },
@@ -291,6 +303,12 @@ KPReference = {
                     }
                 }
             }
+        },
+        darkmoonFaire = {
+            questID = 29510,
+            x = 53.6,
+            y = 75.6,
+            mapID = 407,
         }
     },
 
@@ -375,6 +393,12 @@ KPReference = {
                     }
                 }
             }
+        },
+        darkmoonFaire = {
+            questID = 29511,
+            x = 49.6,
+            y = 60.8,
+            mapID = 407,
         }
     },
 
@@ -464,6 +488,12 @@ KPReference = {
                     }
                 }
             }
+        },
+        darkmoonFaire = {
+            questID = 29515,
+            x = 53.6,
+            y = 75.6,
+            mapID = 407,
         }
     },
 
@@ -553,6 +583,12 @@ KPReference = {
                     }
                 }
             }
+        },
+        darkmoonFaire = {
+            questID = 29516,
+            x = 55,
+            y = 70.6,
+            mapID = 407,
         }
     },
 
@@ -640,6 +676,12 @@ KPReference = {
                     }
                 }
             }
+        },
+        darkmoonFaire = {
+            questID = 29517,
+            x = 49.6,
+            y = 60.8,
+            mapID = 407,
         }
     },
 
@@ -726,6 +768,12 @@ KPReference = {
                     }
                 }
             }
+        },
+        darkmoonFaire = {
+            questID = 29520,
+            x = 55.6,
+            y = 55.8,
+            mapID = 407,
         }
     },
     ---------------------------------------------------------------------
@@ -793,6 +841,12 @@ KPReference = {
                     }
                 }
             }
+        },
+        darkmoonFaire = {
+            questID = 29514,
+            x = 55,
+            y = 70.6,
+            mapID = 407,
         }
     },
 
@@ -854,6 +908,12 @@ KPReference = {
                     }
                 }
             }
+        },
+        darkmoonFaire = {
+            questID = 29518,
+            x = 49.6,
+            y = 60.8,
+            mapID = 407,
         }
     },
 
@@ -911,6 +971,12 @@ KPReference = {
                     }
                 }
             }
+        },
+        darkmoonFaire = {
+            questID = 29519,
+            x = 55,
+            y = 70.6,
+            mapID = 407,
         }
     },
 
@@ -1334,20 +1400,26 @@ local function ResetDarkmoonFaireStateIfNeeded()
         return
     end
     
-    -- Iterate entire DB and reset Darkmoon Faire state
+    -- Iterate entire DB and reset Darkmoon Faire state at profession level
     if ProfessionTrackerDB.characters then
         for _, charData in pairs(ProfessionTrackerDB.characters) do
-            if type(charData) == "table" then
-                charData.darkmoonFaireData = charData.darkmoonFaireData or {}
-                charData.darkmoonFaireData.questsCompleted = {}
-                charData.darkmoonFaireData.lastReset = time()
+            if type(charData) == "table" and charData.professions then
+                for profName, profData in pairs(charData.professions) do
+                    if type(profData) == "table" then
+                        -- Initialize darkmoonFaire table if it doesn't exist
+                        profData.darkmoonFaire = profData.darkmoonFaire or {}
+                        profData.darkmoonFaire.lastReset = time()
+                    end
+                end
             end
         end
     end
     
     meta.lastDarkmoonFaireToken = token
     meta.lastDarkmoonFaireResetAt = time()
+
     --print(meta.lastDarkmoonFaireToken)
+
 end
 
 -- ========================================================
@@ -1437,6 +1509,19 @@ local function WeeklyQuestCompleted(questID)
         return CheckQuestCompletion(questID)
     end
     return false
+end
+
+-- Helper: Get quest name from questID
+local function GetQuestName(questID)
+    
+    if not questID then return "Unknown Quest" end
+    
+    local questInfo = C_QuestLog.GetTitleForQuestID(questID)
+    
+    if questInfo then
+        return questInfo
+    end
+    return "Unknown Quest"
 end
 
 -- ========================================================
@@ -1755,6 +1840,64 @@ local function RecalculateWeeklyKnowledgePoints()
 end
 
 -- ========================================================
+-- Darkmoon Faire Quest Tracking
+-- ========================================================
+
+local function RecalculateDarkmoonFaireQuests()
+    if not ProfessionTrackerDB or not ProfessionTrackerDB.characters then return end
+    
+    local charKey = GetCharacterKey()
+    local charData = ProfessionTrackerDB.characters[charKey]
+    if not charData or not charData.professions then return end
+    
+    -- Only track if Darkmoon Faire is currently active
+    if not IsDarkmoonFaireActive() then return end
+    
+    for profName, profData in pairs(charData.professions) do
+        -- Get profession ID
+        local profID = ProfessionNameToID[profName]
+        if not profID then
+            -- Try to infer from expansions
+            if profData.expansions then
+                for _, exp in pairs(profData.expansions) do
+                    if exp.skillLineID then
+                        profID = exp.skillLineID
+                        break
+                    end
+                end
+            end
+        end
+        
+        -- Check if this profession has Darkmoon Faire data in KPReference
+        if profID and KPReference[profID] and KPReference[profID].darkmoonFaire then
+            local faireRef = KPReference[profID].darkmoonFaire
+            
+            -- Initialize darkmoonFaire structure if not present
+            profData.darkmoonFaire = profData.darkmoonFaire or {
+                lastReset = 0
+            }
+            
+            -- Check quest completion
+            local questID = faireRef.questID
+            if questID then
+                local isComplete = C_QuestLog.IsQuestFlaggedCompleted(questID)
+                profData.darkmoonFaire.completed = isComplete
+                profData.darkmoonFaire.questID = questID
+                
+                -- Store location data for UI display
+                if faireRef.x and faireRef.y and faireRef.mapID then
+                    profData.darkmoonFaire.location = {
+                        x = faireRef.x,
+                        y = faireRef.y,
+                        mapID = faireRef.mapID
+                    }
+                end
+            end
+        end
+    end
+end
+
+-- ========================================================
 -- Data Initialization & Update (patched merged version)
 -- ========================================================
 local function UpdateCharacterProfessionData()
@@ -1798,7 +1941,7 @@ local function UpdateCharacterProfessionData()
     local profIndices = { GetProfessions() }
     for _, profIndex in ipairs(profIndices) do
         if profIndex then
-            local name, _, skillLevel, maxSkillLevel, _, _, skillLine = GetProfessionInfo(profIndex)
+            local name, icon, skillLevel, maxSkillLevel, _, _, skillLine = GetProfessionInfo(profIndex)
             if name then
 
                 if not EXCLUDED_PROFESSIONS[name] then
@@ -1806,6 +1949,7 @@ local function UpdateCharacterProfessionData()
                     local profession = EnsureTable(professions, name)
                     profession.lastUpdated = currentTime
                     profession.name = name
+                    profession.icon = icon 
 
                     -- Ensure expansions table exists (may have been populated by previous full-scan)
                     local expansions = EnsureTable(profession, "expansions")
@@ -1893,6 +2037,7 @@ local function UpdateCharacterProfessionData()
     -- This is the key: RecalculateOneTimeTreasures doesn't require TradeSkill UI.
     RecalculateOneTimeTreasures(charKey)
     RecalculateWeeklyKnowledgePoints()
+    RecalculateDarkmoonFaireQuests()
 
 
 -- Find this section in your ProfessionTracker.lua (around line 750-780)
@@ -1996,8 +2141,39 @@ end
 
 function ProfessionTracker:GetCharacterDarkmoonFaireData()
     local charData = self:GetCharacterData()
-    if not charData then return nil end
-    return charData.darkmoonFaireData
+    if not charData or not charData.professions then return {} end
+    
+    -- Collect Darkmoon Faire data from all professions
+    local faireData = {}
+    for profName, profData in pairs(charData.professions) do
+        if profData.darkmoonFaire then
+            faireData[profName] = profData.darkmoonFaire
+        end
+    end
+    
+    return faireData
+end
+
+-- Get Darkmoon Faire data for a specific profession
+function ProfessionTracker:GetProfessionDarkmoonFaireData(professionName)
+    local charData = self:GetCharacterData()
+    if not charData or not charData.professions then return nil end
+    
+    local profData = charData.professions[professionName]
+    if not profData then return nil end
+    
+    -- Initialize if not present
+    profData.darkmoonFaire = profData.darkmoonFaire or {
+        lastReset = 0
+    }
+    
+    return profData.darkmoonFaire
+end
+
+-- Get quest name for a given questID
+function ProfessionTracker:GetQuestName(questID)
+    return GetQuestName(questID)
+
 end
 
 -- ========================================================

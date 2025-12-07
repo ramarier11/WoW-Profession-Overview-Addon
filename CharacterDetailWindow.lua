@@ -125,6 +125,19 @@ function CharacterDetailWindow:ShowCharacter(charKey, charData)
     self.currentCharKey = charKey
     self:RefreshDisplay()
     self:Show()
+    
+    -- Register for quest updates
+    if not self.questEventRegistered then
+        self:RegisterEvent("QUEST_TURNED_IN")
+        self:SetScript("OnEvent", function(self, event)
+            if event == "QUEST_TURNED_IN" and self:IsShown() then
+                C_Timer.After(0.1, function()
+                    self:Refresh()
+                end)
+            end
+        end)
+        self.questEventRegistered = true
+    end
 end
 
 -- Refresh the current character's display
@@ -169,23 +182,44 @@ function CharacterDetailWindow:RefreshDisplay()
     -- Check Darkmoon Faire status and show section if active
     local faireStatus = ProfessionTracker:GetDarkmoonFaireStatus()
     if faireStatus and faireStatus.isActive then
-        local faireHeader = self.Content:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+        local faireHeader = self.Content:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         faireHeader:SetPoint("TOPLEFT", 10, -10)
         faireHeader:SetText("|cff00ff00Darkmoon Faire Active|r")
         
         local daysRemaining = math.ceil((faireStatus.nextStart - time()) / 86400)
         local faireInfo = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
         faireInfo:SetPoint("TOPLEFT", faireHeader, "BOTTOMLEFT", 0, -3)
-        faireInfo:SetText(string.format("Started: %s | %d days remaining", 
-            faireStatus.currentStartFormatted, daysRemaining))
+        
+        -- Display quest information for each profession
+        local currentY = -30
+        local charData = characters[self.currentCharKey]
+        if charData and charData.professions then
+            for profName, profData in pairs(charData.professions) do
+                if profData.darkmoonFaire and profData.darkmoonFaire.questID then
+                    local profIcon = profData.icon or "Interface\\Icons\\inv_misc_questionmark"
+                    local questID = profData.darkmoonFaire.questID
+                    local questName = ProfessionTracker:GetQuestName(questID)
+                    local isComplete = profData.darkmoonFaire.completed or false
+                    
+                    -- Create quest line with profession icon, profession name, quest name, and status icon
+                    local questText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+                    questText:SetPoint("TOPLEFT", 20, currentY)
+                    
+                    local statusIcon = isComplete 
+                        and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t" 
+                        or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
+                    
+                    questText:SetText(string.format("|T%s:16:16|t %s %s", profIcon, questName, statusIcon))
+                    currentY = currentY - 16
+                end
+            end
+        end
         
         -- Add separator line
         local separator = self.Content:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        separator:SetPoint("TOPLEFT", faireInfo, "BOTTOMLEFT", 0, -5)
-        --separator:SetText("----------------------------------")
         separator:SetTextColor(0.5, 0.5, 0.5, 1)
         CharacterDetailWindow:SetSize(400, characterDetailWindowHeight + 30)
-        yOffset = -50
+        yOffset = currentY
     end
     
     -- Build detailed profession display (2-column layout)

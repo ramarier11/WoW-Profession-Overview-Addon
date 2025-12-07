@@ -114,6 +114,10 @@ local function AcquireCharacterEntry()
         end)
     end
     
+    -- Clear any existing faire indicator
+    if frame.FaireIndicator then
+        frame.FaireIndicator:Hide()
+    end
 
     frame:Show()
     return frame
@@ -245,6 +249,51 @@ function ProfessionTrackerDashboard:CreateCharacterEntry(charKey, charData)
         classColor[3] * 255,
         charData.name or "Unknown",
         charData.realm or "Unknown"))
+    
+    -- Add Darkmoon Faire status if faire is active
+    local faireStatus = ProfessionTracker:GetDarkmoonFaireStatus()
+    if faireStatus and faireStatus.isActive then
+        -- Check if all professions with faire quests are completed
+        local allFaireComplete = true
+        local anyFaireQuest = false
+        
+        if charData.professions then
+            for profName, profData in pairs(charData.professions) do
+                if profData.darkmoonFaire then
+                    anyFaireQuest = true
+                    if not profData.darkmoonFaire.completed then
+                        allFaireComplete = false
+                        break
+                    end
+                end
+            end
+        end
+        
+        -- Only show faire indicator if character has faire quests available
+        if anyFaireQuest then
+            -- Create or reuse the faire indicator
+            if not entry.FaireIndicator then
+                entry.FaireIndicator = entry:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+                entry.FaireIndicator:SetPoint("TOPRIGHT", entry, "TOPRIGHT", -10, -10)
+            end
+            
+            if allFaireComplete then
+                entry.FaireIndicator:SetText("|cff00ff00Faire |TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t|r")
+            else
+                entry.FaireIndicator:SetText("|cffff0000Faire |TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t|r")
+            end
+            entry.FaireIndicator:Show()
+        elseif entry.FaireIndicator then
+            -- Hide if no faire quest or faire not active
+            entry.FaireIndicator:Hide()
+        end
+    else
+        -- Hide faire indicator if faire is not active
+        if entry.FaireIndicator then
+            entry.FaireIndicator:Hide()
+        end
+    end
+    
     -- Make entry clickable to show detail window
     entry:SetScript("OnMouseUp", function(self, button)
         if button == "LeftButton" then
