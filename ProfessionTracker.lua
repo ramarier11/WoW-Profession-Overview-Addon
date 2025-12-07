@@ -1827,6 +1827,65 @@ local function RecalculateWeeklyKnowledgePoints()
 end
 
 -- ========================================================
+-- Darkmoon Faire Quest Tracking
+-- ========================================================
+
+local function RecalculateDarkmoonFaireQuests()
+    if not ProfessionTrackerDB or not ProfessionTrackerDB.characters then return end
+    
+    local charKey = GetCharacterKey()
+    local charData = ProfessionTrackerDB.characters[charKey]
+    if not charData or not charData.professions then return end
+    
+    -- Only track if Darkmoon Faire is currently active
+    if not IsDarkmoonFaireActive() then return end
+    
+    for profName, profData in pairs(charData.professions) do
+        -- Get profession ID
+        local profID = ProfessionNameToID[profName]
+        if not profID then
+            -- Try to infer from expansions
+            if profData.expansions then
+                for _, exp in pairs(profData.expansions) do
+                    if exp.skillLineID then
+                        profID = exp.skillLineID
+                        break
+                    end
+                end
+            end
+        end
+        
+        -- Check if this profession has Darkmoon Faire data in KPReference
+        if profID and KPReference[profID] and KPReference[profID].darkmoonFaire then
+            local faireRef = KPReference[profID].darkmoonFaire
+            
+            -- Initialize darkmoonFaire structure if not present
+            profData.darkmoonFaire = profData.darkmoonFaire or {
+                questsCompleted = {},
+                lastReset = 0
+            }
+            
+            -- Check quest completion
+            local questID = faireRef.questID
+            if questID then
+                local isComplete = C_QuestLog.IsQuestFlaggedCompleted(questID)
+                profData.darkmoonFaire.completed = isComplete
+                profData.darkmoonFaire.questID = questID
+                
+                -- Store location data for UI display
+                if faireRef.x and faireRef.y and faireRef.mapID then
+                    profData.darkmoonFaire.location = {
+                        x = faireRef.x,
+                        y = faireRef.y,
+                        mapID = faireRef.mapID
+                    }
+                end
+            end
+        end
+    end
+end
+
+-- ========================================================
 -- Data Initialization & Update (patched merged version)
 -- ========================================================
 local function UpdateCharacterProfessionData()
@@ -1965,6 +2024,7 @@ local function UpdateCharacterProfessionData()
     -- This is the key: RecalculateOneTimeTreasures doesn't require TradeSkill UI.
     RecalculateOneTimeTreasures(charKey)
     RecalculateWeeklyKnowledgePoints()
+    RecalculateDarkmoonFaireQuests()
 
 
 -- Find this section in your ProfessionTracker.lua (around line 750-780)
