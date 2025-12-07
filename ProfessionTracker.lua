@@ -1308,6 +1308,7 @@ end
 
 -- Clears monthly Darkmoon Faire state if a new event has started
 local function ResetDarkmoonFaireStateIfNeeded()
+    print("Checking Darkmoon Faire reset...")
     if not ProfessionTrackerDB then return end
     ProfessionTrackerDB.meta = ProfessionTrackerDB.meta or {}
     local meta = ProfessionTrackerDB.meta
