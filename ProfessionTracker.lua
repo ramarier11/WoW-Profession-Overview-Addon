@@ -1939,7 +1939,7 @@ local function UpdateCharacterProfessionData()
     local profIndices = { GetProfessions() }
     for _, profIndex in ipairs(profIndices) do
         if profIndex then
-            local name, _, skillLevel, maxSkillLevel, _, _, skillLine = GetProfessionInfo(profIndex)
+            local name, icon, skillLevel, maxSkillLevel, _, _, skillLine = GetProfessionInfo(profIndex)
             if name then
 
                 if not EXCLUDED_PROFESSIONS[name] then
@@ -1947,6 +1947,7 @@ local function UpdateCharacterProfessionData()
                     local profession = EnsureTable(professions, name)
                     profession.lastUpdated = currentTime
                     profession.name = name
+                    profession.icon = icon 
 
                     -- Ensure expansions table exists (may have been populated by previous full-scan)
                     local expansions = EnsureTable(profession, "expansions")

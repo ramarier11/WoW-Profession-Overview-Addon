@@ -196,11 +196,12 @@ function CharacterDetailWindow:RefreshDisplay()
         if charData and charData.professions then
             for profName, profData in pairs(charData.professions) do
                 if profData.darkmoonFaire and profData.darkmoonFaire.questID then
+                    local profIcon = profData.icon or "Interface\\Icons\\inv_misc_questionmark"
                     local questID = profData.darkmoonFaire.questID
                     local questName = ProfessionTracker:GetQuestName(questID)
                     local isComplete = profData.darkmoonFaire.completed or false
                     
-                    -- Create quest line with profession name, quest name, and status icon
+                    -- Create quest line with profession icon, profession name, quest name, and status icon
                     local questText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
                     questText:SetPoint("TOPLEFT", 20, currentY)
                     
@@ -208,7 +209,7 @@ function CharacterDetailWindow:RefreshDisplay()
                         and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t" 
                         or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
                     
-                    questText:SetText(string.format("%s: %s %s", profName, questName, statusIcon))
+                    questText:SetText(string.format("|T%s:16:16|t %s: %s %s", profIcon, profName, questName, statusIcon))
                     currentY = currentY - 16
                 end
             end
