@@ -185,7 +185,7 @@ function CharacterDetailWindow:RefreshDisplay()
         --separator:SetText("----------------------------------")
         separator:SetTextColor(0.5, 0.5, 0.5, 1)
         
-        yOffset = -60
+        yOffset = -40
     end
     
     -- Build detailed profession display (2-column layout)
