@@ -110,6 +110,12 @@ KPReference = {
                     }
                 }
             }
+        },
+        darkmoonFaire = {
+            questID = 29506,
+            x = 51,
+            y = 69.2,
+            mapID = 407,
         }
     },
 
@@ -198,6 +204,12 @@ KPReference = {
                     }
                 }
             }
+        },
+        darkmoonFaire = {
+            questID = 29508,
+            x = 51,
+            y = 81.8,
+            mapID = 407,
         }
 
     },
@@ -291,6 +303,12 @@ KPReference = {
                     }
                 }
             }
+        },
+        darkmoonFaire = {
+            questID = 29510,
+            x = 53.6,
+            y = 75.6,
+            mapID = 407,
         }
     },
 
@@ -375,6 +393,12 @@ KPReference = {
                     }
                 }
             }
+        },
+        darkmoonFaire = {
+            questID = 29511,
+            x = 49.6,
+            y = 60.8,
+            mapID = 407,
         }
     },
 
@@ -464,6 +488,12 @@ KPReference = {
                     }
                 }
             }
+        },
+        darkmoonFaire = {
+            questID = 29515,
+            x = 53.6,
+            y = 75.6,
+            mapID = 407,
         }
     },
 
@@ -553,6 +583,12 @@ KPReference = {
                     }
                 }
             }
+        },
+        darkmoonFaire = {
+            questID = 29516,
+            x = 55,
+            y = 70.6,
+            mapID = 407,
         }
     },
 
@@ -640,6 +676,12 @@ KPReference = {
                     }
                 }
             }
+        },
+        darkmoonFaire = {
+            questID = 29517,
+            x = 49.6,
+            y = 60.8,
+            mapID = 407,
         }
     },
 
@@ -726,6 +768,12 @@ KPReference = {
                     }
                 }
             }
+        },
+        darkmoonFaire = {
+            questID = 29520,
+            x = 55.6,
+            y = 55.8,
+            mapID = 407,
         }
     },
     ---------------------------------------------------------------------
@@ -793,6 +841,12 @@ KPReference = {
                     }
                 }
             }
+        },
+        darkmoonFaire = {
+            questID = 29514,
+            x = 55,
+            y = 70.6,
+            mapID = 407,
         }
     },
 
@@ -854,6 +908,12 @@ KPReference = {
                     }
                 }
             }
+        },
+        darkmoonFaire = {
+            questID = 29518,
+            x = 49.6,
+            y = 60.8,
+            mapID = 407,
         }
     },
 
@@ -911,6 +971,12 @@ KPReference = {
                     }
                 }
             }
+        },
+        darkmoonFaire = {
+            questID = 29519,
+            x = 55,
+            y = 70.6,
+            mapID = 407,
         }
     },
 
