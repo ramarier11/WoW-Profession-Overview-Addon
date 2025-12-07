@@ -169,7 +169,7 @@ function ProfessionTrackerDashboard:Refresh()
         end
         
         local daysRemaining = math.ceil((faireStatus.nextStart - time()) / 86400)
-        self.DarkmoonFaireBanner:SetText(string.format("|cff00ff00🎪 Darkmoon Faire Active!|r (%d days remaining)", daysRemaining))
+        self.DarkmoonFaireBanner:SetText(string.format("|cff00ff00 Darkmoon Faire Active!|r (%d days remaining)", daysRemaining))
         self.DarkmoonFaireBanner:Show()
     elseif self.DarkmoonFaireBanner then
         self.DarkmoonFaireBanner:Hide()
