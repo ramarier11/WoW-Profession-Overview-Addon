@@ -1756,6 +1756,9 @@ local function UpdateCharacterProfessionData()
 
     -- One-time weekly reset across entire DB (before any recalculations)
     ResetWeeklyStateIfNeeded()
+    
+    -- One-time monthly reset for Darkmoon Faire state
+    ResetDarkmoonFaireStateIfNeeded()
 
     local currentTime = time()
     local charKey = GetCharacterKey()
@@ -1942,6 +1945,36 @@ function ProfessionTracker:GetAllCharacters()
     return chars
 end
 
+
+-- ========================================================
+-- Darkmoon Faire Accessors
+-- ========================================================
+
+function ProfessionTracker:IsDarkmoonFaireActive()
+    return IsDarkmoonFaireActive()
+end
+
+function ProfessionTracker:GetDarkmoonFaireStatus()
+    local isActive = IsDarkmoonFaireActive()
+    local currentStart = GetCurrentDarkmoonFaireStart()
+    local nextStart = GetNextDarkmoonFaireStart()
+    local secondsUntilNext = GetSecondsUntilDarkmoonFaire()
+    
+    return {
+        isActive = isActive,
+        currentStart = currentStart,
+        nextStart = nextStart,
+        secondsUntilNext = secondsUntilNext,
+        currentStartFormatted = date("%B %d, %Y", currentStart),
+        nextStartFormatted = date("%B %d, %Y", nextStart),
+    }
+end
+
+function ProfessionTracker:GetCharacterDarkmoonFaireData()
+    local charData = self:GetCharacterData()
+    if not charData then return nil end
+    return charData.darkmoonFaireData
+end
 
 -- ========================================================
 -- Weekly Activity Tracking
