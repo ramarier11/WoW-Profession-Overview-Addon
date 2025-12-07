@@ -271,9 +271,9 @@ function ProfessionTrackerDashboard:CreateCharacterEntry(charKey, charData)
             faireIndicator:SetPoint("TOPRIGHT", entry, "TOPRIGHT", -10, -10)
             
             if allFaireComplete then
-                faireIndicator:SetText("|cff00ff00Faire ✓|r")
+                faireIndicator:SetText("|cff00ff00Faire |TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t|r")
             else
-                faireIndicator:SetText("|cffff0000Faire ✗|r")
+                faireIndicator:SetText("|cffff0000Faire |TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t|r")
             end
         end
     end
