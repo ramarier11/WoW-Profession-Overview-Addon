@@ -114,6 +114,10 @@ local function AcquireCharacterEntry()
         end)
     end
     
+    -- Clear any existing faire indicator
+    if frame.FaireIndicator then
+        frame.FaireIndicator:Hide()
+    end
 
     frame:Show()
     return frame
@@ -267,14 +271,26 @@ function ProfessionTrackerDashboard:CreateCharacterEntry(charKey, charData)
         
         -- Only show faire indicator if character has faire quests available
         if anyFaireQuest then
-            local faireIndicator = entry:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-            faireIndicator:SetPoint("TOPRIGHT", entry, "TOPRIGHT", -10, -10)
+            -- Create or reuse the faire indicator
+            if not entry.FaireIndicator then
+                entry.FaireIndicator = entry:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+                entry.FaireIndicator:SetPoint("TOPRIGHT", entry, "TOPRIGHT", -10, -10)
+            end
             
             if allFaireComplete then
-                faireIndicator:SetText("|cff00ff00Faire |TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t|r")
+                entry.FaireIndicator:SetText("|cff00ff00Faire |TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t|r")
             else
-                faireIndicator:SetText("|cffff0000Faire |TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t|r")
+                entry.FaireIndicator:SetText("|cffff0000Faire |TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t|r")
             end
+            entry.FaireIndicator:Show()
+        elseif entry.FaireIndicator then
+            -- Hide if no faire quest or faire not active
+            entry.FaireIndicator:Hide()
+        end
+    else
+        -- Hide faire indicator if faire is not active
+        if entry.FaireIndicator then
+            entry.FaireIndicator:Hide()
         end
     end
     
