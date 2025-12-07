@@ -1217,8 +1217,9 @@ local function GetCurrentDarkmoonFaireStart()
     
     -- Find first Sunday of current month
     while day <= 31 do
-        local checkStr = string.format("%04d-%02d-%02d", year, month, day)
+        local checkStr = tonumber(string.format("%04d-%02d-%02d", year, month, day))
         local weekdayStr = date("%w", checkStr)
+        print(weekdayStr)
         local weekday = tonumber(weekdayStr) or 0
         
         if weekday == 0 then
