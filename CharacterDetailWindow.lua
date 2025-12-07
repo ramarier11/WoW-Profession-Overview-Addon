@@ -171,7 +171,7 @@ function CharacterDetailWindow:RefreshDisplay()
     if faireStatus and faireStatus.isActive then
         local faireHeader = self.Content:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
         faireHeader:SetPoint("TOPLEFT", 10, -10)
-        faireHeader:SetText("|cff00ff00 Darkmoon Faire Active|r")
+        faireHeader:SetText("|cff00ff00Darkmoon Faire Active|r")
         
         local daysRemaining = math.ceil((faireStatus.nextStart - time()) / 86400)
         local faireInfo = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
