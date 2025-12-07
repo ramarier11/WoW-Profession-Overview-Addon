@@ -1511,12 +1511,13 @@ end
 
 -- Helper: Get quest name from questID
 local function GetQuestName(questID)
-    print("Getting quest name for ID:", questID)
+    
     if not questID then return "Unknown Quest" end
     
     local questInfo = C_QuestLog.GetTitleForQuestID(questID)
-    if questInfo and questInfo.name then
-        return questInfo.name
+    
+    if questInfo and questInfo.title then
+        return questInfo.title
     end
     return "Unknown Quest"
 end
