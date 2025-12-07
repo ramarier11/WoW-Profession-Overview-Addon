@@ -1408,8 +1408,6 @@ local function ResetDarkmoonFaireStateIfNeeded()
                     if type(profData) == "table" then
                         -- Initialize darkmoonFaire table if it doesn't exist
                         profData.darkmoonFaire = profData.darkmoonFaire or {}
-                        -- Clear quest completion data for new month
-                        profData.darkmoonFaire.questsCompleted = {}
                         profData.darkmoonFaire.lastReset = time()
                     end
                 end
@@ -1861,7 +1859,6 @@ local function RecalculateDarkmoonFaireQuests()
             
             -- Initialize darkmoonFaire structure if not present
             profData.darkmoonFaire = profData.darkmoonFaire or {
-                questsCompleted = {},
                 lastReset = 0
             }
             
@@ -2151,7 +2148,6 @@ function ProfessionTracker:GetProfessionDarkmoonFaireData(professionName)
     
     -- Initialize if not present
     profData.darkmoonFaire = profData.darkmoonFaire or {
-        questsCompleted = {},
         lastReset = 0
     }
     
