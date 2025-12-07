@@ -1177,91 +1177,67 @@ end
 -- The event always starts on the first Sunday of each month at the start of the day (00:00 UTC)
 local function GetNextDarkmoonFaireStart()
     local now = time()
-    local date = os.date("*t", now)
+    local dateTable = date("*t", now)
     
     -- Start with the first day of current month
-    local year = date.year
-    local month = date.month
+    local year = dateTable.year
+    local month = dateTable.month
     local day = 1
     
     -- Find the first Sunday
-    while true do
-        local dateTable = {
-            year = year,
-            month = month,
-            day = day,
-            hour = 0,
-            min = 0,
-            sec = 0
-        }
+    while day <= 31 do
+        local checkStr = string.format("%04d-%02d-%02d", year, month, day)
+        local weekday = tonumber(date("%w", checkStr))  -- 0 = Sunday in WoW
         
-        local timestamp = os.time(dateTable)
-        local checkDate = os.date("*t", timestamp)
-        local dayOfWeek = checkDate.wday  -- 1 = Sunday, 7 = Saturday
-        
-        if dayOfWeek == 1 then
+        if weekday == 0 then
             -- Found first Sunday of the month
-            return timestamp
+            return tonumber(date("%s", checkStr))
         end
         
         day = day + 1
     end
+    
+    -- Fallback: shouldn't reach here
+    return now + (30 * 24 * 60 * 60)
 end
 
 -- Returns the timestamp of the current Darkmoon Faire start (or next if not active)
 local function GetCurrentDarkmoonFaireStart()
     local now = time()
-    local date = os.date("*t", now)
+    local dateTable = date("*t", now)
     
     -- Check if first Sunday of current month has passed
-    local month = date.month
-    local year = date.year
+    local month = dateTable.month
+    local year = dateTable.year
     local day = 1
     
-    while true do
-        local dateTable = {
-            year = year,
-            month = month,
-            day = day,
-            hour = 0,
-            min = 0,
-            sec = 0
-        }
+    -- Find first Sunday of current month
+    while day <= 31 do
+        local checkStr = string.format("%04d-%02d-%02d", year, month, day)
+        local weekday = tonumber(date("%w", checkStr))
         
-        local timestamp = os.time(dateTable)
-        local checkDate = os.date("*t", timestamp)
-        local dayOfWeek = checkDate.wday
-        
-        if dayOfWeek == 1 then
+        if weekday == 0 then
             -- Found first Sunday
+            local timestamp = tonumber(date("%s", checkStr))
             if timestamp <= now then
                 -- This month's event has started or is current
                 return timestamp
             else
                 -- Haven't reached this month's event yet, return last month's
-                -- Move to previous month and find first Sunday
                 month = month - 1
                 if month == 0 then
                     month = 12
                     year = year - 1
                 end
-                day = 1
                 
-                while true do
-                    dateTable = {
-                        year = year,
-                        month = month,
-                        day = day,
-                        hour = 0,
-                        min = 0,
-                        sec = 0
-                    }
-                    timestamp = os.time(dateTable)
-                    checkDate = os.date("*t", timestamp)
-                    dayOfWeek = checkDate.wday
+                -- Find first Sunday of previous month
+                day = 1
+                while day <= 31 do
+                    checkStr = string.format("%04d-%02d-%02d", year, month, day)
+                    weekday = tonumber(date("%w", checkStr))
                     
-                    if dayOfWeek == 1 then
-                        return timestamp
+                    if weekday == 0 then
+                        return tonumber(date("%s", checkStr))
                     end
                     day = day + 1
                 end
@@ -1270,6 +1246,9 @@ local function GetCurrentDarkmoonFaireStart()
         
         day = day + 1
     end
+    
+    -- Fallback: return timestamp from 30 days ago
+    return now - (30 * 24 * 60 * 60)
 end
 
 -- Returns true if Darkmoon Faire is currently active (within the month starting on first Sunday)
