@@ -1388,7 +1388,7 @@ end
 
 -- Clears monthly Darkmoon Faire state if a new event has started
 local function ResetDarkmoonFaireStateIfNeeded()
-    print("Checking Darkmoon Faire reset...")
+    --print("Checking Darkmoon Faire reset...")
     if not ProfessionTrackerDB then return end
     ProfessionTrackerDB.meta = ProfessionTrackerDB.meta or {}
     local meta = ProfessionTrackerDB.meta
@@ -1417,7 +1417,9 @@ local function ResetDarkmoonFaireStateIfNeeded()
     
     meta.lastDarkmoonFaireToken = token
     meta.lastDarkmoonFaireResetAt = time()
-    print("Darkmoon Faire reset token:", meta.lastDarkmoonFaireToken)
+
+    --print(meta.lastDarkmoonFaireToken)
+
 end
 
 -- ========================================================
@@ -2066,7 +2068,7 @@ local function UpdateCharacterProfessionData()
         ProfessionTrackerUI.missingTreasureWindow:Hide()
     end
 
-    print("|cff00ff00[Profession Tracker]|r Data updated for:", charKey)
+    --print("|cff00ff00[Profession Tracker]|r Data updated for:", charKey)
 end
 
 
@@ -2191,8 +2193,7 @@ function ProfessionTracker:MarkWeeklyActivityComplete(profession, expansion, act
     if expData.weeklyKnowledgeProgress[activity] then
         expData.weeklyKnowledgeProgress[activity].completed = true
         expData.weeklyKnowledgeProgress[activity].lastCompleted = time()
-        print(string.format("|cff00ff00[Profession Tracker]|r Marked %s complete for %s (%s)", 
-            activity, profession, expansion))
+        --print(string.format("|cff00ff00[Profession Tracker]|r Marked %s complete for %s (%s)", activity, profession, expansion))
         return true
     end
     
@@ -2216,7 +2217,7 @@ ProfessionTracker:RegisterEvent("QUEST_TURNED_IN")
 
 
 ProfessionTracker:SetScript("OnEvent", function(self, event, ...)
-    print("|cffff00ff[DEBUG]|r Event fired:", event)
+    --print("|cffff00ff[DEBUG]|r Event fired:", event)
     -- Run DB update
     if  event == "TRADE_SKILL_SHOW" or
         event == "PLAYER_LOGIN" or
@@ -2245,36 +2246,36 @@ end)
 -- Debug Commands
 -- ========================================================
 
-function ProfessionTracker:PrintCharacterData()
-    local charData = self:GetCharacterData()
-    if not charData then
-        print("|cffff0000[Profession Tracker]|r No data found for this character")
-        return
-    end
+-- function ProfessionTracker:PrintCharacterData()
+--     local charData = self:GetCharacterData()
+--     if not charData then
+--         --print("|cffff0000[Profession Tracker]|r No data found for this character")
+--         return
+--     end
     
-    print("|cff00ff00[Profession Tracker]|r Character Data:")
-    print(string.format("  Name: %s-%s", charData.name or "Unknown", charData.realm or "Unknown"))
-    print(string.format("  Class: %s, Level: %d", charData.class or "Unknown", charData.level or 0))
+--     --print("|cff00ff00[Profession Tracker]|r Character Data:")
+--     --print(string.format("  Name: %s-%s", charData.name or "Unknown", charData.realm or "Unknown"))
+--     --print(string.format("  Class: %s, Level: %d", charData.class or "Unknown", charData.level or 0))
     
-    if charData.professions then
-        print("  Professions:")
-        for profName, profData in pairs(charData.professions) do
-            print(string.format("    - %s", profName))
-            if profData.expansions then
-                for expName, expData in pairs(profData.expansions) do
-                    local knowledgeInfo = ""
-                    if expData.knowledgePoints then
-                        knowledgeInfo = string.format(" [Knowledge: %d Remaining %d]",
-                            expData.knowledgePoints or 0,
-                            expData.pointsUntilMaxKnowledge or 0)
-                    end
-                    print(string.format("      %s: %d/%d%s",
-                        expName,
-                        expData.skillLevel or 0,
-                        expData.maxSkillLevel or 0,
-                        knowledgeInfo))
-                end
-            end
-        end
-    end
-end
+--     if charData.professions then
+--         --print("  Professions:")
+--         for profName, profData in pairs(charData.professions) do
+--             --  print(string.format("    - %s", profName))
+--             if profData.expansions then
+--                 for expName, expData in pairs(profData.expansions) do
+--                     local knowledgeInfo = ""
+--                     if expData.knowledgePoints then
+--                         knowledgeInfo = string.format(" [Knowledge: %d Remaining %d]",
+--                             expData.knowledgePoints or 0,
+--                             expData.pointsUntilMaxKnowledge or 0)
+--                     end
+--                     -- --print(string.format("      %s: %d/%d%s",
+--                     --     expName,
+--                     --     expData.skillLevel or 0,
+--                     --     expData.maxSkillLevel or 0,
+--                     --     knowledgeInfo))
+--                 end
+--             end
+--         end
+--     end
+-- end
