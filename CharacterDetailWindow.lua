@@ -125,6 +125,19 @@ function CharacterDetailWindow:ShowCharacter(charKey, charData)
     self.currentCharKey = charKey
     self:RefreshDisplay()
     self:Show()
+    
+    -- Register for quest updates
+    if not self.questEventRegistered then
+        self:RegisterEvent("QUEST_TURNED_IN")
+        self:SetScript("OnEvent", function(self, event)
+            if event == "QUEST_TURNED_IN" and self:IsShown() then
+                C_Timer.After(0.1, function()
+                    self:Refresh()
+                end)
+            end
+        end)
+        self.questEventRegistered = true
+    end
 end
 
 -- Refresh the current character's display
@@ -192,8 +205,8 @@ function CharacterDetailWindow:RefreshDisplay()
                     questText:SetPoint("TOPLEFT", 20, currentY)
                     
                     local statusIcon = isComplete 
-                        and "|cff00ff00✓|r" 
-                        or "|cffff0000✗|r"
+                        and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t" 
+                        or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
                     
                     questText:SetText(string.format("%s: %s %s", profName, questName, statusIcon))
                     currentY = currentY - 16
