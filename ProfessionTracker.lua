@@ -1170,6 +1170,171 @@ local function ResetWeeklyStateIfNeeded()
 end
 
 -- ========================================================
+-- Darkmoon Faire Tracking Functions
+-- ========================================================
+
+-- Returns the timestamp of the next upcoming Darkmoon Faire start
+-- The event always starts on the first Sunday of each month at the start of the day (00:00 UTC)
+local function GetNextDarkmoonFaireStart()
+    local now = time()
+    local date = os.date("*t", now)
+    
+    -- Start with the first day of current month
+    local year = date.year
+    local month = date.month
+    local day = 1
+    
+    -- Find the first Sunday
+    while true do
+        local dateTable = {
+            year = year,
+            month = month,
+            day = day,
+            hour = 0,
+            min = 0,
+            sec = 0
+        }
+        
+        local timestamp = os.time(dateTable)
+        local checkDate = os.date("*t", timestamp)
+        local dayOfWeek = checkDate.wday  -- 1 = Sunday, 7 = Saturday
+        
+        if dayOfWeek == 1 then
+            -- Found first Sunday of the month
+            return timestamp
+        end
+        
+        day = day + 1
+    end
+end
+
+-- Returns the timestamp of the current Darkmoon Faire start (or next if not active)
+local function GetCurrentDarkmoonFaireStart()
+    local now = time()
+    local date = os.date("*t", now)
+    
+    -- Check if first Sunday of current month has passed
+    local month = date.month
+    local year = date.year
+    local day = 1
+    
+    while true do
+        local dateTable = {
+            year = year,
+            month = month,
+            day = day,
+            hour = 0,
+            min = 0,
+            sec = 0
+        }
+        
+        local timestamp = os.time(dateTable)
+        local checkDate = os.date("*t", timestamp)
+        local dayOfWeek = checkDate.wday
+        
+        if dayOfWeek == 1 then
+            -- Found first Sunday
+            if timestamp <= now then
+                -- This month's event has started or is current
+                return timestamp
+            else
+                -- Haven't reached this month's event yet, return last month's
+                -- Move to previous month and find first Sunday
+                month = month - 1
+                if month == 0 then
+                    month = 12
+                    year = year - 1
+                end
+                day = 1
+                
+                while true do
+                    dateTable = {
+                        year = year,
+                        month = month,
+                        day = day,
+                        hour = 0,
+                        min = 0,
+                        sec = 0
+                    }
+                    timestamp = os.time(dateTable)
+                    checkDate = os.date("*t", timestamp)
+                    dayOfWeek = checkDate.wday
+                    
+                    if dayOfWeek == 1 then
+                        return timestamp
+                    end
+                    day = day + 1
+                end
+            end
+        end
+        
+        day = day + 1
+    end
+end
+
+-- Returns true if Darkmoon Faire is currently active (within the month starting on first Sunday)
+local function IsDarkmoonFaireActive()
+    local now = time()
+    local currentStart = GetCurrentDarkmoonFaireStart()
+    local nextStart = GetNextDarkmoonFaireStart()
+    
+    -- If current start is in the future, faire is not active
+    if currentStart > now then
+        return false
+    end
+    
+    -- If we're before the next start, we're in the current faire month
+    return now < nextStart
+end
+
+-- Returns seconds until the next Darkmoon Faire begins
+local function GetSecondsUntilDarkmoonFaire()
+    local now = time()
+    local nextStart = GetNextDarkmoonFaireStart()
+    
+    if nextStart > now then
+        return nextStart - now
+    else
+        -- Should not happen, but recalculate
+        return 0
+    end
+end
+
+-- Returns the Darkmoon Faire token (changes once per month when faire resets)
+local function GetDarkmoonFaireToken()
+    local currentStart = GetCurrentDarkmoonFaireStart()
+    return math.floor(currentStart / (24 * 60 * 60))
+end
+
+-- Clears monthly Darkmoon Faire state if a new event has started
+local function ResetDarkmoonFaireStateIfNeeded()
+    if not ProfessionTrackerDB then return end
+    ProfessionTrackerDB.meta = ProfessionTrackerDB.meta or {}
+    local meta = ProfessionTrackerDB.meta
+    
+    local token = GetDarkmoonFaireToken()
+    
+    -- Already reset for this faire token
+    if meta.lastDarkmoonFaireToken == token then
+        return
+    end
+    
+    -- Iterate entire DB and reset Darkmoon Faire state
+    if ProfessionTrackerDB.characters then
+        for _, charData in pairs(ProfessionTrackerDB.characters) do
+            if type(charData) == "table" then
+                charData.darkmoonFaireData = charData.darkmoonFaireData or {}
+                charData.darkmoonFaireData.questsCompleted = {}
+                charData.darkmoonFaireData.lastReset = time()
+            end
+        end
+    end
+    
+    meta.lastDarkmoonFaireToken = token
+    meta.lastDarkmoonFaireResetAt = time()
+end
+
+-- ========================================================
 -- Helper Functions
 -- ========================================================
 
