@@ -203,10 +203,9 @@ function CharacterDetailWindow:RefreshDisplay()
         
         -- Add separator line
         local separator = self.Content:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        separator:SetPoint("TOPLEFT", 20, currentY - 5)
         separator:SetTextColor(0.5, 0.5, 0.5, 1)
         CharacterDetailWindow:SetSize(400, characterDetailWindowHeight + 30)
-        yOffset = currentY - 20
+        yOffset = currentY
     end
     
     -- Build detailed profession display (2-column layout)
