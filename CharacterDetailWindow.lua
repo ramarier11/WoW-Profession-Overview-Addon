@@ -178,7 +178,7 @@ function CharacterDetailWindow:RefreshDisplay()
         faireInfo:SetPoint("TOPLEFT", faireHeader, "BOTTOMLEFT", 0, -3)
         
         -- Display quest information for each profession
-        local currentY = -20
+        local currentY = -30
         local charData = characters[self.currentCharKey]
         if charData and charData.professions then
             for profName, profData in pairs(charData.professions) do
@@ -204,7 +204,6 @@ function CharacterDetailWindow:RefreshDisplay()
         -- Add separator line
         local separator = self.Content:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         separator:SetPoint("TOPLEFT", 20, currentY - 5)
-        separator:SetText("----------------------------------")
         separator:SetTextColor(0.5, 0.5, 0.5, 1)
         CharacterDetailWindow:SetSize(400, characterDetailWindowHeight + 30)
         yOffset = currentY - 20
