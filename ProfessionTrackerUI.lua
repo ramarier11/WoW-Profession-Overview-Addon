@@ -245,6 +245,39 @@ function ProfessionTrackerDashboard:CreateCharacterEntry(charKey, charData)
         classColor[3] * 255,
         charData.name or "Unknown",
         charData.realm or "Unknown"))
+    
+    -- Add Darkmoon Faire status if faire is active
+    local faireStatus = ProfessionTracker:GetDarkmoonFaireStatus()
+    if faireStatus and faireStatus.isActive then
+        -- Check if all professions with faire quests are completed
+        local allFaireComplete = true
+        local anyFaireQuest = false
+        
+        if charData.professions then
+            for profName, profData in pairs(charData.professions) do
+                if profData.darkmoonFaire then
+                    anyFaireQuest = true
+                    if not profData.darkmoonFaire.completed then
+                        allFaireComplete = false
+                        break
+                    end
+                end
+            end
+        end
+        
+        -- Only show faire indicator if character has faire quests available
+        if anyFaireQuest then
+            local faireIndicator = entry:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+            faireIndicator:SetPoint("TOPRIGHT", entry, "TOPRIGHT", -10, -10)
+            
+            if allFaireComplete then
+                faireIndicator:SetText("|cff00ff00Faire ✓|r")
+            else
+                faireIndicator:SetText("|cffff0000Faire ✗|r")
+            end
+        end
+    end
+    
     -- Make entry clickable to show detail window
     entry:SetScript("OnMouseUp", function(self, button)
         if button == "LeftButton" then
