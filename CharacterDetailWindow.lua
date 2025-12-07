@@ -209,7 +209,7 @@ function CharacterDetailWindow:RefreshDisplay()
                         and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t" 
                         or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14:14|t"
                     
-                    questText:SetText(string.format("|T%s:16:16|t: %s %s", profIcon, questName, statusIcon))
+                    questText:SetText(string.format("|T%s:16:16|t %s %s", profIcon, questName, statusIcon))
                     currentY = currentY - 16
                 end
             end
