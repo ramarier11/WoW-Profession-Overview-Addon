@@ -821,8 +821,8 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 gatherNodes = {
-                    {name = "Deepgrove Petal", questID = { 81416, 81417, 81418, 81419, 81420 }, icon ="Interface\\Icons\\inv_magic_swirl_color2" },
-                    {name = "Deepgrove Rose", questID = 81421, icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
+                    {name = "Deepgrove Petal", questID = { 81416, 81417, 81418, 81419, 81420 }, icon ="Interface\\Icons\\inv_-misc_herb_deathblossom_leaf" },
+                    {name = "Deepgrove Rose", questID = 81421, icon ="Interface\\Icons\\inv_jewelry_trinket_05" }
                 }
             },
             oneTime = {
@@ -888,8 +888,8 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_crafting_orders", 
                 },
                 gatherNodes = {
-                    {name = "Slab of Slate", questID = { 83054, 83053, 83052, 83051, 83050 }, icon ="Interface\\Icons\\inv_magic_swirl_color2" },
-                    {name = "Erosion-Polished Slate", questID = 83049, icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
+                    {name = "Slab of Slate", questID = { 83054, 83053, 83052, 83051, 83050 }, icon ="Interface\\Icons\\inv_ore_adamantium_01" },
+                    {name = "Erosion-Polished Slate", questID = 83049, icon ="Interface\\Icons\\inv_ore_arcanite_02" }
                 }
             },
             oneTime = {
@@ -951,8 +951,8 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 gatherNodes = {
-                    {name = "Toughened Tempest Pelt", questID = { 81459, 81460, 81461, 81462, 81463 }, icon ="Interface\\Icons\\inv_magic_swirl_color2" },
-                    {name = "Abyssal Fur", questID = 81464, icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" }
+                    {name = "Toughened Tempest Pelt", questID = { 81459, 81460, 81461, 81462, 81463 }, icon ="Interface\\Icons\\inv_skinning_stormchargedleather1" },
+                    {name = "Abyssal Fur", questID = 81464, icon ="Interface\\Icons\\inv_misc_pelt_11" }
                 }
             },
             oneTime = {
