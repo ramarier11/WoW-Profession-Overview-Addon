@@ -179,6 +179,9 @@ function CharacterDetailWindow:RefreshDisplay()
         end
     end
     
+    -- Initialize yOffset for content layout
+    local yOffset = -10
+    
     -- Check Darkmoon Faire status and show section if active
     local faireStatus = ProfessionTracker:GetDarkmoonFaireStatus()
     if faireStatus and faireStatus.isActive then
@@ -215,15 +218,11 @@ function CharacterDetailWindow:RefreshDisplay()
             end
         end
         
-        -- Add separator line
-        local separator = self.Content:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        separator:SetTextColor(0.5, 0.5, 0.5, 1)
-        CharacterDetailWindow:SetSize(400, characterDetailWindowHeight + 30)
-        yOffset = currentY
+        -- Add spacing after faire section if it was shown
+        yOffset = currentY - 10
     end
     
     -- Build detailed profession display (2-column layout)
-    local yOffset = yOffset or -10
     local leftColumnX = 4 -- reduced left padding
     -- Derive usable content width (fallback to frame width minus padding if not yet calculated)
     local contentWidth = self.Content:GetWidth()
