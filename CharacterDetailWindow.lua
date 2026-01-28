@@ -573,13 +573,6 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
             self:ShowMissingTreasures(profName, expName, expData)
         end)
         yOffset = yOffset - 25
-    elseif hasKnowledgeSystem and expData.oneTimeCollectedAll then
-        yOffset = yOffset - 3
-        local completeText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-        completeText:SetPoint("TOPLEFT", xOffset + 6, yOffset)
-        completeText:SetText("|TInterface\\RaidFrame\\ReadyCheck-Ready:12:12|t All One Time Collected")
-        completeText:SetTextColor(0, 1, 0, 1)
-        yOffset = yOffset - 16
     end
     
     yOffset = yOffset - 5
