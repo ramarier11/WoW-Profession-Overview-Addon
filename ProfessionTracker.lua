@@ -1352,19 +1352,21 @@ local function GetCurrentDarkmoonFaireStart()
     return now - (30 * 86400)
 end
 
--- Returns true if Darkmoon Faire is currently active (within the month starting on first Sunday)
+-- Returns the timestamp when the current Darkmoon Faire ends
+-- (First Sunday + 7 days = the following Sunday)
+local function GetCurrentDarkmoonFaireEnd()
+    local currentStart = GetCurrentDarkmoonFaireStart()
+    return currentStart + (7 * 86400)  -- 7 days later
+end
+
+-- Returns true if Darkmoon Faire is currently active (from first Sunday through the following Sunday)
 local function IsDarkmoonFaireActive()
     local now = time()
     local currentStart = GetCurrentDarkmoonFaireStart()
-    local nextStart = GetNextDarkmoonFaireStart()
+    local currentEnd = GetCurrentDarkmoonFaireEnd()
     
-    -- If current start is in the future, faire is not active
-    if currentStart > now then
-        return false
-    end
-    
-    -- If we're before the next start, we're in the current faire month
-    return now < nextStart
+    -- Check if we're within the faire window (start <= now < end)
+    return now >= currentStart and now < currentEnd
 end
 
 -- Returns seconds until the next Darkmoon Faire begins
