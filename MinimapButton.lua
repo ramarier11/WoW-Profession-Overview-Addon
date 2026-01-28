@@ -50,30 +50,38 @@ end)
 -- Click handlers
 minimapButton:SetScript("OnClick", function(self, button)
     if button == "LeftButton" then
-        -- Open character detail window for current character
-        local charKey = ProfessionTracker and (function()
-            local name, realm = UnitFullName("player")
-            if not realm or realm == "" then
-                realm = GetRealmName() or "UnknownRealm"
-            end
-            if not name then
-                name = UnitName("player") or "UnknownPlayer"
-            end
-            return string.format("%s-%s", name, realm)
-        end)() or nil
-        
-        if charKey then
-            local characters = ProfessionTracker:GetAllCharacters()
-            if characters and characters[charKey] then
-                if ProfessionTrackerUI and ProfessionTrackerUI.CharacterDetailWindow then
-                    ProfessionTrackerUI.CharacterDetailWindow:ShowCharacter(charKey, characters[charKey])
-                end
+        -- Toggle character detail window for current character
+        if ProfessionTrackerUI and ProfessionTrackerUI.CharacterDetailWindow then
+            local charDetailWindow = ProfessionTrackerUI.CharacterDetailWindow
+            
+            if charDetailWindow:IsShown() then
+                -- Window is open, close it
+                charDetailWindow:Hide()
             else
-                print("|cffff0000[Profession Tracker]|r No data found for current character")
+                -- Window is closed, open it
+                local charKey = ProfessionTracker and (function()
+                    local name, realm = UnitFullName("player")
+                    if not realm or realm == "" then
+                        realm = GetRealmName() or "UnknownRealm"
+                    end
+                    if not name then
+                        name = UnitName("player") or "UnknownPlayer"
+                    end
+                    return string.format("%s-%s", name, realm)
+                end)() or nil
+                
+                if charKey then
+                    local characters = ProfessionTracker:GetAllCharacters()
+                    if characters and characters[charKey] then
+                        charDetailWindow:ShowCharacter(charKey, characters[charKey])
+                    else
+                        print("|cffff0000[Profession Tracker]|r No data found for current character")
+                    end
+                end
             end
         end
     elseif button == "RightButton" then
-        -- Open dashboard
+        -- Toggle dashboard
         if ProfessionTrackerDashboard then
             if ProfessionTrackerDashboard:IsShown() then
                 ProfessionTrackerDashboard:Hide()

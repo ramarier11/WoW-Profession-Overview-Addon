@@ -179,6 +179,9 @@ function CharacterDetailWindow:RefreshDisplay()
         end
     end
     
+    -- Initialize yOffset for content layout
+    local yOffset = -10
+    
     -- Check Darkmoon Faire status and show section if active
     local faireStatus = ProfessionTracker:GetDarkmoonFaireStatus()
     if faireStatus and faireStatus.isActive then
@@ -215,15 +218,11 @@ function CharacterDetailWindow:RefreshDisplay()
             end
         end
         
-        -- Add separator line
-        local separator = self.Content:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        separator:SetTextColor(0.5, 0.5, 0.5, 1)
-        CharacterDetailWindow:SetSize(400, characterDetailWindowHeight + 30)
-        yOffset = currentY
+        -- Add spacing after faire section if it was shown
+        yOffset = currentY - 10
     end
     
     -- Build detailed profession display (2-column layout)
-    local yOffset = yOffset or -10
     local leftColumnX = 4 -- reduced left padding
     -- Derive usable content width (fallback to frame width minus padding if not yet calculated)
     local contentWidth = self.Content:GetWidth()
@@ -461,14 +460,11 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
     end
 
     -- Knowledge points (condensed, knowledge expansions only)
-    if expData.pointsUntilMaxKnowledge then
+    if expData.pointsUntilMaxKnowledge and expData.pointsUntilMaxKnowledge > 0 then
         local kpText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
         kpText:SetPoint("TOPLEFT", xOffset + 6, yOffset)
         local kpRemaining = math.max(0, expData.pointsUntilMaxKnowledge)
         kpText:SetText(string.format("Knowledge Remaining: %d", kpRemaining))
-        if kpRemaining == 0 then
-            kpText:SetTextColor(0, 1, 0, 1)
-        end
         yOffset = yOffset - 14
     end
     
@@ -574,13 +570,6 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
             self:ShowMissingTreasures(profName, expName, expData)
         end)
         yOffset = yOffset - 25
-    elseif hasKnowledgeSystem and expData.oneTimeCollectedAll then
-        yOffset = yOffset - 3
-        local completeText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-        completeText:SetPoint("TOPLEFT", xOffset + 6, yOffset)
-        completeText:SetText("|TInterface\\RaidFrame\\ReadyCheck-Ready:12:12|t All One Time Collected")
-        completeText:SetTextColor(0, 1, 0, 1)
-        yOffset = yOffset - 16
     end
     
     yOffset = yOffset - 5
