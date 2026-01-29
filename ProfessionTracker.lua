@@ -76,8 +76,41 @@ KPReference = {
                 }
             },
         },
-        [11] = { 
-             -- The War Within / Khaz Algar
+        [11] = { -- The War Within / Khaz Algar
+            weekly = {
+                treatise = {
+                    questID = 83725,  
+                    name = "Treatise: Alchemy",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_alchemy",
+                },
+                craftingOrder = {
+                    questID = 84133,
+                    name = "Alchemy Services Requested",
+                    icon = "Interface\\Icons\\inv_crafting_orders",
+                },
+                treasures = {
+                    { questID = 83253, name = "Alchemical Sediment", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
+                    { questID = 83255, name = "Deepstone Crucible", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
+                }
+            },
+            oneTime = {
+                treasures = {
+                    name = "One-Time Knowledge Treasures",
+                    icon = "",
+                    locations = {
+                        { mapID = 2339, x = 32.5, y = 60.1, name = "Earthen Iron Powder", questID = 83840 },
+                        { mapID = 2248, x = 57.7, y = 61.7, name = "Metal Dornogal Frame", questID = 83841 },
+                        { mapID = 2214, x = 64.9, y = 61.8, name = "Engraved Stirring Rod", questID = 83843 },
+                        { mapID = 2214, x = 42.2, y = 24.1, name = "Reinforced Beaker", questID = 83842 },
+                        { mapID = 2215, x = 42.6, y = 55.0, name = "Chemist's Purified Water", questID = 83844 },
+                        { mapID = 2215, x = 41.6, y = 55.8, name = "Sanctified Mortar and Pestle", questID = 83845 },
+                        { mapID = 2255, x = 42.8, y = 57.3, name = "Dark Apothecary's Vial", questID = 83847 },
+                        { mapID = 2216, x = 45.5, y = 13.2, name = "Nerubian Mixing Salts", questID = 83846 },
+                    }
+                }
+            }
+        },
+        [12] = { -- Midnight
             weekly = {
                 treatise = {
                     questID = 83725,  
@@ -205,6 +238,40 @@ KPReference = {
                 }
             }
         },
+        [12] = { -- Midnight
+            weekly = {
+                treatise = {
+                    questID = 83725,  
+                    name = "Treatise: Alchemy",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_alchemy",
+                },
+                craftingOrder = {
+                    questID = 84133,
+                    name = "Alchemy Services Requested",
+                    icon = "Interface\\Icons\\inv_crafting_orders",
+                },
+                treasures = {
+                    { questID = 83253, name = "Alchemical Sediment", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
+                    { questID = 83255, name = "Deepstone Crucible", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
+                }
+            },
+            oneTime = {
+                treasures = {
+                    name = "One-Time Knowledge Treasures",
+                    icon = "",
+                    locations = {
+                        { mapID = 2339, x = 32.5, y = 60.1, name = "Earthen Iron Powder", questID = 83840 },
+                        { mapID = 2248, x = 57.7, y = 61.7, name = "Metal Dornogal Frame", questID = 83841 },
+                        { mapID = 2214, x = 64.9, y = 61.8, name = "Engraved Stirring Rod", questID = 83843 },
+                        { mapID = 2214, x = 42.2, y = 24.1, name = "Reinforced Beaker", questID = 83842 },
+                        { mapID = 2215, x = 42.6, y = 55.0, name = "Chemist's Purified Water", questID = 83844 },
+                        { mapID = 2215, x = 41.6, y = 55.8, name = "Sanctified Mortar and Pestle", questID = 83845 },
+                        { mapID = 2255, x = 42.8, y = 57.3, name = "Dark Apothecary's Vial", questID = 83847 },
+                        { mapID = 2216, x = 45.5, y = 13.2, name = "Nerubian Mixing Salts", questID = 83846 },
+                    }
+                }
+            }
+        },
         darkmoonFaire = {
             questID = 29508,
             x = 51,
@@ -304,6 +371,40 @@ KPReference = {
                 }
             }
         },
+        [12] = { -- Midnight
+            weekly = {
+                treatise = {
+                    questID = 83725,  
+                    name = "Treatise: Alchemy",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_alchemy",
+                },
+                craftingOrder = {
+                    questID = 84133,
+                    name = "Alchemy Services Requested",
+                    icon = "Interface\\Icons\\inv_crafting_orders",
+                },
+                treasures = {
+                    { questID = 83253, name = "Alchemical Sediment", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
+                    { questID = 83255, name = "Deepstone Crucible", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
+                }
+            },
+            oneTime = {
+                treasures = {
+                    name = "One-Time Knowledge Treasures",
+                    icon = "",
+                    locations = {
+                        { mapID = 2339, x = 32.5, y = 60.1, name = "Earthen Iron Powder", questID = 83840 },
+                        { mapID = 2248, x = 57.7, y = 61.7, name = "Metal Dornogal Frame", questID = 83841 },
+                        { mapID = 2214, x = 64.9, y = 61.8, name = "Engraved Stirring Rod", questID = 83843 },
+                        { mapID = 2214, x = 42.2, y = 24.1, name = "Reinforced Beaker", questID = 83842 },
+                        { mapID = 2215, x = 42.6, y = 55.0, name = "Chemist's Purified Water", questID = 83844 },
+                        { mapID = 2215, x = 41.6, y = 55.8, name = "Sanctified Mortar and Pestle", questID = 83845 },
+                        { mapID = 2255, x = 42.8, y = 57.3, name = "Dark Apothecary's Vial", questID = 83847 },
+                        { mapID = 2216, x = 45.5, y = 13.2, name = "Nerubian Mixing Salts", questID = 83846 },
+                    }
+                }
+            }
+        },
         darkmoonFaire = {
             questID = 29510,
             x = 53.6,
@@ -390,6 +491,40 @@ KPReference = {
                         { mapID = 2215, x = 46.3, y = 61.4, name = "Holy Firework Dud", questID = 83870 },
                         { mapID = 2255, x = 56.9, y = 38.6, name = "Puppeted Mechanical Spider", questID = 83872 },
                         { mapID = 2216, x = 63.2, y = 11.3, name = "Emptied Venom Canister", questID = 83873 },
+                    }
+                }
+            }
+        },
+        [12] = { -- Midnight
+            weekly = {
+                treatise = {
+                    questID = 83725,  
+                    name = "Treatise: Alchemy",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_alchemy",
+                },
+                craftingOrder = {
+                    questID = 84133,
+                    name = "Alchemy Services Requested",
+                    icon = "Interface\\Icons\\inv_crafting_orders",
+                },
+                treasures = {
+                    { questID = 83253, name = "Alchemical Sediment", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
+                    { questID = 83255, name = "Deepstone Crucible", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
+                }
+            },
+            oneTime = {
+                treasures = {
+                    name = "One-Time Knowledge Treasures",
+                    icon = "",
+                    locations = {
+                        { mapID = 2339, x = 32.5, y = 60.1, name = "Earthen Iron Powder", questID = 83840 },
+                        { mapID = 2248, x = 57.7, y = 61.7, name = "Metal Dornogal Frame", questID = 83841 },
+                        { mapID = 2214, x = 64.9, y = 61.8, name = "Engraved Stirring Rod", questID = 83843 },
+                        { mapID = 2214, x = 42.2, y = 24.1, name = "Reinforced Beaker", questID = 83842 },
+                        { mapID = 2215, x = 42.6, y = 55.0, name = "Chemist's Purified Water", questID = 83844 },
+                        { mapID = 2215, x = 41.6, y = 55.8, name = "Sanctified Mortar and Pestle", questID = 83845 },
+                        { mapID = 2255, x = 42.8, y = 57.3, name = "Dark Apothecary's Vial", questID = 83847 },
+                        { mapID = 2216, x = 45.5, y = 13.2, name = "Nerubian Mixing Salts", questID = 83846 },
                     }
                 }
             }
@@ -489,6 +624,40 @@ KPReference = {
                 }
             }
         },
+        [12] = { -- Midnight
+            weekly = {
+                treatise = {
+                    questID = 83725,  
+                    name = "Treatise: Alchemy",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_alchemy",
+                },
+                craftingOrder = {
+                    questID = 84133,
+                    name = "Alchemy Services Requested",
+                    icon = "Interface\\Icons\\inv_crafting_orders",
+                },
+                treasures = {
+                    { questID = 83253, name = "Alchemical Sediment", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
+                    { questID = 83255, name = "Deepstone Crucible", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
+                }
+            },
+            oneTime = {
+                treasures = {
+                    name = "One-Time Knowledge Treasures",
+                    icon = "",
+                    locations = {
+                        { mapID = 2339, x = 32.5, y = 60.1, name = "Earthen Iron Powder", questID = 83840 },
+                        { mapID = 2248, x = 57.7, y = 61.7, name = "Metal Dornogal Frame", questID = 83841 },
+                        { mapID = 2214, x = 64.9, y = 61.8, name = "Engraved Stirring Rod", questID = 83843 },
+                        { mapID = 2214, x = 42.2, y = 24.1, name = "Reinforced Beaker", questID = 83842 },
+                        { mapID = 2215, x = 42.6, y = 55.0, name = "Chemist's Purified Water", questID = 83844 },
+                        { mapID = 2215, x = 41.6, y = 55.8, name = "Sanctified Mortar and Pestle", questID = 83845 },
+                        { mapID = 2255, x = 42.8, y = 57.3, name = "Dark Apothecary's Vial", questID = 83847 },
+                        { mapID = 2216, x = 45.5, y = 13.2, name = "Nerubian Mixing Salts", questID = 83846 },
+                    }
+                }
+            }
+        },
         darkmoonFaire = {
             questID = 29515,
             x = 53.6,
@@ -580,6 +749,40 @@ KPReference = {
                         { mapID = 2215, x = 47.4, y = 60.6, name = "Arathi Sizing Gauges", questID = 83894 },
                         { mapID = 2255, x = 56.2, y = 58.8, name = "Nerubian Bench Blocks", questID = 83897 },
                         { mapID = 2216, x = 47.7, y = 19.4, name = "Ritual Caster's Crystal", questID = 83896 },
+                    }
+                }
+            }
+        },
+        [12] = { -- Midnight
+            weekly = {
+                treatise = {
+                    questID = 83725,  
+                    name = "Treatise: Alchemy",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_alchemy",
+                },
+                craftingOrder = {
+                    questID = 84133,
+                    name = "Alchemy Services Requested",
+                    icon = "Interface\\Icons\\inv_crafting_orders",
+                },
+                treasures = {
+                    { questID = 83253, name = "Alchemical Sediment", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
+                    { questID = 83255, name = "Deepstone Crucible", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
+                }
+            },
+            oneTime = {
+                treasures = {
+                    name = "One-Time Knowledge Treasures",
+                    icon = "",
+                    locations = {
+                        { mapID = 2339, x = 32.5, y = 60.1, name = "Earthen Iron Powder", questID = 83840 },
+                        { mapID = 2248, x = 57.7, y = 61.7, name = "Metal Dornogal Frame", questID = 83841 },
+                        { mapID = 2214, x = 64.9, y = 61.8, name = "Engraved Stirring Rod", questID = 83843 },
+                        { mapID = 2214, x = 42.2, y = 24.1, name = "Reinforced Beaker", questID = 83842 },
+                        { mapID = 2215, x = 42.6, y = 55.0, name = "Chemist's Purified Water", questID = 83844 },
+                        { mapID = 2215, x = 41.6, y = 55.8, name = "Sanctified Mortar and Pestle", questID = 83845 },
+                        { mapID = 2255, x = 42.8, y = 57.3, name = "Dark Apothecary's Vial", questID = 83847 },
+                        { mapID = 2216, x = 45.5, y = 13.2, name = "Nerubian Mixing Salts", questID = 83846 },
                     }
                 }
             }
@@ -677,6 +880,40 @@ KPReference = {
                 }
             }
         },
+        [12] = { -- Midnight
+            weekly = {
+                treatise = {
+                    questID = 83725,  
+                    name = "Treatise: Alchemy",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_alchemy",
+                },
+                craftingOrder = {
+                    questID = 84133,
+                    name = "Alchemy Services Requested",
+                    icon = "Interface\\Icons\\inv_crafting_orders",
+                },
+                treasures = {
+                    { questID = 83253, name = "Alchemical Sediment", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
+                    { questID = 83255, name = "Deepstone Crucible", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
+                }
+            },
+            oneTime = {
+                treasures = {
+                    name = "One-Time Knowledge Treasures",
+                    icon = "",
+                    locations = {
+                        { mapID = 2339, x = 32.5, y = 60.1, name = "Earthen Iron Powder", questID = 83840 },
+                        { mapID = 2248, x = 57.7, y = 61.7, name = "Metal Dornogal Frame", questID = 83841 },
+                        { mapID = 2214, x = 64.9, y = 61.8, name = "Engraved Stirring Rod", questID = 83843 },
+                        { mapID = 2214, x = 42.2, y = 24.1, name = "Reinforced Beaker", questID = 83842 },
+                        { mapID = 2215, x = 42.6, y = 55.0, name = "Chemist's Purified Water", questID = 83844 },
+                        { mapID = 2215, x = 41.6, y = 55.8, name = "Sanctified Mortar and Pestle", questID = 83845 },
+                        { mapID = 2255, x = 42.8, y = 57.3, name = "Dark Apothecary's Vial", questID = 83847 },
+                        { mapID = 2216, x = 45.5, y = 13.2, name = "Nerubian Mixing Salts", questID = 83846 },
+                    }
+                }
+            }
+        },
         darkmoonFaire = {
             questID = 29517,
             x = 49.6,
@@ -769,6 +1006,40 @@ KPReference = {
                 }
             }
         },
+        [12] = { -- Midnight
+            weekly = {
+                treatise = {
+                    questID = 83725,  
+                    name = "Treatise: Alchemy",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_alchemy",
+                },
+                craftingOrder = {
+                    questID = 84133,
+                    name = "Alchemy Services Requested",
+                    icon = "Interface\\Icons\\inv_crafting_orders",
+                },
+                treasures = {
+                    { questID = 83253, name = "Alchemical Sediment", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
+                    { questID = 83255, name = "Deepstone Crucible", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
+                }
+            },
+            oneTime = {
+                treasures = {
+                    name = "One-Time Knowledge Treasures",
+                    icon = "",
+                    locations = {
+                        { mapID = 2339, x = 32.5, y = 60.1, name = "Earthen Iron Powder", questID = 83840 },
+                        { mapID = 2248, x = 57.7, y = 61.7, name = "Metal Dornogal Frame", questID = 83841 },
+                        { mapID = 2214, x = 64.9, y = 61.8, name = "Engraved Stirring Rod", questID = 83843 },
+                        { mapID = 2214, x = 42.2, y = 24.1, name = "Reinforced Beaker", questID = 83842 },
+                        { mapID = 2215, x = 42.6, y = 55.0, name = "Chemist's Purified Water", questID = 83844 },
+                        { mapID = 2215, x = 41.6, y = 55.8, name = "Sanctified Mortar and Pestle", questID = 83845 },
+                        { mapID = 2255, x = 42.8, y = 57.3, name = "Dark Apothecary's Vial", questID = 83847 },
+                        { mapID = 2216, x = 45.5, y = 13.2, name = "Nerubian Mixing Salts", questID = 83846 },
+                    }
+                }
+            }
+        },
         darkmoonFaire = {
             questID = 29520,
             x = 55.6,
@@ -809,6 +1080,40 @@ KPReference = {
                 },
         },
         [11] = { -- The War Within / Khaz Algar
+            weekly = {
+                treatise = {
+                    questID = 83729,  
+                    name = "Treatise: Herbalism",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_herbalism",
+                },
+                craftingOrder = {
+                    questID = {82970, 82962, 82965, 82958, 82916},
+                    name = "Weekly Herbalism Profession Quest",
+                    icon = "Interface\\Icons\\inv_crafting_orders",
+                },
+                gatherNodes = {
+                    {name = "Deepgrove Petal", questID = { 81416, 81417, 81418, 81419, 81420 }, icon ="Interface\\Icons\\inv_-misc_herb_deathblossom_leaf" },
+                    {name = "Deepgrove Rose", questID = 81421, icon ="Interface\\Icons\\inv_jewelry_trinket_05" }
+                }
+            },
+            oneTime = {
+                treasures = {
+                    name = "One-Time Knowledge Treasures",
+                    icon = "",
+                    locations = {
+                        { mapID = 2339, x = 59.1, y = 23.7, name = "Dornogal Gardening Scythe", questID = 83875 },
+                        { mapID = 2248, x = 57.5, y = 61.5, name = "Ancient Flower", questID = 83874 },
+                        { mapID = 2214, x = 52.8, y = 65.8, name = "Fungarian Slicer's Knife", questID = 83877 },
+                        { mapID = 2214, x = 48.3, y = 34.9, name = "Earthen Digging Fork", questID = 83876 },
+                        { mapID = 2215, x = 47.7, y = 63.3, name = "Arathi Garden Trowel", questID = 83878 },
+                        { mapID = 2215, x = 36.01, y = 55.0, name = "Arathi Herb Pruner", questID = 83879 },
+                        { mapID = 2216, x = 46.6, y = 15.9, name = "Tunneler's Shovel", questID = 83881 },
+                        { mapID = 2216, x = 54.8, y = 20.6, name = "Web-Entangled Lotus", questID = 83880 },
+                    }
+                }
+            }
+        },
+        [12] = { -- Midnight
             weekly = {
                 treatise = {
                     questID = 83729,  
@@ -909,6 +1214,40 @@ KPReference = {
                 }
             }
         },
+        [12] = { -- Midnight
+            weekly = {
+                treatise = {
+                    questID = 83733,  
+                    name = "Treatise: Mining",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_mining",
+                },
+                craftingOrder = {
+                    questID = {83103, 83102, 83104, 83106, 83105},
+                    name = "Weekly Mining Profession Quest",
+                    icon = "Interface\\Icons\\inv_crafting_orders", 
+                },
+                gatherNodes = {
+                    {name = "Slab of Slate", questID = { 83054, 83053, 83052, 83051, 83050 }, icon ="Interface\\Icons\\inv_ore_adamantium_01" },
+                    {name = "Erosion-Polished Slate", questID = 83049, icon ="Interface\\Icons\\inv_ore_arcanite_02" }
+                }
+            },
+            oneTime = {
+                treasures = {
+                    name = "One-Time Knowledge Treasures",
+                    icon = "",
+                    locations = {
+                        { mapID = 2339, x = 36.6, y = 79.3, name = "Dornogal Chisel", questID = 83907 },
+                        { mapID = 2248, x = 58.2, y = 62.0, name = "Earthen Miner's Gavel", questID = 83906 },
+                        { mapID = 2214, x = 45.2, y = 27.5, name = "Earthen Excavator's Shovel", questID = 83908 },
+                        { mapID = 2214, x = 62, y = 66.2, name = "Regenerating Ore", questID = 83909 },
+                        { mapID = 2215, x = 46.1, y = 64.4, name = "Arathi Precision Drill", questID = 83910 },
+                        { mapID = 2215, x = 43.1, y = 56.8, name = "Devout Archaeologist's Excavator", questID = 83911 },
+                        { mapID = 2216, x = 46.8, y = 21.8, name = "Heavy Spider Crusher", questID = 83912 },
+                        { mapID = 2216, x = 48.3, y = 40.8, name = "Nerubian Mining Cart", questID = 83913 },
+                    }
+                }
+            }
+        },
         darkmoonFaire = {
             questID = 29518,
             x = 49.6,
@@ -939,6 +1278,40 @@ KPReference = {
         },
         [11] = {
             -- The War Within / Khaz Algar
+            weekly = {
+                treatise = {
+                    questID = 83734,  
+                    name = "Treatise: Skinning",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_skinning",
+                },
+                craftingOrder = {
+                    questID = {83097, 83100, 82993, 83098, 82992},
+                    name = "Weekly Skinning Profession Quest",
+                    icon = "Interface\\Icons\\inv_crafting_orders",
+                },
+                gatherNodes = {
+                    {name = "Toughened Tempest Pelt", questID = { 81459, 81460, 81461, 81462, 81463 }, icon ="Interface\\Icons\\inv_skinning_stormchargedleather1" },
+                    {name = "Abyssal Fur", questID = 81464, icon ="Interface\\Icons\\inv_misc_pelt_11" }
+                }
+            },
+            oneTime = {
+                treasures = {
+                    name = "One-Time Knowledge Treasures",
+                    icon = "",
+                    locations = {
+                        { mapID = 2339, x = 28.8, y = 51.7, name = "Dornogal Carving Knife", questID = 83914 },
+                        { mapID = 2248, x = 60.0, y = 28.0, name = "Earthen Worker's Beams", questID = 83915 },
+                        { mapID = 2214, x = 47.3, y = 28.3, name = "Artisan's Drawing Knife", questID = 83916 },
+                        { mapID = 2214, x = 65.8, y = 61.88, name = "Fungarian's Rich Tannin", questID = 83917 },
+                        { mapID = 2215, x = 42.3, y = 53.8, name = "Arathi Craftsman's Spokeshave", questID = 83919 },
+                        { mapID = 2215, x = 49.3, y = 62.1, name = "Arathi Tanning Agent", questID = 83918 },
+                        { mapID = 2255, x = 56.6, y = 55.3, name = "Carapace Shiner", questID = 83921 },
+                        { mapID = 2216, x = 44.6, y = 49.3, name = "Nerubian Slicking Iron", questID = 83920 },
+                    }
+                }
+            }
+        },
+        [12] = { -- Midnight
             weekly = {
                 treatise = {
                     questID = 83734,  
