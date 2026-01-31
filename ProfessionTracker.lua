@@ -123,8 +123,8 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    { questID = 83253, name = "Alchemical Sediment", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
-                    { questID = 83255, name = "Deepstone Crucible", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
+                    { questID = 93258, name = "Lightbloomed Spore Sample", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
+                    { questID = 93259, name = "Aged Cruor", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
                 }
             },
             oneTime = {
@@ -132,14 +132,13 @@ KPReference = {
                     name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
-                        { mapID = 2339, x = 32.5, y = 60.1, name = "Earthen Iron Powder", questID = 83840 },
-                        { mapID = 2248, x = 57.7, y = 61.7, name = "Metal Dornogal Frame", questID = 83841 },
-                        { mapID = 2214, x = 64.9, y = 61.8, name = "Engraved Stirring Rod", questID = 83843 },
-                        { mapID = 2214, x = 42.2, y = 24.1, name = "Reinforced Beaker", questID = 83842 },
-                        { mapID = 2215, x = 42.6, y = 55.0, name = "Chemist's Purified Water", questID = 83844 },
-                        { mapID = 2215, x = 41.6, y = 55.8, name = "Sanctified Mortar and Pestle", questID = 83845 },
-                        { mapID = 2255, x = 42.8, y = 57.3, name = "Dark Apothecary's Vial", questID = 83847 },
-                        { mapID = 2216, x = 45.5, y = 13.2, name = "Nerubian Mixing Salts", questID = 83846 },
+                        { mapID = 2393, x = 49.1, y = 75.71, name = "Freshly Plucked Peacebloom", questID = 89115 },
+                        { mapID = 2393, x = 47.74, y = 51.4, name = "Pristine Potion", questID = 89117 },
+                        { mapID = 2536, x = 49.01, y = 23.52, name = "Measured Ladle", questID = 89116 },
+                        { mapID = 2536, x = 40.34, y = 51.18, name = "Vial of Zul'Aman Oddities", questID = 89114 },
+                        { mapID = 2413, x = 34.78, y = 24.71, name = "Vial of Rootland Oddities", questID = 89113 },
+                        { mapID = 2405, x = 32.79, y = 43.28, name = "Failed Experiment", questID = 89118 },
+                        
                     }
                 }
             }
@@ -251,8 +250,8 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    { questID = 83253, name = "Alchemical Sediment", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
-                    { questID = 83255, name = "Deepstone Crucible", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
+                    { questID = 93530, name = "Thalassian Whetstone", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
+                    { questID = 93531, name = "Infused Quenching Oil", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
                 }
             },
             oneTime = {
@@ -260,14 +259,13 @@ KPReference = {
                     name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
-                        { mapID = 2339, x = 32.5, y = 60.1, name = "Earthen Iron Powder", questID = 83840 },
-                        { mapID = 2248, x = 57.7, y = 61.7, name = "Metal Dornogal Frame", questID = 83841 },
-                        { mapID = 2214, x = 64.9, y = 61.8, name = "Engraved Stirring Rod", questID = 83843 },
-                        { mapID = 2214, x = 42.2, y = 24.1, name = "Reinforced Beaker", questID = 83842 },
-                        { mapID = 2215, x = 42.6, y = 55.0, name = "Chemist's Purified Water", questID = 83844 },
-                        { mapID = 2215, x = 41.6, y = 55.8, name = "Sanctified Mortar and Pestle", questID = 83845 },
-                        { mapID = 2255, x = 42.8, y = 57.3, name = "Dark Apothecary's Vial", questID = 83847 },
-                        { mapID = 2216, x = 45.5, y = 13.2, name = "Nerubian Mixing Salts", questID = 83846 },
+                        { mapID = 2393, x = 49.07, y = 61.38, name = "Sin'dorei Master's Forgemace", questID = 89183 },
+                        { mapID = 2393, x = 48.5, y = 74.44, name = "Silvermoon's Blacksmith Hammer", questID = 89184 },
+                        { mapID = 2393, x = 26.94, y = 60.31, name = "Deconstructed Forge Techniques", questID = 89177 },
+                        { mapID = 2395, x = 48.38, y = 75.8, name = "Silvermoon Smithing Kit", questID = 89178 },
+                        { mapID = 2395, x = 56.81, y = 40.8, name = "Metalworking Cheat Sheet", questID = 89180 },
+                        { mapID = 2413, x = 66.33, y = 50.92, name = "Ruutani Floratender's Sword", questID = 89182 },
+                      
                     }
                 }
             }
@@ -384,8 +382,8 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    { questID = 83253, name = "Alchemical Sediment", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
-                    { questID = 83255, name = "Deepstone Crucible", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
+                    { questID = 93532, name = "Voidstorm Ashes", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
+                    { questID = 93533, name = "Lost Thalassian Vellum", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
                 }
             },
             oneTime = {
@@ -393,14 +391,12 @@ KPReference = {
                     name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
-                        { mapID = 2339, x = 32.5, y = 60.1, name = "Earthen Iron Powder", questID = 83840 },
-                        { mapID = 2248, x = 57.7, y = 61.7, name = "Metal Dornogal Frame", questID = 83841 },
-                        { mapID = 2214, x = 64.9, y = 61.8, name = "Engraved Stirring Rod", questID = 83843 },
-                        { mapID = 2214, x = 42.2, y = 24.1, name = "Reinforced Beaker", questID = 83842 },
-                        { mapID = 2215, x = 42.6, y = 55.0, name = "Chemist's Purified Water", questID = 83844 },
-                        { mapID = 2215, x = 41.6, y = 55.8, name = "Sanctified Mortar and Pestle", questID = 83845 },
-                        { mapID = 2255, x = 42.8, y = 57.3, name = "Dark Apothecary's Vial", questID = 83847 },
-                        { mapID = 2216, x = 45.5, y = 13.2, name = "Nerubian Mixing Salts", questID = 83846 },
+                        { mapID = 2395, x = 63.48, y = 32.57, name = "Sin'dorei Enchanting Rod", questID = 89107 },
+                        { mapID = 2395, x = 60.78, y = 53.01, name = "Everblazing Sunmote", questID = 89103 },
+                        { mapID = 2536, x = 48.68, y = 22.3, name = "Enchanted Amani Mask", questID = 89100 },
+                        { mapID = 2536, x = 40.37, y = 51.27, name = "Loa Blessed Dirt", questID = 89106 }, -- CHECK ZONE ID
+                        { mapID = 2413, x = 65.76, y = 50.19, name = "Primal Essence Orb", questID = 89105 },
+                        { mapID = 2413, x = 37.73, y = 65.31, name = "Entropic Shard", questID = 89104 },
                     }
                 }
             }
@@ -508,8 +504,8 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    { questID = 83253, name = "Alchemical Sediment", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
-                    { questID = 83255, name = "Deepstone Crucible", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
+                    { questID = 93534, name = "Dance Gear", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
+                    { questID = 93535, name = "Dawn Capacitor", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
                 }
             },
             oneTime = {
@@ -517,14 +513,13 @@ KPReference = {
                     name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
-                        { mapID = 2339, x = 32.5, y = 60.1, name = "Earthen Iron Powder", questID = 83840 },
-                        { mapID = 2248, x = 57.7, y = 61.7, name = "Metal Dornogal Frame", questID = 83841 },
-                        { mapID = 2214, x = 64.9, y = 61.8, name = "Engraved Stirring Rod", questID = 83843 },
-                        { mapID = 2214, x = 42.2, y = 24.1, name = "Reinforced Beaker", questID = 83842 },
-                        { mapID = 2215, x = 42.6, y = 55.0, name = "Chemist's Purified Water", questID = 83844 },
-                        { mapID = 2215, x = 41.6, y = 55.8, name = "Sanctified Mortar and Pestle", questID = 83845 },
-                        { mapID = 2255, x = 42.8, y = 57.3, name = "Dark Apothecary's Vial", questID = 83847 },
-                        { mapID = 2216, x = 45.5, y = 13.2, name = "Nerubian Mixing Salts", questID = 83846 },
+                        { mapID = 2393, x = 51.34, y = 74.48, name = "One Engineer's Junk", questID = 89133 },
+                        { mapID = 2393, x = 51.19, y = 57.13, name = "What to do when nothing works", questID = 89139 },
+                        { mapID = 2395, x = 39.58, y = 45.82, name = "Manual of Mistakes and Mishaps", questID = 89135 },
+                        { mapID = 2536, x = 65.13, y = 34.95, name = "Offline Helper Bot", questID = 89138 },
+                        { mapID = 2536, x = 34.22, y = 87.82, name = "Handy Wrench", questID = 89140 },
+                        { mapID = 2413, x = 67.97, y = 49.78, name = "Expeditious Pylon", questID = 89136 },
+                        { mapID = 2444, x = 28.9, y = 39.09, name = "Miniaturized Transport Staff", questID = 89134 },
                     }
                 }
             }
