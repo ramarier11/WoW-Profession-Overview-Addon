@@ -123,8 +123,8 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    { questID = 93258, name = "Lightbloomed Spore Sample", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
-                    { questID = 93259, name = "Aged Cruor", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
+                    { questID = 93528, name = "Lightbloomed Spore Sample", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
+                    { questID = 93529, name = "Aged Cruor", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
                 }
             },
             oneTime = {
