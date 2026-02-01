@@ -137,6 +137,7 @@ KPReference = {
                         { mapID = 2536, x = 49.01, y = 23.52, name = "Measured Ladle", questID = 89116 },
                         { mapID = 2536, x = 40.34, y = 51.18, name = "Vial of Zul'Aman Oddities", questID = 89114 },
                         { mapID = 2413, x = 34.78, y = 24.71, name = "Vial of Rootland Oddities", questID = 89113 },
+                        { mapID = 2444, x = 41.9, y = 40.65, name = "Vial of Voidstorm Oddities", questID = 89112 },
                         { mapID = 2405, x = 32.79, y = 43.28, name = "Failed Experiment", questID = 89118 },
                         
                     }
@@ -241,12 +242,12 @@ KPReference = {
             weekly = {
                 treatise = {
                     questID = 83725,  
-                    name = "Treatise: Alchemy",
-                    icon = "Interface\\Icons\\inv_misc_profession_book_alchemy",
+                    name = "Treatise: Blacksmithing",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_blacksmithing",
                 },
                 craftingOrder = {
                     questID = 84133,
-                    name = "Alchemy Services Requested",
+                    name = "Blacksmithing Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
@@ -265,7 +266,8 @@ KPReference = {
                         { mapID = 2395, x = 48.38, y = 75.8, name = "Silvermoon Smithing Kit", questID = 89178 },
                         { mapID = 2395, x = 56.81, y = 40.8, name = "Metalworking Cheat Sheet", questID = 89180 },
                         { mapID = 2413, x = 66.33, y = 50.92, name = "Ruutani Floratender's Sword", questID = 89182 },
-                      
+                        { mapID = 2536, x = 33.20, y = 65.87, name = "Carefully Racked Spear", questID = 89179 },
+                        { mapID = 2444, x = 30.54, y = 69.03, name = "Void Defense Spear", questID = 89181 }                      
                     }
                 }
             }
@@ -373,12 +375,12 @@ KPReference = {
             weekly = {
                 treatise = {
                     questID = 83725,  
-                    name = "Treatise: Alchemy",
-                    icon = "Interface\\Icons\\inv_misc_profession_book_alchemy",
+                    name = "Treatise: Enchanting",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_enchanting",
                 },
                 craftingOrder = {
                     questID = 84133,
-                    name = "Alchemy Services Requested",
+                    name = "Enchanting Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
@@ -394,7 +396,7 @@ KPReference = {
                         { mapID = 2395, x = 63.48, y = 32.57, name = "Sin'dorei Enchanting Rod", questID = 89107 },
                         { mapID = 2395, x = 60.78, y = 53.01, name = "Everblazing Sunmote", questID = 89103 },
                         { mapID = 2536, x = 48.68, y = 22.3, name = "Enchanted Amani Mask", questID = 89100 },
-                        { mapID = 2536, x = 40.37, y = 51.27, name = "Loa Blessed Dirt", questID = 89106 }, -- CHECK ZONE ID
+                        { mapID = 2437, x = 40.37, y = 51.27, name = "Loa Blessed Dirt", questID = 89106 }, -- CHECK ZONE ID
                         { mapID = 2413, x = 65.76, y = 50.19, name = "Primal Essence Orb", questID = 89105 },
                         { mapID = 2413, x = 37.73, y = 65.31, name = "Entropic Shard", questID = 89104 },
                     }
@@ -495,12 +497,12 @@ KPReference = {
             weekly = {
                 treatise = {
                     questID = 83725,  
-                    name = "Treatise: Alchemy",
-                    icon = "Interface\\Icons\\inv_misc_profession_book_alchemy",
+                    name = "Treatise: Engineering",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_engineering",
                 },
                 craftingOrder = {
                     questID = 84133,
-                    name = "Alchemy Services Requested",
+                    name = "Engineering Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
@@ -520,6 +522,7 @@ KPReference = {
                         { mapID = 2536, x = 34.22, y = 87.82, name = "Handy Wrench", questID = 89140 },
                         { mapID = 2413, x = 67.97, y = 49.78, name = "Expeditious Pylon", questID = 89136 },
                         { mapID = 2444, x = 28.9, y = 39.09, name = "Miniaturized Transport Staff", questID = 89134 },
+                        { mapID = 2444, x = 54.13, y = 51.05, name = "Ethereal Stormwrench", questID = 89137 },
                     }
                 }
             }
@@ -623,17 +626,17 @@ KPReference = {
             weekly = {
                 treatise = {
                     questID = 83725,  
-                    name = "Treatise: Alchemy",
-                    icon = "Interface\\Icons\\inv_misc_profession_book_alchemy",
+                    name = "Treatise: Inscription",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_inscription",
                 },
                 craftingOrder = {
                     questID = 84133,
-                    name = "Alchemy Services Requested",
+                    name = "Inscription Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    { questID = 83253, name = "Alchemical Sediment", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
-                    { questID = 83255, name = "Deepstone Crucible", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
+                    { questID = 93536, name = "Brilliant Phoenix Ink", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
+                    { questID = 93537, name = "Loa-Blessed Rune", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
                 }
             },
             oneTime = {
@@ -641,14 +644,13 @@ KPReference = {
                     name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
-                        { mapID = 2339, x = 32.5, y = 60.1, name = "Earthen Iron Powder", questID = 83840 },
-                        { mapID = 2248, x = 57.7, y = 61.7, name = "Metal Dornogal Frame", questID = 83841 },
-                        { mapID = 2214, x = 64.9, y = 61.8, name = "Engraved Stirring Rod", questID = 83843 },
-                        { mapID = 2214, x = 42.2, y = 24.1, name = "Reinforced Beaker", questID = 83842 },
-                        { mapID = 2215, x = 42.6, y = 55.0, name = "Chemist's Purified Water", questID = 83844 },
-                        { mapID = 2215, x = 41.6, y = 55.8, name = "Sanctified Mortar and Pestle", questID = 83845 },
-                        { mapID = 2255, x = 42.8, y = 57.3, name = "Dark Apothecary's Vial", questID = 83847 },
-                        { mapID = 2216, x = 45.5, y = 13.2, name = "Nerubian Mixing Salts", questID = 83846 },
+                        { mapID = 2393, x = 47.54, y = 50.36, name = "Songwriter's Pen", questID = 89073 },
+                        { mapID = 2395, x = 48.31, y = 75.56, name = "Spare Ink", questID = 89069 },
+                        { mapID = 2395, x = 40.34, y = 61.25, name = "Songwriter's Quill", questID = 89074 },
+                        { mapID = 2413, x = 52.74, y = 49.99, name = "Leftover Sanguithorne Pigment", questID = 89071 },
+                        { mapID = 2413, x = 52.43, y = 52.59, name = "Intrepid Explorer's Marker", questID = 89070 },
+                        { mapID = 2437, x = 40.48, y = 49.39, name = "Leather-Bound Techniques", questID = 89068 },
+                        { mapID = 2444, x = 60.71, y = 84.29, name = "Void-touched Quill", questID = 89067 }
                     }
                 }
             }
@@ -752,17 +754,17 @@ KPReference = {
             weekly = {
                 treatise = {
                     questID = 83725,  
-                    name = "Treatise: Alchemy",
-                    icon = "Interface\\Icons\\inv_misc_profession_book_alchemy",
+                    name = "Treatise: Jewelcrafting",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_jewelcrafting",
                 },
                 craftingOrder = {
                     questID = 84133,
-                    name = "Alchemy Services Requested",
+                    name = "Jewelcrafting Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    { questID = 83253, name = "Alchemical Sediment", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
-                    { questID = 83255, name = "Deepstone Crucible", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
+                    { questID = 93538, name = "Void-Touched Eversong Diamond Fragments", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
+                    { questID = 93539, name = "Harandar Stone Sample", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
                 }
             },
             oneTime = {
@@ -770,14 +772,13 @@ KPReference = {
                     name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
-                        { mapID = 2339, x = 32.5, y = 60.1, name = "Earthen Iron Powder", questID = 83840 },
-                        { mapID = 2248, x = 57.7, y = 61.7, name = "Metal Dornogal Frame", questID = 83841 },
-                        { mapID = 2214, x = 64.9, y = 61.8, name = "Engraved Stirring Rod", questID = 83843 },
-                        { mapID = 2214, x = 42.2, y = 24.1, name = "Reinforced Beaker", questID = 83842 },
-                        { mapID = 2215, x = 42.6, y = 55.0, name = "Chemist's Purified Water", questID = 83844 },
-                        { mapID = 2215, x = 41.6, y = 55.8, name = "Sanctified Mortar and Pestle", questID = 83845 },
-                        { mapID = 2255, x = 42.8, y = 57.3, name = "Dark Apothecary's Vial", questID = 83847 },
-                        { mapID = 2216, x = 45.5, y = 13.2, name = "Nerubian Mixing Salts", questID = 83846 },
+                        { mapID = 2393, x = 50.53, y = 56.47, name = "Sin'dorei Masterwork Chisel", questID = 89122 },
+                        { mapID = 2393, x = 55.47, y = 47.85, name = "Vintage Soul Gem", questID = 89127 },
+                        { mapID = 2395, x = 39.64, y = 38.84, name = "Sin'dorei Gem Faceters", questID = 89129 },
+                        { mapID = 2395, x = 56.64, y = 40.88, name = "Poorly Rounded Vial", questID = 89125 },
+                        { mapID = 2444, x = 30.53, y = 69.02, name = "Speculative Voidstorm Crystal", questID = 89123 },
+                        { mapID = 2444, x = 54.17, y = 51.09, name = "Ethereal Gem Pliers", questID = 89128 },
+                        { mapID = 2444, x = 62.79, y = 53.49, name = "Shattered Glass", questID = 89126 }
                     }
                 }
             }
@@ -879,17 +880,17 @@ KPReference = {
             weekly = {
                 treatise = {
                     questID = 83725,  
-                    name = "Treatise: Alchemy",
-                    icon = "Interface\\Icons\\inv_misc_profession_book_alchemy",
+                    name = "Treatise: Leatherworking",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_leatherworking",
                 },
                 craftingOrder = {
                     questID = 84133,
-                    name = "Alchemy Services Requested",
+                    name = "Leatherworking Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    { questID = 83253, name = "Alchemical Sediment", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
-                    { questID = 83255, name = "Deepstone Crucible", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
+                    { questID = 93540, name = "Amani Tanning Oil", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
+                    { questID = 93541, name = "Thalassian Mana Oil", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
                 }
             },
             oneTime = {
@@ -897,14 +898,14 @@ KPReference = {
                     name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
-                        { mapID = 2339, x = 32.5, y = 60.1, name = "Earthen Iron Powder", questID = 83840 },
-                        { mapID = 2248, x = 57.7, y = 61.7, name = "Metal Dornogal Frame", questID = 83841 },
-                        { mapID = 2214, x = 64.9, y = 61.8, name = "Engraved Stirring Rod", questID = 83843 },
-                        { mapID = 2214, x = 42.2, y = 24.1, name = "Reinforced Beaker", questID = 83842 },
-                        { mapID = 2215, x = 42.6, y = 55.0, name = "Chemist's Purified Water", questID = 83844 },
-                        { mapID = 2215, x = 41.6, y = 55.8, name = "Sanctified Mortar and Pestle", questID = 83845 },
-                        { mapID = 2255, x = 42.8, y = 57.3, name = "Dark Apothecary's Vial", questID = 83847 },
-                        { mapID = 2216, x = 45.5, y = 13.2, name = "Nerubian Mixing Salts", questID = 83846 },
+                        { mapID = 2393, x = 44.87, y = 56.25, name = "Artisan's Considered Order", questID = 89096 },
+                        { mapID = 2536, x = 45.31, y = 45.47, name = "Bundle of Tanner's Trinkets", questID = 89092 },
+                        { mapID = 2437, x = 33.10, y = 78.91, name = "Amani Leatherworker's Tool", questID = 89089 },
+                        { mapID = 2437, x = 30.76, y = 84.02, name = "Prestigiuosly Racked Hide", questID = 89091 },
+                        { mapID = 2413, x = 51.70, y = 51.36, name = "Haranir Leatherworking Mallet", questID = 89094 },
+                        { mapID = 2413, x = 36.09, y = 25.22, name = "Haranir Leatherworking Knife", questID = 89095 },
+                        { mapID = 2444, x = 53.75, y = 51.60, name = "Pattern: Beyond the Void", questID = 89093 },
+                        { mapID = 2405, x = 34.71, y = 56.95, name = "Ethereal Leatherworking Knife", questID = 89090 },
                     }
                 }
             }
@@ -1005,17 +1006,17 @@ KPReference = {
             weekly = {
                 treatise = {
                     questID = 83725,  
-                    name = "Treatise: Alchemy",
-                    icon = "Interface\\Icons\\inv_misc_profession_book_alchemy",
+                    name = "Treatise: Tailoring",
+                    icon = "Interface\\Icons\\inv_misc_profession_book_tailoring",
                 },
                 craftingOrder = {
                     questID = 84133,
-                    name = "Alchemy Services Requested",
+                    name = "Tailoring Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 treasures = {
-                    { questID = 83253, name = "Alchemical Sediment", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
-                    { questID = 83255, name = "Deepstone Crucible", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
+                    { questID = 93542, name = "Embroidered Memento", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
+                    { questID = 93543, name = "Finely Woven Lynx Collar", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
                 }
             },
             oneTime = {
@@ -1023,14 +1024,14 @@ KPReference = {
                     name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
-                        { mapID = 2339, x = 32.5, y = 60.1, name = "Earthen Iron Powder", questID = 83840 },
-                        { mapID = 2248, x = 57.7, y = 61.7, name = "Metal Dornogal Frame", questID = 83841 },
-                        { mapID = 2214, x = 64.9, y = 61.8, name = "Engraved Stirring Rod", questID = 83843 },
-                        { mapID = 2214, x = 42.2, y = 24.1, name = "Reinforced Beaker", questID = 83842 },
-                        { mapID = 2215, x = 42.6, y = 55.0, name = "Chemist's Purified Water", questID = 83844 },
-                        { mapID = 2215, x = 41.6, y = 55.8, name = "Sanctified Mortar and Pestle", questID = 83845 },
-                        { mapID = 2255, x = 42.8, y = 57.3, name = "Dark Apothecary's Vial", questID = 83847 },
-                        { mapID = 2216, x = 45.5, y = 13.2, name = "Nerubian Mixing Salts", questID = 83846 },
+                        { mapID = 2393, x = 35.88, y = 61.26, name = "A Really Nice Curtain", questID = 89079 },
+                        { mapID = 2393, x = 31.73, y = 68.22, name = "Particularly Enchanting Tablecloth", questID = 89084 },
+                        { mapID = 2395, x = 46.35, y = 34.83, name = "Sin'dorei Outfitter's Ruler", questID = 89080 },
+                        { mapID = 2437, x = 40.51, y = 49.39, name = "Artisan's Cover Comb", questID = 89085 },
+                        { mapID = 2413, x = 69.81, y = 51.02, name = "Wooden Weaving Sword", questID = 89081 },
+                        { mapID = 2413, x = 70.54, y = 50.88, name = "A Child's Stuffy", questID = 89078 },
+                        { mapID = 2444, x = 61.41, y = 85.19, name = "Satin Throw Pillow", questID = 89083 },
+                        { mapID = 2444, x = 61.98, y = 83.64, name = "Book of Sin'dorei Stitches", questID = 89082 },
                     }
                 }
             }
@@ -1116,13 +1117,13 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_misc_profession_book_herbalism",
                 },
                 craftingOrder = {
-                    questID = {82970, 82962, 82965, 82958, 82916},
+                    questID = {93702},
                     name = "Weekly Herbalism Profession Quest",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 gatherNodes = {
-                    {name = "Deepgrove Petal", questID = { 81416, 81417, 81418, 81419, 81420 }, icon ="Interface\\Icons\\inv_-misc_herb_deathblossom_leaf" },
-                    {name = "Deepgrove Rose", questID = 81421, icon ="Interface\\Icons\\inv_jewelry_trinket_05" }
+                    {name = "Thalassian Phoenix Plume", questID = { 81425, 81426, 81427, 81428, 81429 }, icon ="Interface\\Icons\\inv_-misc_herb_deathblossom_leaf" },
+                    {name = "Thalassian Phoenix Tail", questID = 81421, icon ="Interface\\Icons\\inv_jewelry_trinket_05" }
                 }
             },
             oneTime = {
@@ -1130,14 +1131,13 @@ KPReference = {
                     name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
-                        { mapID = 2339, x = 59.1, y = 23.7, name = "Dornogal Gardening Scythe", questID = 83875 },
-                        { mapID = 2248, x = 57.5, y = 61.5, name = "Ancient Flower", questID = 83874 },
-                        { mapID = 2214, x = 52.8, y = 65.8, name = "Fungarian Slicer's Knife", questID = 83877 },
-                        { mapID = 2214, x = 48.3, y = 34.9, name = "Earthen Digging Fork", questID = 83876 },
-                        { mapID = 2215, x = 47.7, y = 63.3, name = "Arathi Garden Trowel", questID = 83878 },
-                        { mapID = 2215, x = 36.01, y = 55.0, name = "Arathi Herb Pruner", questID = 83879 },
-                        { mapID = 2216, x = 46.6, y = 15.9, name = "Tunneler's Shovel", questID = 83881 },
-                        { mapID = 2216, x = 54.8, y = 20.6, name = "Web-Entangled Lotus", questID = 83880 },
+                        { mapID = 2393, x = 48.96, y = 75.81, name = "Simple Leaf Pruners", questID = 89160 },
+                        { mapID = 2395, x = 64.25, y = 30.44, name = "A Spade", questID = 89158 },
+                        { mapID = 2413, x = 36.62, y = 25.11, name = "Lightbloom Root", questID = 89159 },
+                        { mapID = 2413, x = 76.17, y = 51.1, name = "Harvester's Sickle", questID = 89157 },
+                        { mapID = 2413, x = 51.17, y = 55.70, name = "Planting Shovel", questID = 89155 },
+                        { mapID = 2413, x = 38.38, y = 67.05, name = "Bloomed Bud", questID = 89162 },
+                        { mapID = 2405, x = 34.67, y = 57.01, name = "Peculiar Lotus", questID = 89156 },
                     }
                 }
             }
@@ -1217,13 +1217,13 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_misc_profession_book_mining",
                 },
                 craftingOrder = {
-                    questID = {83103, 83102, 83104, 83106, 83105},
+                    questID = {},
                     name = "Weekly Mining Profession Quest",
                     icon = "Interface\\Icons\\inv_crafting_orders", 
                 },
                 gatherNodes = {
-                    {name = "Slab of Slate", questID = { 83054, 83053, 83052, 83051, 83050 }, icon ="Interface\\Icons\\inv_ore_adamantium_01" },
-                    {name = "Erosion-Polished Slate", questID = 83049, icon ="Interface\\Icons\\inv_ore_arcanite_02" }
+                    {name = "Igneous Rock Specimen", questID = { 88673, 88674, 88675, 88676, 88677 }, icon ="Interface\\Icons\\inv_ore_adamantium_01" },
+                    {name = "Septarian Nodule", questID = 88678, icon ="Interface\\Icons\\inv_ore_arcanite_02" }
                 }
             },
             oneTime = {
@@ -1231,14 +1231,14 @@ KPReference = {
                     name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
-                        { mapID = 2339, x = 36.6, y = 79.3, name = "Dornogal Chisel", questID = 83907 },
-                        { mapID = 2248, x = 58.2, y = 62.0, name = "Earthen Miner's Gavel", questID = 83906 },
-                        { mapID = 2214, x = 45.2, y = 27.5, name = "Earthen Excavator's Shovel", questID = 83908 },
-                        { mapID = 2214, x = 62, y = 66.2, name = "Regenerating Ore", questID = 83909 },
-                        { mapID = 2215, x = 46.1, y = 64.4, name = "Arathi Precision Drill", questID = 83910 },
-                        { mapID = 2215, x = 43.1, y = 56.8, name = "Devout Archaeologist's Excavator", questID = 83911 },
-                        { mapID = 2216, x = 46.8, y = 21.8, name = "Heavy Spider Crusher", questID = 83912 },
-                        { mapID = 2216, x = 48.3, y = 40.8, name = "Nerubian Mining Cart", questID = 83913 },
+                        { mapID = 2395, x = 38, y = 45.36, name = "Solid Ore Punchers", questID = 89147 },
+                        { mapID = 2413, x = 38.8, y = 65.91, name = "Spare Expedition Torch", questID = 89151 },
+                        { mapID = 2413, x = 41.99, y = 46.52, name = "Spelunker's Lucky Charm", questID = 89145 },
+                        { mapID = 2413, x = 33.53, y = 66.1, name = "Amani Expert Chisel", questID = 89149 },
+                        { mapID = 2444, x = 30.53, y = 69.04, name = "Miner's Guide to Voidstorm", questID = 89144 },
+                        { mapID = 2444, x = 54.19, y = 51.56, name = "Lost Voidstorm Satchel", questID = 89146 },
+                        { mapID = 2444, x = 28.74, y = 38.54, name = "Glimmering Void Pearl", questID = 89148 },
+                        { mapID = 2405, x = 41.81, y = 38.23, name = "Star Metal Deposit", questID = 89150 },
                     }
                 }
             }
@@ -1309,18 +1309,18 @@ KPReference = {
         [12] = { -- Midnight
             weekly = {
                 treatise = {
-                    questID = 83734,  
+                    questID = 95136,  
                     name = "Treatise: Skinning",
                     icon = "Interface\\Icons\\inv_misc_profession_book_skinning",
                 },
                 craftingOrder = {
-                    questID = {83097, 83100, 82993, 83098, 82992},
+                    questID = {93714},
                     name = "Weekly Skinning Profession Quest",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
                 gatherNodes = {
-                    {name = "Toughened Tempest Pelt", questID = { 81459, 81460, 81461, 81462, 81463 }, icon ="Interface\\Icons\\inv_skinning_stormchargedleather1" },
-                    {name = "Abyssal Fur", questID = 81464, icon ="Interface\\Icons\\inv_misc_pelt_11" }
+                    {name = "Fine Void-Tempered Hide", questID = { 88534, 88549, 88536, 88537, 88530 }, icon ="Interface\\Icons\\inv_skinning_stormchargedleather1" },
+                    {name = "Mana-Infused Bone", questID = 88529, icon ="Interface\\Icons\\inv_misc_pelt_11" }
                 }
             },
             oneTime = {
@@ -1328,14 +1328,14 @@ KPReference = {
                     name = "One-Time Knowledge Treasures",
                     icon = "",
                     locations = {
-                        { mapID = 2339, x = 28.8, y = 51.7, name = "Dornogal Carving Knife", questID = 83914 },
-                        { mapID = 2248, x = 60.0, y = 28.0, name = "Earthen Worker's Beams", questID = 83915 },
-                        { mapID = 2214, x = 47.3, y = 28.3, name = "Artisan's Drawing Knife", questID = 83916 },
-                        { mapID = 2214, x = 65.8, y = 61.88, name = "Fungarian's Rich Tannin", questID = 83917 },
-                        { mapID = 2215, x = 42.3, y = 53.8, name = "Arathi Craftsman's Spokeshave", questID = 83919 },
-                        { mapID = 2215, x = 49.3, y = 62.1, name = "Arathi Tanning Agent", questID = 83918 },
-                        { mapID = 2255, x = 56.6, y = 55.3, name = "Carapace Shiner", questID = 83921 },
-                        { mapID = 2216, x = 44.6, y = 49.3, name = "Nerubian Slicking Iron", questID = 83920 },
+                        { mapID = 2393, x = 43.18, y = 55.71, name = "Sin'dorei Tanning Oil", questID = 89171 },
+                        { mapID = 2395, x = 48.42, y = 76.26, name = "Thalassian Skinning Knife", questID = 89173 },
+                        { mapID = 2437, x = 33.1, y = 79.05, name = "Amani Skinning Knife", questID = 89172 },
+                        { mapID = 2536, x = 45.01, y = 45.19, name = "Cadre Skinning Knife", questID = 89167 },
+                        { mapID = 2437, x = 40.40, y = 36, name = "Amani Tanning Oil", questID = 89170 },
+                        { mapID = 2413, x = 69.53, y = 49.2, name = "Primal Hide", questID = 89168 },
+                        { mapID = 2413, x = 76.09, y = 51.17, name = "Lightbloom Afflicted Hide", questID = 89166 },
+                        { mapID = 2444, x = 45.46, y = 42.34, name = "Voidstorm Leather Sample", questID = 89169 },
                     }
                 }
             }
