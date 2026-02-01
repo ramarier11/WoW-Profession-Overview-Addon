@@ -386,7 +386,7 @@ KPReference = {
                 treasures = {
                     { questID = 93532, name = "Voidstorm Ashes", icon = "Interface\\Icons\\inv_misc_powder_mithril"  },
                     { questID = 93533, name = "Lost Thalassian Vellum", icon = "Interface\\Icons\\inv_archaeology_ogres_mortarpestle"  },
-                }
+                },
                 gatherNodes = { 
                     {name = "Swirling Arcane Essence", questID = {95048, 95049, 95050, 95051, 95052}, icon ="Interface\\Icons\\inv_magic_swirl_color2" },
                     {name = "Gleaming Telluric Crystal", questID = 84295, icon ="Interface\\Icons\\inv_10_enchanting_crystal_color3" } -- NOT DONE
