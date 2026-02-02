@@ -590,6 +590,11 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
         return
     end
     
+    -- Hide existing window if it's already showing to prevent multiple instances
+    if self.missingTreasureWindow and self.missingTreasureWindow:IsShown() then
+        self.missingTreasureWindow:Hide()
+    end
+    
     -- Create or reuse treasure window
     if not self.missingTreasureWindow then
         local treasureWin = CreateFrame("Frame", "ProfessionTrackerMissingTreasures", UIParent, "BackdropTemplate")
