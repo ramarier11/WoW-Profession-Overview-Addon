@@ -1891,9 +1891,12 @@ local function GetQuestName(questID)
     
     if not questID then return "Unknown Quest" end
     
+    -- Request quest data from server if not cached
+    C_QuestLog.RequestLoadQuestByID(questID)
+    
     local questInfo = C_QuestLog.GetTitleForQuestID(questID)
     
-    if questInfo then
+    if questInfo and questInfo ~= "" then
         return questInfo
     end
     return "Unknown Quest"
