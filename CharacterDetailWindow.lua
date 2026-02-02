@@ -559,7 +559,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
         treasureText:SetPoint("TOPLEFT", xOffset + 6, yOffset)
         treasureText:SetText(string.format("|cffff8800One Time Missing: %d|r", 
             #expData.missingOneTimeTreasures))
-        -- yOffset = yOffset - 22
+        yOffset = yOffset - 10
         
         -- Create button with more padding
         local showTreasuresBtn = CreateFrame("Button", nil, self.Content, "UIPanelButtonTemplate")
