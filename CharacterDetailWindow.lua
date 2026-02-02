@@ -159,11 +159,17 @@ end
 
 -- Refresh the current character's display
 function CharacterDetailWindow:RefreshDisplay()
-    if not self.currentCharKey then return end
+    print("|cffff00ff[DEBUG]|r RefreshDisplay called, currentCharKey:", self.currentCharKey)
+    if not self.currentCharKey then
+        print("|cffff00ff[DEBUG]|r RefreshDisplay: No currentCharKey, returning")
+        return
+    end
     
     -- Get fresh character data
     local characters = ProfessionTracker:GetAllCharacters()
+    print("|cffff00ff[DEBUG]|r RefreshDisplay: characters table:", characters)
     if not characters or not characters[self.currentCharKey] then
+        print("|cffff00ff[DEBUG]|r RefreshDisplay: No character data found for key:", self.currentCharKey)
         return
     end
     
@@ -171,6 +177,7 @@ function CharacterDetailWindow:RefreshDisplay()
     
     -- Set title with class color
     local classColor = CLASS_COLORS[charData.class] or {1, 1, 1}
+    print("|cffff00ff[DEBUG]|r Setting title for char:", charData.name, "class:", charData.class)
     self.Title:SetText(string.format("|cff%02x%02x%02x%s-%s|r",
         classColor[1] * 255,
         classColor[2] * 255,
@@ -257,8 +264,10 @@ function CharacterDetailWindow:RefreshDisplay()
     
     if charData.professions then
         -- Sort professions alphabetically for consistent layout
+        print("|cffff00ff[DEBUG]|r Found professions for character")
         local sortedProfs = {}
         for profName, profData in pairs(charData.professions) do
+            print("|cffff00ff[DEBUG]|r Adding profession:", profName)
             table.insert(sortedProfs, {name = profName, data = profData})
         end
         table.sort(sortedProfs, function(a, b) return a.name < b.name end)
@@ -266,6 +275,7 @@ function CharacterDetailWindow:RefreshDisplay()
         for _, prof in ipairs(sortedProfs) do
             local profName = prof.name
             local profData = prof.data
+            print("|cffff00ff[DEBUG]|r Processing profession:", profName)
             
             -- Determine column position
             local xOffset = (currentColumn == 0) and leftColumnX or rightColumnX
@@ -402,6 +412,8 @@ function CharacterDetailWindow:RefreshDisplay()
             -- Last row wasn't completed (odd number of professions)
             yOffset = columnStartY - maxHeightInRow - 20
         end
+    else
+        print("|cffff00ff[DEBUG]|r No professions found for character")
     end
     --HEIGHT ADJUSTMENT
     -- Update scroll child height
@@ -412,11 +424,13 @@ function CharacterDetailWindow:RefreshDisplay()
     -- Dynamically resize window based on content
     local neededHeight = 25 + contentHeight
     local finalHeight = math.max(minCharacterDetailWindowHeight, math.min(neededHeight, maxCharacterDetailWindowHeight))
+    print("|cffff00ff[DEBUG]|r Final window height:", finalHeight, "contentHeight:", contentHeight)
     self:SetHeight(finalHeight)
 end
 
 -- Refresh method to update with latest data
 function CharacterDetailWindow:Refresh()
+    print("|cffff00ff[DEBUG]|r Refresh called, isShown:", self:IsShown(), "currentCharKey:", self.currentCharKey)
     if self:IsShown() and self.currentCharKey then
         self:RefreshDisplay()
     end
