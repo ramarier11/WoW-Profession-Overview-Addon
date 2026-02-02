@@ -400,12 +400,12 @@ function CharacterDetailWindow:RefreshDisplay()
     
     -- Update scroll child height
     -- No scroll height adjustment needed; content is fixed
-    local contentHeight = math.abs(yOffset) + 20
+    local contentHeight = math.abs(yOffset)
     self.Content:SetHeight(contentHeight)
     
     -- Dynamically resize window based on content
     -- Account for: title area (45px), content, bottom padding (20px), backdrop insets (23px)
-    local neededHeight = 45 + contentHeight + 20 + 23
+    local neededHeight = 45 + contentHeight
     local finalHeight = math.max(minCharacterDetailWindowHeight, math.min(neededHeight, maxCharacterDetailWindowHeight))
     self:SetHeight(finalHeight)
 end
