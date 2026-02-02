@@ -427,19 +427,26 @@ end
 
 -- Refresh the open treasure window with latest data
 function CharacterDetailWindow:RefreshOpenTreasureWindow()
+    print("|cffff00ff[DEBUG]|r RefreshOpenTreasureWindow called")
     if not self.missingTreasureWindow or not self.missingTreasureWindow:IsShown() then
+        print("|cffff00ff[DEBUG]|r Treasure window not shown or doesn't exist")
         return
     end
     
+    print("|cffff00ff[DEBUG]|r Current char key:", self.currentCharKey)
     if not self.currentCharKey then return end
     
     local characters = ProfessionTracker:GetAllCharacters()
+    print("|cffff00ff[DEBUG]|r Characters retrieved:", characters ~= nil)
     if not characters or not characters[self.currentCharKey] then
+        print("|cffff00ff[DEBUG]|r Character data not found")
         return
     end
     
     local charData = characters[self.currentCharKey]
     local treasureWin = self.missingTreasureWindow
+    
+    print("|cffff00ff[DEBUG]|r Treasure window has profName:", treasureWin.profName, "expName:", treasureWin.expName)
     
     -- Find the profession and expansion data
     if charData.professions and treasureWin.profName and treasureWin.expName then
@@ -447,12 +454,17 @@ function CharacterDetailWindow:RefreshOpenTreasureWindow()
         if profData and profData.expansions then
             for expName, expData in pairs(profData.expansions) do
                 if expName == treasureWin.expName then
-                    print("|cffff00ff[DEBUG]|r Refreshing open treasure window")
+                    print("|cffff00ff[DEBUG]|r Refreshing open treasure window - found expansion data")
+                    print("|cffff00ff[DEBUG]|r Missing treasures count:", #(expData.missingOneTimeTreasures or {}))
                     self:RefreshTreasureWindow(treasureWin, treasureWin.profName, treasureWin.expName, expData)
                     break
                 end
             end
+        else
+            print("|cffff00ff[DEBUG]|r Profession or expansions not found")
         end
+    else
+        print("|cffff00ff[DEBUG]|r Missing professions, profName, or expName")
     end
 end
 
