@@ -648,11 +648,7 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
     
     local yOffset = -10
     
-    print("|cffff8800[Debug] Total treasures to display:|r", #expData.missingOneTimeTreasures)
-    
     for i, treasure in ipairs(expData.missingOneTimeTreasures) do
-        print("|cffff8800[Debug] Processing treasure|r", i, treasure.name, "at yOffset:", yOffset)
-        
         -- Create clickable button frame for each treasure
         local treasureBtn = CreateFrame("Button", nil, treasureWin.ScrollChild)
         treasureBtn:SetSize(320, 18)
@@ -667,8 +663,6 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
         -- Get map name from map ID
         local mapInfo = C_Map.GetMapInfo(treasure.mapID)
         local mapName = mapInfo and mapInfo.name or "Unknown Map"
-        
-        print("|cffff8800[Debug] Map name:|r", mapName, "for mapID:", treasure.mapID)
         
         nameText:SetText(string.format("%s - %s", treasure.name, mapName))
         nameText:SetTextColor(1, 0.82, 0, 1)
@@ -688,22 +682,14 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
         -- Click to create waypoint
         treasureBtn:SetScript("OnClick", function(self, button)
             if button == "LeftButton" then
-                local success, err = pcall(function()
-                    local mapPoint = UiMapPoint.CreateFromVector2D(treasure.mapID, CreateVector2D(treasure.x/100, treasure.y/100))
-                    C_Map.SetUserWaypoint(mapPoint)
-                    print(string.format("|cff00ff00Waypoint set for %s at %.1f, %.1f|r", treasure.name, treasure.x, treasure.y))
-                end)
-                if not success then
-                    print("|cffff0000Error setting waypoint:|r", err)
-                end
+                local mapPoint = UiMapPoint.CreateFromVector2D(treasure.mapID, CreateVector2D(treasure.x/100, treasure.y/100))
+                C_Map.SetUserWaypoint(mapPoint)
+                print(string.format("|cff00ff00Waypoint set for %s at %.1f, %.1f|r", treasure.name, treasure.x, treasure.y))
             end
         end)
         
         yOffset = yOffset - 18
-        print("|cffff8800[Debug] New yOffset:|r", yOffset)
     end
-    
-    print("|cffff8800[Debug] Final yOffset:|r", yOffset, "Content height will be:", math.abs(yOffset) + 20)
     
     local contentHeight = math.abs(yOffset) + 20
     treasureWin.ScrollChild:SetHeight(contentHeight)
