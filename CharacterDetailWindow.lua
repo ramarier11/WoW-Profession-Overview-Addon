@@ -3,7 +3,7 @@
 -- ########################################################
 local minCharacterDetailWindowHeight = 285
 local maxCharacterDetailWindowHeight = 800
-local minTreasureWindowHeight = 200
+local minTreasureWindowHeight = 100
 local maxTreasureWindowHeight = 600
 -- Create the detail window frame
 local CharacterDetailWindow = CreateFrame("Frame", "ProfessionTrackerCharacterDetail", UIParent, "BackdropTemplate")
