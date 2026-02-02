@@ -596,18 +596,28 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
                 local mapInfo = C_Map.GetMapInfo(treasure.mapID)
                 local mapName = mapInfo and mapInfo.name or "Unknown Map"
                 
-                local treasureText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-                treasureText:SetPoint("TOPLEFT", xOffset + 12, yOffset)
+                -- Create a button frame to enable hover effects
+                local treasureBtn = CreateFrame("Button", nil, self.Content)
+                treasureBtn:SetSize(300, 14)
+                treasureBtn:SetPoint("TOPLEFT", xOffset + 12, yOffset)
+                
+                local treasureText = treasureBtn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+                treasureText:SetPoint("LEFT", 0, 0)
                 treasureText:SetText(string.format("%s - %s", treasure.name, mapName))
                 treasureText:SetTextColor(0.8, 0.8, 1, 1)
-                yOffset = yOffset - 14
                 
-                -- Add coordinates as small text underneath
-                local coordText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontWhiteTiny")
-                coordText:SetPoint("TOPLEFT", xOffset + 18, yOffset)
-                coordText:SetText(string.format("(%.1f, %.1f)", treasure.x or 0, treasure.y or 0))
-                coordText:SetTextColor(0.7, 0.7, 0.7, 1)
-                yOffset = yOffset - 12
+                -- Add hover tooltip with coordinates
+                treasureBtn:SetScript("OnEnter", function(self)
+                    GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+                    GameTooltip:AddLine(string.format("%.1f, %.1f", treasure.x or 0, treasure.y or 0))
+                    GameTooltip:Show()
+                end)
+                
+                treasureBtn:SetScript("OnLeave", function(self)
+                    GameTooltip:Hide()
+                end)
+                
+                yOffset = yOffset - 14
             end
         end
     end
