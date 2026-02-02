@@ -1221,7 +1221,7 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_misc_profession_book_mining",
                 },
                 craftingOrder = {
-                    questID = {},
+                    questID = {93709},
                     name = "Weekly Mining Profession Quest",
                     icon = "Interface\\Icons\\inv_crafting_orders", 
                 },
