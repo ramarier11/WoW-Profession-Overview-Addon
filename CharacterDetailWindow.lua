@@ -695,7 +695,6 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
         treasureWin.detailWindow = self
         treasureWin.profName = profName
         treasureWin.expName = expName
-        treasureWin.charKey = self.currentCharKey
         
         self.missingTreasureWindow = treasureWin
     end
@@ -708,6 +707,7 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
     treasureWin.Title:SetText(string.format("%s (%s)", profName, expName))
     
     -- Store current expansion data for event updates
+    treasureWin.currentExpData = expData
     treasureWin.profName = profName
     treasureWin.expName = expName
     treasureWin.charKey = self.currentCharKey
