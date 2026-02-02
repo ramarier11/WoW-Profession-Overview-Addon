@@ -678,11 +678,11 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
 
     end
     
-    local contentHeight = math.abs(yOffset) + 30
+    local contentHeight = math.abs(yOffset) + 20
     treasureWin.ScrollChild:SetHeight(contentHeight)
     
     -- Dynamically resize window based on content
-    local neededHeight = contentHeight + 25
+    local neededHeight = contentHeight + 50
     local finalHeight = math.max(minTreasureWindowHeight, math.min(neededHeight, maxTreasureWindowHeight))
     treasureWin:SetHeight(finalHeight)
     
