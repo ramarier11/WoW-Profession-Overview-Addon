@@ -144,13 +144,11 @@ function CharacterDetailWindow:ShowCharacter(charKey, charData)
             if event == "QUEST_TURNED_IN" then
                 print("|cffff00ff[DEBUG]|r Main window QUEST_TURNED_IN received")
                 C_Timer.After(0.1, function()
-                    print("|cffff00ff[DEBUG]|r Refreshing main display and treasure window")
                     if self:IsShown() then
                         self:Refresh()
                     end
                     -- Also refresh treasure window if it's open
                     if self.missingTreasureWindow and self.missingTreasureWindow:IsShown() then
-                        print("|cffff00ff[DEBUG]|r Treasure window is open, refreshing it")
                         self:RefreshOpenTreasureWindow()
                     end
                 end)
@@ -447,7 +445,6 @@ function CharacterDetailWindow:RefreshOpenTreasureWindow()
         if profData and profData.expansions then
             for expName, expData in pairs(profData.expansions) do
                 if expName == treasureWin.expName then
-                    print("|cffff00ff[DEBUG]|r Refreshing open treasure window")
                     self:RefreshTreasureWindow(treasureWin, treasureWin.profName, treasureWin.expName, expData)
                     break
                 end
@@ -641,23 +638,17 @@ end
 
 -- Show missing treasures window
 function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
-    print("|cffff00ff[DEBUG]|r ShowMissingTreasures called - profName:", profName, "expName:", expName)
     if not expData.missingOneTimeTreasures or #expData.missingOneTimeTreasures == 0 then
-        print("|cffff00ff[DEBUG]|r No treasures to show")
         return
     end
     
-    print("|cffff00ff[DEBUG]|r Showing treasure window with", #expData.missingOneTimeTreasures, "treasures")
-    
     -- Hide existing window if it's already showing to prevent multiple instances
     if self.missingTreasureWindow and self.missingTreasureWindow:IsShown() then
-        print("|cffff00ff[DEBUG]|r Hiding existing treasure window")
         self.missingTreasureWindow:Hide()
     end
     
     -- Create or reuse treasure window
     if not self.missingTreasureWindow then
-        print("|cffff00ff[DEBUG]|r Creating NEW treasure window")
         local treasureWin = CreateFrame("Frame", "ProfessionTrackerMissingTreasures", UIParent, "BackdropTemplate")
         treasureWin:SetSize(350, minTreasureWindowHeight)
         treasureWin:SetPoint("CENTER")
@@ -700,9 +691,6 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
     end
     
     local treasureWin = self.missingTreasureWindow
-    
-    print("|cffff00ff[DEBUG]|r Using treasure window (is it new?", self.missingTreasureWindow.questEventRegistered == nil, ")")
-    print("|cffff00ff[DEBUG]|r Setting title and storing data")
     
     treasureWin.Title:SetText(string.format("%s (%s)", profName, expName))
     
