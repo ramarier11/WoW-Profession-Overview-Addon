@@ -20,6 +20,8 @@ CharacterDetailWindow:SetScript("OnDragStop", function(self) self:StopMovingOrSi
 CharacterDetailWindow:SetScript("OnKeyDown", function(self, key)
     if key == "ESCAPE" then
         self:Hide()
+    else
+        self:SetPropagateKeyboardInput(true)
     end
 end)
 
@@ -618,6 +620,8 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
         treasureWin:SetScript("OnKeyDown", function(self, key)
             if key == "ESCAPE" then
                 self:Hide()
+            else
+                self:SetPropagateKeyboardInput(true)
             end
         end)
         
