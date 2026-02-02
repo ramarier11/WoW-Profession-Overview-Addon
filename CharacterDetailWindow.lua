@@ -652,28 +652,16 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
     local yOffset = -10
     
     for i, treasure in ipairs(expData.missingOneTimeTreasures) do
-        -- Treasure name
+        -- Treasure name with coordinates on same line
         local nameText = treasureWin.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         nameText:SetPoint("TOPLEFT", 10, yOffset)
-        nameText:SetText(treasure.name)
-        nameText:SetTextColor(1, 0.82, 0, 1)
-        yOffset = yOffset - 18
-        
-        -- Location info
-        local locText = treasureWin.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        locText:SetPoint("TOPLEFT", 20, yOffset)
-        locText:SetText(string.format("Map ID: %d, Coords: %.1f, %.1f", 
-            treasure.mapID or 0,
+        nameText:SetText(string.format("%s (%.1f, %.1f)", 
+            treasure.name,
             treasure.x or 0,
             treasure.y or 0))
+        nameText:SetTextColor(1, 0.82, 0, 1)
         yOffset = yOffset - 18
-        
-        -- -- Quest ID (for reference)
-        -- local questText = treasureWin.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-        -- questText:SetPoint("TOPLEFT", 20, yOffset)
-        -- questText:SetText(string.format("Quest ID: %d", treasure.questID or 0))
-        -- questText:SetTextColor(0.7, 0.7, 0.7, 1)
-        -- yOffset = yOffset - 20
+
     end
     
     local contentHeight = math.abs(yOffset) + 20
