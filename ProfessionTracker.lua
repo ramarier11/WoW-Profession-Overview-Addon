@@ -113,12 +113,12 @@ KPReference = {
         [12] = { -- Midnight
             weekly = {
                 treatise = {
-                    questID = 83725,  
+                    questID = 95127,  
                     name = "Treatise: Alchemy",
                     icon = "Interface\\Icons\\inv_misc_profession_book_alchemy",
                 },
                 craftingOrder = {
-                    questID = 84133,
+                    questID = 93690,
                     name = "Alchemy Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
@@ -241,12 +241,12 @@ KPReference = {
         [12] = { -- Midnight
             weekly = {
                 treatise = {
-                    questID = 83725,  
+                    questID = 95128,  
                     name = "Treatise: Blacksmithing",
                     icon = "Interface\\Icons\\inv_misc_profession_book_blacksmithing",
                 },
                 craftingOrder = {
-                    questID = 84133,
+                    questID = 93691,
                     name = "Blacksmithing Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
@@ -379,7 +379,7 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_misc_profession_book_enchanting",
                 },
                 craftingOrder = {
-                    questID = {84085, 84086, 84084},
+                    questID = {93697},
                     name = "Enchanting Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
@@ -500,12 +500,12 @@ KPReference = {
         [12] = { -- Midnight
             weekly = {
                 treatise = {
-                    questID = 83725,  
+                    questID = 83728,  -- CHECK AFTER LIVE  RELEASE
                     name = "Treatise: Engineering",
                     icon = "Interface\\Icons\\inv_misc_profession_book_engineering",
                 },
                 craftingOrder = {
-                    questID = 84133,
+                    questID = 93692,
                     name = "Engineering Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
@@ -634,7 +634,7 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_misc_profession_book_inscription",
                 },
                 craftingOrder = {
-                    questID = 84133,
+                    questID = 93693,
                     name = "Inscription Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
@@ -757,12 +757,12 @@ KPReference = {
         [12] = { -- Midnight
             weekly = {
                 treatise = {
-                    questID = 83725,  
+                    questID = 95133,  
                     name = "Treatise: Jewelcrafting",
                     icon = "Interface\\Icons\\inv_misc_profession_book_jewelcrafting",
                 },
                 craftingOrder = {
-                    questID = 84133,
+                    questID = 93694,
                     name = "Jewelcrafting Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
@@ -883,12 +883,12 @@ KPReference = {
         [12] = { -- Midnight
             weekly = {
                 treatise = {
-                    questID = 83725,  
+                    questID = 95134,  
                     name = "Treatise: Leatherworking",
                     icon = "Interface\\Icons\\inv_misc_profession_book_leatherworking",
                 },
                 craftingOrder = {
-                    questID = 84133,
+                    questID = 93695,
                     name = "Leatherworking Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
@@ -1014,7 +1014,7 @@ KPReference = {
                     icon = "Interface\\Icons\\inv_misc_profession_book_tailoring",
                 },
                 craftingOrder = {
-                    questID = 84133,
+                    questID = 93696,
                     name = "Tailoring Services Requested",
                     icon = "Interface\\Icons\\inv_crafting_orders",
                 },
@@ -1116,7 +1116,7 @@ KPReference = {
         [12] = { -- Midnight
             weekly = {
                 treatise = {
-                    questID = 83729,  
+                    questID = 95130,  
                     name = "Treatise: Herbalism",
                     icon = "Interface\\Icons\\inv_misc_profession_book_herbalism",
                 },
@@ -1216,7 +1216,7 @@ KPReference = {
         [12] = { -- Midnight
             weekly = {
                 treatise = {
-                    questID = 83733,  
+                    questID = 95135,  
                     name = "Treatise: Mining",
                     icon = "Interface\\Icons\\inv_misc_profession_book_mining",
                 },
