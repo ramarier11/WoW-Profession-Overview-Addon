@@ -601,17 +601,23 @@ end
 
 -- Show missing treasures window
 function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
+    print("|cffff00ff[DEBUG]|r ShowMissingTreasures called - profName:", profName, "expName:", expName)
     if not expData.missingOneTimeTreasures or #expData.missingOneTimeTreasures == 0 then
+        print("|cffff00ff[DEBUG]|r No treasures to show")
         return
     end
     
+    print("|cffff00ff[DEBUG]|r Showing treasure window with", #expData.missingOneTimeTreasures, "treasures")
+    
     -- Hide existing window if it's already showing to prevent multiple instances
     if self.missingTreasureWindow and self.missingTreasureWindow:IsShown() then
+        print("|cffff00ff[DEBUG]|r Hiding existing treasure window")
         self.missingTreasureWindow:Hide()
     end
     
     -- Create or reuse treasure window
     if not self.missingTreasureWindow then
+        print("|cffff00ff[DEBUG]|r Creating NEW treasure window")
         local treasureWin = CreateFrame("Frame", "ProfessionTrackerMissingTreasures", UIParent, "BackdropTemplate")
         treasureWin:SetSize(350, minTreasureWindowHeight)
         treasureWin:SetPoint("CENTER")
@@ -656,14 +662,15 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
     
     local treasureWin = self.missingTreasureWindow
     
+    print("|cffff00ff[DEBUG]|r Using treasure window (is it new?", self.missingTreasureWindow.questEventRegistered == nil, ")")
+    print("|cffff00ff[DEBUG]|r Setting title and storing data")
+    
+    treasureWin.Title:SetText(string.format("%s (%s)", profName, expName))
+    
     -- Store current expansion data for event updates
     treasureWin.profName = profName
     treasureWin.expName = expName
     treasureWin.charKey = self.currentCharKey
-    
-    treasureWin.Title:SetText(string.format("%s (%s)", profName, expName))
-    
-    -- Register for quest events if not already registered
     if not treasureWin.questEventRegistered then
         print("|cffff00ff[DEBUG]|r Registering QUEST_TURNED_IN event on treasure window")
         treasureWin:RegisterEvent("QUEST_TURNED_IN")
