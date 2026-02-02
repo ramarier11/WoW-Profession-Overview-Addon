@@ -405,7 +405,7 @@ function CharacterDetailWindow:RefreshDisplay()
     
     -- Dynamically resize window based on content
     -- Account for: title area (45px), content, bottom padding (20px), backdrop insets (23px)
-    local neededHeight = 45 + contentHeight
+    local neededHeight = 25 + contentHeight
     local finalHeight = math.max(minCharacterDetailWindowHeight, math.min(neededHeight, maxCharacterDetailWindowHeight))
     self:SetHeight(finalHeight)
 end
