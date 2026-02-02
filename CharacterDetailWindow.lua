@@ -581,10 +581,9 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
                 CreateStatusLine(icon, label, completed, false)
             end
         end
-    end
-    
-    -- One-time treasures section (display inline underneath weekly treasures)
-        if not isGathering and hasKnowledgeSystem and expData.missingOneTimeTreasures and #expData.missingOneTimeTreasures > 0 then
+        
+        -- One-time treasures section (display inline underneath weekly treasures)
+        if not isGathering and expData.missingOneTimeTreasures and #expData.missingOneTimeTreasures > 0 then
             yOffset = yOffset - 5
             local oneTimeHeader = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
             oneTimeHeader:SetPoint("TOPLEFT", xOffset + 6, yOffset)
@@ -611,6 +610,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
                 yOffset = yOffset - 12
             end
         end
+    end
     
     yOffset = yOffset - 5
     return yOffset
