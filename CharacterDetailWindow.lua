@@ -619,13 +619,10 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
         treasureWin.CloseButton = CreateFrame("Button", nil, treasureWin, "UIPanelCloseButton")
         treasureWin.CloseButton:SetPoint("TOPRIGHT", -5, -5)
         
-        treasureWin.ScrollFrame = CreateFrame("ScrollFrame", nil, treasureWin, "UIPanelScrollFrameTemplate")
-        treasureWin.ScrollFrame:SetPoint("TOPLEFT", 15, -45)
-        treasureWin.ScrollFrame:SetPoint("BOTTOMRIGHT", -30, 15)
-        
-        treasureWin.ScrollChild = CreateFrame("Frame", nil, treasureWin.ScrollFrame)
-        treasureWin.ScrollChild:SetSize(450, 1)
-        treasureWin.ScrollFrame:SetScrollChild(treasureWin.ScrollChild)
+        treasureWin.ScrollChild = CreateFrame("Frame", nil, treasureWin)
+        treasureWin.ScrollChild:SetPoint("TOPLEFT", 15, -45)
+        treasureWin.ScrollChild:SetPoint("BOTTOMRIGHT", -30, 15)
+        treasureWin.ScrollChild:SetSize(320, 1)
         
         self.missingTreasureWindow = treasureWin
     end
