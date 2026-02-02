@@ -3,8 +3,6 @@
 -- ########################################################
 local minCharacterDetailWindowHeight = 285
 local maxCharacterDetailWindowHeight = 800
-local minTreasureWindowHeight = 100
-local maxTreasureWindowHeight = 600
 -- Create the detail window frame
 local CharacterDetailWindow = CreateFrame("Frame", "ProfessionTrackerCharacterDetail", UIParent, "BackdropTemplate")
 CharacterDetailWindow:SetSize(400, minCharacterDetailWindowHeight)
@@ -131,32 +129,33 @@ local function GetCurrentConcentration(expData)
     return math.floor(currentConc), maxConc
 end
 
--- Show character details
-function CharacterDetailWindow:ShowCharacter(charKey, charData)
-    self.currentCharKey = charKey
-    self:RefreshDisplay()
-    self:Show()
+-- PRETTY SURE THIS ISN'T DOING ANYTHING
+-- -- Show character details
+-- function CharacterDetailWindow:ShowCharacter(charKey, charData)
+--     self.currentCharKey = charKey
+--     self:RefreshDisplay()
+--     self:Show()
     
-    -- -- Register for quest updates
-    -- if not self.questEventRegistered then
-    --     self:RegisterEvent("QUEST_TURNED_IN")
-    --     self:SetScript("OnEvent", function(self, event)
-    --         if event == "QUEST_TURNED_IN" then
-    --             print("|cffff00ff[DEBUG]|r Main window QUEST_TURNED_IN received")
-    --             C_Timer.After(0.1, function()
-    --                 if self:IsShown() then
-    --                     self:Refresh()
-    --                 end
-    --                 -- Also refresh treasure window if it's open
-    --                 if self.missingTreasureWindow and self.missingTreasureWindow:IsShown() then
-    --                     self:RefreshOpenTreasureWindow()
-    --                 end
-    --             end)
-    --         end
-    --     end)
-    --     self.questEventRegistered = true
-    -- end
-end
+--     -- Register for quest updates
+--     if not self.questEventRegistered then
+--         self:RegisterEvent("QUEST_TURNED_IN")
+--         self:SetScript("OnEvent", function(self, event)
+--             if event == "QUEST_TURNED_IN" then
+--                 print("|cffff00ff[DEBUG]|r Main window QUEST_TURNED_IN received")
+--                 C_Timer.After(0.1, function()
+--                     if self:IsShown() then
+--                         self:Refresh()
+--                     end
+--                     -- Also refresh treasure window if it's open
+--                     if self.missingTreasureWindow and self.missingTreasureWindow:IsShown() then
+--                         self:RefreshOpenTreasureWindow()
+--                     end
+--                 end)
+--             end
+--         end)
+--         self.questEventRegistered = true
+--     end
+-- end
 
 -- Refresh the current character's display
 function CharacterDetailWindow:RefreshDisplay()
@@ -423,36 +422,6 @@ function CharacterDetailWindow:Refresh()
     end
 end
 
--- Refresh the open treasure window with latest data
-function CharacterDetailWindow:RefreshOpenTreasureWindow()
-    if not self.missingTreasureWindow or not self.missingTreasureWindow:IsShown() then
-        return
-    end
-    
-    if not self.currentCharKey then return end
-    
-    local characters = ProfessionTracker:GetAllCharacters()
-    if not characters or not characters[self.currentCharKey] then
-        return
-    end
-    
-    local charData = characters[self.currentCharKey]
-    local treasureWin = self.missingTreasureWindow
-    
-    -- Find the profession and expansion data
-    if charData.professions and treasureWin.profName and treasureWin.expName then
-        local profData = charData.professions[treasureWin.profName]
-        if profData and profData.expansions then
-            for expName, expData in pairs(profData.expansions) do
-                if expName == treasureWin.expName then
-                    self:RefreshTreasureWindow(treasureWin, treasureWin.profName, treasureWin.expName, expData)
-                    break
-                end
-            end
-        end
-    end
-end
-
 function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName, yOffset, xOffset)
     local weekly = expData.weeklyKnowledgePoints or {}
     local isGathering = GATHERING_PROFESSIONS[profName]
@@ -612,176 +581,36 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
         end
     end
     
-    -- One-time treasures section (condensed)
+    -- One-time treasures section (condensed, inline)
     if hasKnowledgeSystem and expData.missingOneTimeTreasures and #expData.missingOneTimeTreasures > 0 then
-        yOffset = yOffset - 3
-        local treasureText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-        treasureText:SetPoint("TOPLEFT", xOffset + 6, yOffset)
-        treasureText:SetText(string.format("|cffff8800One Time Missing: %d|r", 
+        yOffset = yOffset - 5
+        local treasureHeaderText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        treasureHeaderText:SetPoint("TOPLEFT", xOffset + 6, yOffset)
+        treasureHeaderText:SetText(string.format("|cffff8800One-Time Treasures (%d)|r", 
             #expData.missingOneTimeTreasures))
-        yOffset = yOffset - 10
+        yOffset = yOffset - 14
         
-        -- Create button with more padding
-        local showTreasuresBtn = CreateFrame("Button", nil, self.Content, "UIPanelButtonTemplate")
-        showTreasuresBtn:SetSize(110, 24)
-        showTreasuresBtn:SetPoint("TOPLEFT", xOffset + 6, yOffset)
-        showTreasuresBtn:SetText("Show")
-        showTreasuresBtn:SetScript("OnClick", function()
-            self:ShowMissingTreasures(profName, expName, expData)
-        end)
-        yOffset = yOffset - 32
+        -- List each one-time treasure inline
+        for i, treasure in ipairs(expData.missingOneTimeTreasures) do
+            local mapInfo = C_Map.GetMapInfo(treasure.mapID)
+            local mapName = mapInfo and mapInfo.name or "Unknown Map"
+            
+            local treasureText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+            treasureText:SetPoint("TOPLEFT", xOffset + 16, yOffset)
+            treasureText:SetPoint("RIGHT", self.Content, "RIGHT", -10, 0)
+            treasureText:SetJustifyH("LEFT")
+            treasureText:SetText(string.format("%s - %s (%.1f, %.1f)", 
+                treasure.name, mapName, treasure.x or 0, treasure.y or 0))
+            treasureText:SetTextColor(0.8, 0.8, 0.9, 1)
+            
+            yOffset = yOffset - 14
+        end
+        
+        yOffset = yOffset - 3
     end
     
     yOffset = yOffset - 5
     return yOffset
-end
-
--- Show missing treasures window
-function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
-    if not expData.missingOneTimeTreasures or #expData.missingOneTimeTreasures == 0 then
-        return
-    end
-    
-    -- Hide existing window if it's already showing to prevent multiple instances
-    if self.missingTreasureWindow and self.missingTreasureWindow:IsShown() then
-        self.missingTreasureWindow:Hide()
-    end
-    
-    -- Create or reuse treasure window
-    if not self.missingTreasureWindow then
-        local treasureWin = CreateFrame("Frame", "ProfessionTrackerMissingTreasures", UIParent, "BackdropTemplate")
-        treasureWin:SetSize(350, minTreasureWindowHeight)
-        treasureWin:SetPoint("CENTER")
-        treasureWin:SetFrameStrata("DIALOG")
-        treasureWin:SetMovable(true)
-        treasureWin:EnableMouse(true)
-        treasureWin:EnableKeyboard(true)
-        treasureWin:RegisterForDrag("LeftButton")
-        treasureWin:SetScript("OnDragStart", function(self) self:StartMoving() end)
-        treasureWin:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
-        treasureWin:SetScript("OnKeyDown", function(self, key)
-            if key == "ESCAPE" then
-                self:Hide()
-            else
-                self:SetPropagateKeyboardInput(true)
-            end
-        end)
-        
-        treasureWin:SetBackdrop(DETAIL_BACKDROP)
-        treasureWin:SetBackdropColor(0, 0, 0, 0.95)
-        treasureWin:SetBackdropBorderColor(0.8, 0.6, 0, 1)
-        
-        treasureWin.Title = treasureWin:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-        treasureWin.Title:SetPoint("TOP", 0, -15)
-        
-        treasureWin.CloseButton = CreateFrame("Button", nil, treasureWin, "UIPanelCloseButton")
-        treasureWin.CloseButton:SetPoint("TOPRIGHT", -5, -5)
-        
-        treasureWin.ScrollChild = CreateFrame("Frame", nil, treasureWin)
-        treasureWin.ScrollChild:SetPoint("TOPLEFT", 15, -45)
-        treasureWin.ScrollChild:SetPoint("BOTTOMRIGHT", -30, 15)
-        treasureWin.ScrollChild:SetSize(320, 1)
-        
-        -- Store reference to character detail window for refresh callback
-        treasureWin.detailWindow = self
-        treasureWin.profName = profName
-        treasureWin.expName = expName
-        
-        self.missingTreasureWindow = treasureWin
-    end
-    
-    local treasureWin = self.missingTreasureWindow
-    
-    treasureWin.Title:SetText(string.format("%s (%s)", profName, expName))
-    
-    -- Store current expansion data for event updates
-    treasureWin.currentExpData = expData
-    treasureWin.profName = profName
-    treasureWin.expName = expName
-    treasureWin.charKey = self.currentCharKey
-    
-    -- Refresh the treasure window content
-    self:RefreshTreasureWindow(treasureWin, profName, expName, expData)
-    treasureWin:Show()
-end
-
--- Refresh treasure window content
-function CharacterDetailWindow:RefreshTreasureWindow(treasureWin, profName, expName, expData)
-    if not expData.missingOneTimeTreasures or #expData.missingOneTimeTreasures == 0 then
-        treasureWin:Hide()
-        return
-    end
-    
-    -- Clear existing content (both frames and font strings)
-    for _, child in ipairs({treasureWin.ScrollChild:GetChildren()}) do
-        child:Hide()
-        child:SetParent(nil)
-    end
-    
-    -- Clear font strings
-    local regions = {treasureWin.ScrollChild:GetRegions()}
-    for _, region in ipairs(regions) do
-        if region:GetObjectType() == "FontString" then
-            region:Hide()
-            region:SetText("")
-            region:ClearAllPoints()
-        end
-    end
-    
-    local yOffset = -10
-    
-    for i, treasure in ipairs(expData.missingOneTimeTreasures) do
-        -- Create clickable button frame for each treasure
-        local treasureBtn = CreateFrame("Button", nil, treasureWin.ScrollChild)
-        treasureBtn:SetSize(320, 18)
-        treasureBtn:SetPoint("TOPLEFT", 10, yOffset)
-        
-        -- Treasure name with map name on same line
-        local nameText = treasureBtn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        nameText:SetPoint("LEFT", 0, 0)
-        nameText:SetPoint("RIGHT", 0, 0)
-        nameText:SetJustifyH("LEFT")
-        
-        -- Get map name from map ID
-        local mapInfo = C_Map.GetMapInfo(treasure.mapID)
-        local mapName = mapInfo and mapInfo.name or "Unknown Map"
-        
-        nameText:SetText(string.format("%s - %s", treasure.name, mapName))
-        nameText:SetTextColor(1, 0.82, 0, 1)
-        
-        -- Enable tooltip on hover to show coordinates
-        treasureBtn:SetScript("OnEnter", function(self)
-            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-            GameTooltip:AddLine(string.format("%.1f, %.1f", treasure.x or 0, treasure.y or 0))
-            GameTooltip:AddLine("|cff00ff00Click to set waypoint|r", 1, 1, 1)
-            GameTooltip:Show()
-        end)
-        
-        treasureBtn:SetScript("OnLeave", function(self)
-            GameTooltip:Hide()
-        end)
-        
-        -- Click to create waypoint
-        treasureBtn:SetScript("OnClick", function(self, button)
-            if button == "LeftButton" then
-                local mapPoint = UiMapPoint.CreateFromVector2D(treasure.mapID, CreateVector2D(treasure.x/100, treasure.y/100))
-                C_Map.SetUserWaypoint(mapPoint)
-                print(string.format("|cff00ff00Waypoint set for %s at %.1f, %.1f|r", treasure.name, treasure.x, treasure.y))
-            end
-        end)
-        
-        yOffset = yOffset - 18
-    end
-    
-    local contentHeight = math.abs(yOffset) + 20
-    treasureWin.ScrollChild:SetHeight(contentHeight)
-    
-    -- Dynamically resize window based on content
-    local neededHeight = contentHeight + 50
-    local finalHeight = math.max(minTreasureWindowHeight, math.min(neededHeight, maxTreasureWindowHeight))
-    treasureWin:SetHeight(finalHeight)
-    
-    treasureWin:Show()
 end
 
 -- Make globally accessible
