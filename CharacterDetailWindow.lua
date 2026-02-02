@@ -652,14 +652,28 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
     local yOffset = -10
     
     for i, treasure in ipairs(expData.missingOneTimeTreasures) do
-        -- Treasure name with coordinates on same line
+        -- Treasure name with map name on same line
         local nameText = treasureWin.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         nameText:SetPoint("TOPLEFT", 10, yOffset)
-        nameText:SetText(string.format("%s (%.1f, %.1f)", 
-            treasure.name,
-            treasure.x or 0,
-            treasure.y or 0))
+        
+        -- Get map name from map ID
+        local mapInfo = C_Map.GetMapInfo(treasure.mapID)
+        local mapName = mapInfo and mapInfo.name or "Unknown Map"
+        
+        nameText:SetText(string.format("%s - %s", treasure.name, mapName))
         nameText:SetTextColor(1, 0.82, 0, 1)
+        
+        -- Enable tooltip on hover to show coordinates
+        nameText:SetScript("OnEnter", function(self)
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:AddLine(string.format("Coordinates: %.1f, %.1f", treasure.x or 0, treasure.y or 0))
+            GameTooltip:Show()
+        end)
+        
+        nameText:SetScript("OnLeave", function(self)
+            GameTooltip:Hide()
+        end)
+        
         yOffset = yOffset - 18
 
     end
