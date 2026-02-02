@@ -374,7 +374,7 @@ KPReference = {
         [12] = { -- Midnight
             weekly = {
                 treatise = {
-                    questID = 83725,  
+                    questID = 95129,  
                     name = "Treatise: Enchanting",
                     icon = "Interface\\Icons\\inv_misc_profession_book_enchanting",
                 },
@@ -629,7 +629,7 @@ KPReference = {
         [12] = { -- Midnight
             weekly = {
                 treatise = {
-                    questID = 83725,  
+                    questID = 95131,  
                     name = "Treatise: Inscription",
                     icon = "Interface\\Icons\\inv_misc_profession_book_inscription",
                 },
@@ -1009,7 +1009,7 @@ KPReference = {
         [12] = { -- Midnight
             weekly = {
                 treatise = {
-                    questID = 83725,  
+                    questID = 95137,  
                     name = "Treatise: Tailoring",
                     icon = "Interface\\Icons\\inv_misc_profession_book_tailoring",
                 },
