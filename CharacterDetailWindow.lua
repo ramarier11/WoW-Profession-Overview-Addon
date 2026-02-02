@@ -611,11 +611,25 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
                     GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
                     GameTooltip:AddLine(treasure.name)
                     GameTooltip:AddLine(string.format("%.1f, %.1f", treasure.x or 0, treasure.y or 0))
+                    GameTooltip:AddLine("|cff00ff00Click to set waypoint|r", 1, 1, 1)
                     GameTooltip:Show()
                 end)
                 
                 treasureBtn:SetScript("OnLeave", function(self)
                     GameTooltip:Hide()
+                end)
+                
+                -- Click to set waypoint
+                treasureBtn:SetScript("OnClick", function(self, button)
+                    if button == "LeftButton" then
+                        if C_Map.CanSetUserWaypointOnMap(treasure.mapID) then
+                            local mapPoint = UiMapPoint.CreateFromVector2D(treasure.mapID, CreateVector2D(treasure.x/100, treasure.y/100))
+                            C_Map.SetUserWaypoint(mapPoint)
+                            print(string.format("|cff00ff00Waypoint set for %s at %.1f, %.1f|r", treasure.name, treasure.x, treasure.y))
+                        else
+                            print(string.format("|cffff0000Cannot set waypoints on %s|r", mapName))
+                        end
+                    end
                 end)
                 
                 yOffset = yOffset - 14
