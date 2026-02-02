@@ -668,17 +668,24 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
         treasureWin:RegisterEvent("QUEST_TURNED_IN")
         treasureWin:SetScript("OnEvent", function(self, event)
             if event == "QUEST_TURNED_IN" and self:IsShown() then
+                print("|cffff00ff[DEBUG]|r QUEST_TURNED_IN fired in treasure window")
                 C_Timer.After(0.1, function()
+                    print("|cffff00ff[DEBUG]|r Updating treasure window - charKey:", self.charKey, "profName:", self.profName, "expName:", self.expName)
                     -- Refresh the treasure list with updated data from database
                     if self.detailWindow and self.charKey then
                         local characters = ProfessionTracker:GetAllCharacters()
+                        print("|cffff00ff[DEBUG]|r Got characters table:", characters ~= nil)
                         if characters and characters[self.charKey] then
                             local charData = characters[self.charKey]
+                            print("|cffff00ff[DEBUG]|r Found character data")
                             if charData and charData.professions then
                                 local profData = charData.professions[self.profName]
+                                print("|cffff00ff[DEBUG]|r Looking for profession:", self.profName, "Found:", profData ~= nil)
                                 if profData and profData.expansions then
                                     for expName, expData in pairs(profData.expansions) do
                                         if expName == self.expName then
+                                            print("|cffff00ff[DEBUG]|r Found expansion:", self.expName)
+                                            print("|cffff00ff[DEBUG]|r Missing treasures count:", expData.missingOneTimeTreasures and #expData.missingOneTimeTreasures or 0)
                                             -- Get fresh data and refresh the window
                                             self.detailWindow:RefreshTreasureWindow(self, self.profName, self.expName, expData)
                                             break
@@ -686,7 +693,11 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
                                     end
                                 end
                             end
+                        else
+                            print("|cffff00ff[DEBUG]|r Character not found for key:", self.charKey)
                         end
+                    else
+                        print("|cffff00ff[DEBUG]|r detailWindow or charKey not set")
                     end
                 end)
             end
@@ -701,10 +712,15 @@ end
 
 -- Refresh treasure window content
 function CharacterDetailWindow:RefreshTreasureWindow(treasureWin, profName, expName, expData)
+    print("|cffff00ff[DEBUG]|r RefreshTreasureWindow called - profName:", profName, "expName:", expName)
+    
     if not expData.missingOneTimeTreasures or #expData.missingOneTimeTreasures == 0 then
+        print("|cffff00ff[DEBUG]|r No missing treasures, hiding window")
         treasureWin:Hide()
         return
     end
+    
+    print("|cffff00ff[DEBUG]|r Refreshing treasure list with", #expData.missingOneTimeTreasures, "treasures")
     
     -- Clear existing content (both frames and font strings)
     for _, child in ipairs({treasureWin.ScrollChild:GetChildren()}) do
