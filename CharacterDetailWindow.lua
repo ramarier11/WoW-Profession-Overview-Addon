@@ -1,10 +1,11 @@
 -- ########################################################
 -- ## Character Detail Window
 -- ########################################################
-local characterDetailWindowHeight = 285
+local minCharacterDetailWindowHeight = 285
+local maxCharacterDetailWindowHeight = 800
 -- Create the detail window frame
 local CharacterDetailWindow = CreateFrame("Frame", "ProfessionTrackerCharacterDetail", UIParent, "BackdropTemplate")
-CharacterDetailWindow:SetSize(400, characterDetailWindowHeight)
+CharacterDetailWindow:SetSize(400, minCharacterDetailWindowHeight)
 CharacterDetailWindow:SetPoint("CENTER")
 CharacterDetailWindow:Hide()
 CharacterDetailWindow:SetFrameStrata("DIALOG")
@@ -383,7 +384,14 @@ function CharacterDetailWindow:RefreshDisplay()
     
     -- Update scroll child height
     -- No scroll height adjustment needed; content is fixed
-    self.Content:SetHeight(math.abs(yOffset) + 50)
+    local contentHeight = math.abs(yOffset) + 50
+    self.Content:SetHeight(contentHeight)
+    
+    -- Dynamically resize window based on content
+    -- Account for: title area (35px), content, bottom padding (20px), backdrop insets (23px top+bottom)
+    local neededHeight = 35 + contentHeight + 20 + 23
+    local finalHeight = math.max(minCharacterDetailWindowHeight, math.min(neededHeight, maxCharacterDetailWindowHeight))
+    self:SetHeight(finalHeight)
 end
 
 -- Refresh method to update with latest data
