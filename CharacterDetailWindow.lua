@@ -609,6 +609,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
                 -- Add hover tooltip with coordinates
                 treasureBtn:SetScript("OnEnter", function(self)
                     GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+                    GameTooltip:AddLine(treasure.name)
                     GameTooltip:AddLine(string.format("%.1f, %.1f", treasure.x or 0, treasure.y or 0))
                     GameTooltip:Show()
                 end)
