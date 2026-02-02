@@ -1783,6 +1783,8 @@ local function ResetDarkmoonFaireStateIfNeeded()
                     if type(profData) == "table" then
                         -- Initialize darkmoonFaire table if it doesn't exist
                         profData.darkmoonFaire = profData.darkmoonFaire or {}
+                        -- Reset completion flag for new faire
+                        profData.darkmoonFaire.completed = false
                         profData.darkmoonFaire.lastReset = time()
                     end
                 end
