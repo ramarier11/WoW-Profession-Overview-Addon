@@ -397,14 +397,13 @@ function CharacterDetailWindow:RefreshDisplay()
             yOffset = columnStartY - maxHeightInRow - 20
         end
     end
-    
+    --HEIGHT ADJUSTMENT
     -- Update scroll child height
     -- No scroll height adjustment needed; content is fixed
     local contentHeight = math.abs(yOffset)
     self.Content:SetHeight(contentHeight)
     
     -- Dynamically resize window based on content
-    -- Account for: title area (45px), content, bottom padding (20px), backdrop insets (23px)
     local neededHeight = 25 + contentHeight
     local finalHeight = math.max(minCharacterDetailWindowHeight, math.min(neededHeight, maxCharacterDetailWindowHeight))
     self:SetHeight(finalHeight)
@@ -646,11 +645,65 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
         treasureWin.ScrollChild:SetPoint("BOTTOMRIGHT", -30, 15)
         treasureWin.ScrollChild:SetSize(320, 1)
         
+        -- Store reference to character detail window for refresh callback
+        treasureWin.detailWindow = self
+        treasureWin.profName = profName
+        treasureWin.expName = expName
+        
         self.missingTreasureWindow = treasureWin
     end
     
     local treasureWin = self.missingTreasureWindow
+    
+    -- Store current expansion data for event updates
+    treasureWin.currentExpData = expData
+    treasureWin.profName = profName
+    treasureWin.expName = expName
+    
     treasureWin.Title:SetText(string.format("%s (%s)", profName, expName))
+    
+    -- Register for quest events if not already registered
+    if not treasureWin.questEventRegistered then
+        treasureWin:RegisterEvent("QUEST_TURNED_IN")
+        treasureWin:SetScript("OnEvent", function(self, event)
+            if event == "QUEST_TURNED_IN" and self:IsShown() and self.currentExpData then
+                C_Timer.After(0.1, function()
+                    -- Refresh the treasure list with updated data
+                    if self.detailWindow and self.detailWindow.currentCharKey then
+                        local characters = ProfessionTracker:GetAllCharacters()
+                        if characters and characters[self.detailWindow.currentCharKey] then
+                            local charData = characters[self.detailWindow.currentCharKey]
+                            if charData and charData.professions then
+                                local profData = charData.professions[self.profName]
+                                if profData and profData.expansions then
+                                    for expName, expData in pairs(profData.expansions) do
+                                        if expName == self.expName then
+                                            self.currentExpData = expData
+                                            self.detailWindow:RefreshTreasureWindow(self, self.profName, self.expName, expData)
+                                            break
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end)
+            end
+        end)
+        treasureWin.questEventRegistered = true
+    end
+    
+    -- Refresh the treasure window content
+    self:RefreshTreasureWindow(treasureWin, profName, expName, expData)
+    treasureWin:Show()
+end
+
+-- Refresh treasure window content
+function CharacterDetailWindow:RefreshTreasureWindow(treasureWin, profName, expName, expData)
+    if not expData.missingOneTimeTreasures or #expData.missingOneTimeTreasures == 0 then
+        treasureWin:Hide()
+        return
+    end
     
     -- Clear existing content (both frames and font strings)
     for _, child in ipairs({treasureWin.ScrollChild:GetChildren()}) do
