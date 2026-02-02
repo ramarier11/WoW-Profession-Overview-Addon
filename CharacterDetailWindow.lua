@@ -681,7 +681,7 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
     
     -- Dynamically resize window based on content
     -- Account for: title area (30px), scroll frame padding (60px), bottom padding (15px)
-    local neededHeight = contentHeight + 105
+    local neededHeight = contentHeight + 10
     local finalHeight = math.max(minTreasureWindowHeight, math.min(neededHeight, maxTreasureWindowHeight))
     treasureWin:SetHeight(finalHeight)
     
