@@ -674,11 +674,11 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
             GameTooltip:Hide()
         end)
         
-        yOffset = yOffset - 25
+        yOffset = yOffset - 18
 
     end
     
-    local contentHeight = math.abs(yOffset) + 20
+    local contentHeight = math.abs(yOffset) + 30
     treasureWin.ScrollChild:SetHeight(contentHeight)
     
     -- Dynamically resize window based on content
