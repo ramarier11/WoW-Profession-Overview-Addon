@@ -131,33 +131,32 @@ local function GetCurrentConcentration(expData)
     return math.floor(currentConc), maxConc
 end
 
--- PRETTY SURE THIS ISN'T DOING ANYTHING
--- -- Show character details
--- function CharacterDetailWindow:ShowCharacter(charKey, charData)
---     self.currentCharKey = charKey
---     self:RefreshDisplay()
---     self:Show()
+-- Show character details
+function CharacterDetailWindow:ShowCharacter(charKey, charData)
+    self.currentCharKey = charKey
+    self:RefreshDisplay()
+    self:Show()
     
---     -- Register for quest updates
---     if not self.questEventRegistered then
---         self:RegisterEvent("QUEST_TURNED_IN")
---         self:SetScript("OnEvent", function(self, event)
---             if event == "QUEST_TURNED_IN" then
---                 print("|cffff00ff[DEBUG]|r Main window QUEST_TURNED_IN received")
---                 C_Timer.After(0.1, function()
---                     if self:IsShown() then
---                         self:Refresh()
---                     end
---                     -- Also refresh treasure window if it's open
---                     if self.missingTreasureWindow and self.missingTreasureWindow:IsShown() then
---                         self:RefreshOpenTreasureWindow()
---                     end
---                 end)
---             end
---         end)
---         self.questEventRegistered = true
---     end
--- end
+    -- -- Register for quest updates
+    -- if not self.questEventRegistered then
+    --     self:RegisterEvent("QUEST_TURNED_IN")
+    --     self:SetScript("OnEvent", function(self, event)
+    --         if event == "QUEST_TURNED_IN" then
+    --             print("|cffff00ff[DEBUG]|r Main window QUEST_TURNED_IN received")
+    --             C_Timer.After(0.1, function()
+    --                 if self:IsShown() then
+    --                     self:Refresh()
+    --                 end
+    --                 -- Also refresh treasure window if it's open
+    --                 if self.missingTreasureWindow and self.missingTreasureWindow:IsShown() then
+    --                     self:RefreshOpenTreasureWindow()
+    --                 end
+    --             end)
+    --         end
+    --     end)
+    --     self.questEventRegistered = true
+    -- end
+end
 
 -- Refresh the current character's display
 function CharacterDetailWindow:RefreshDisplay()
