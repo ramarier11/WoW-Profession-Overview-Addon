@@ -3,6 +3,8 @@
 -- ########################################################
 local minCharacterDetailWindowHeight = 285
 local maxCharacterDetailWindowHeight = 800
+local minTreasureWindowHeight = 300
+local maxTreasureWindowHeight = 600
 -- Create the detail window frame
 local CharacterDetailWindow = CreateFrame("Frame", "ProfessionTrackerCharacterDetail", UIParent, "BackdropTemplate")
 CharacterDetailWindow:SetSize(400, minCharacterDetailWindowHeight)
@@ -598,7 +600,7 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
     -- Create or reuse treasure window
     if not self.missingTreasureWindow then
         local treasureWin = CreateFrame("Frame", "ProfessionTrackerMissingTreasures", UIParent, "BackdropTemplate")
-        treasureWin:SetSize(500, 400)
+        treasureWin:SetSize(500, minTreasureWindowHeight)
         treasureWin:SetPoint("CENTER")
         treasureWin:SetFrameStrata("TOOLTIP")
         treasureWin:SetMovable(true)
@@ -674,7 +676,15 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
         -- yOffset = yOffset - 20
     end
     
-    treasureWin.ScrollChild:SetHeight(math.abs(yOffset) + 20)
+    local contentHeight = math.abs(yOffset) + 20
+    treasureWin.ScrollChild:SetHeight(contentHeight)
+    
+    -- Dynamically resize window based on content
+    -- Account for: title area (30px), scroll frame padding (60px), bottom padding (15px)
+    local neededHeight = contentHeight + 105
+    local finalHeight = math.max(minTreasureWindowHeight, math.min(neededHeight, maxTreasureWindowHeight))
+    treasureWin:SetHeight(finalHeight)
+    
     treasureWin:Show()
 end
 
