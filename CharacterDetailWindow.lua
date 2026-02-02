@@ -569,7 +569,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
         showTreasuresBtn:SetScript("OnClick", function()
             self:ShowMissingTreasures(profName, expName, expData)
         end)
-        yOffset = yOffset - 35
+        yOffset = yOffset - 50
     end
     
     yOffset = yOffset - 5
