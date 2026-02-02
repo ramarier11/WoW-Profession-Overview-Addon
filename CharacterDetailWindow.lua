@@ -653,9 +653,16 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
     for i, treasure in ipairs(expData.missingOneTimeTreasures) do
         print("|cffff8800[Debug] Processing treasure|r", i, treasure.name, "at yOffset:", yOffset)
         
+        -- Create clickable button frame for each treasure
+        local treasureBtn = CreateFrame("Button", nil, treasureWin.ScrollChild)
+        treasureBtn:SetSize(320, 18)
+        treasureBtn:SetPoint("TOPLEFT", 10, yOffset)
+        
         -- Treasure name with map name on same line
-        local nameText = treasureWin.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        nameText:SetPoint("TOPLEFT", 10, yOffset)
+        local nameText = treasureBtn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        nameText:SetPoint("LEFT", 0, 0)
+        nameText:SetPoint("RIGHT", 0, 0)
+        nameText:SetJustifyH("LEFT")
         
         -- Get map name from map ID
         local mapInfo = C_Map.GetMapInfo(treasure.mapID)
@@ -666,24 +673,20 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
         nameText:SetText(string.format("%s - %s", treasure.name, mapName))
         nameText:SetTextColor(1, 0.82, 0, 1)
         
-        -- Enable mouse interaction for clicking
-        nameText:SetMouseEnabled(true)
-        nameText:SetMouseClickEnabled(true)
-        
         -- Enable tooltip on hover to show coordinates
-        nameText:SetScript("OnEnter", function(self)
+        treasureBtn:SetScript("OnEnter", function(self)
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
             GameTooltip:AddLine(string.format("%.1f, %.1f", treasure.x or 0, treasure.y or 0))
             GameTooltip:AddLine("|cff00ff00Click to set waypoint|r", 1, 1, 1)
             GameTooltip:Show()
         end)
         
-        nameText:SetScript("OnLeave", function(self)
+        treasureBtn:SetScript("OnLeave", function(self)
             GameTooltip:Hide()
         end)
         
         -- Click to create waypoint
-        nameText:SetScript("OnMouseUp", function(self, button)
+        treasureBtn:SetScript("OnClick", function(self, button)
             if button == "LeftButton" then
                 local success, err = pcall(function()
                     local mapPoint = UiMapPoint.CreateFromVector2D(treasure.mapID, CreateVector2D(treasure.x/100, treasure.y/100))
