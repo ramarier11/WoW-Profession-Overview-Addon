@@ -649,6 +649,7 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
         treasureWin.detailWindow = self
         treasureWin.profName = profName
         treasureWin.expName = expName
+        treasureWin.charKey = self.currentCharKey
         
         self.missingTreasureWindow = treasureWin
     end
@@ -656,9 +657,9 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
     local treasureWin = self.missingTreasureWindow
     
     -- Store current expansion data for event updates
-    treasureWin.currentExpData = expData
     treasureWin.profName = profName
     treasureWin.expName = expName
+    treasureWin.charKey = self.currentCharKey
     
     treasureWin.Title:SetText(string.format("%s (%s)", profName, expName))
     
@@ -666,19 +667,19 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
     if not treasureWin.questEventRegistered then
         treasureWin:RegisterEvent("QUEST_TURNED_IN")
         treasureWin:SetScript("OnEvent", function(self, event)
-            if event == "QUEST_TURNED_IN" and self:IsShown() and self.currentExpData then
+            if event == "QUEST_TURNED_IN" and self:IsShown() then
                 C_Timer.After(0.1, function()
-                    -- Refresh the treasure list with updated data
-                    if self.detailWindow and self.detailWindow.currentCharKey then
+                    -- Refresh the treasure list with updated data from database
+                    if self.detailWindow and self.charKey then
                         local characters = ProfessionTracker:GetAllCharacters()
-                        if characters and characters[self.detailWindow.currentCharKey] then
-                            local charData = characters[self.detailWindow.currentCharKey]
+                        if characters and characters[self.charKey] then
+                            local charData = characters[self.charKey]
                             if charData and charData.professions then
                                 local profData = charData.professions[self.profName]
                                 if profData and profData.expansions then
                                     for expName, expData in pairs(profData.expansions) do
                                         if expName == self.expName then
-                                            self.currentExpData = expData
+                                            -- Get fresh data and refresh the window
                                             self.detailWindow:RefreshTreasureWindow(self, self.profName, self.expName, expData)
                                             break
                                         end
