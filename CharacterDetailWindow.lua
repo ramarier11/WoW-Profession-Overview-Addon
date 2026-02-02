@@ -390,6 +390,12 @@ function CharacterDetailWindow:RefreshDisplay()
                 yOffset = columnStartY
             end
         end
+        
+        -- After all professions, ensure we account for the last row's height
+        if currentColumn > 0 then
+            -- Last row wasn't completed (odd number of professions)
+            yOffset = columnStartY - maxHeightInRow - 20
+        end
     end
     
     -- Update scroll child height
@@ -398,8 +404,8 @@ function CharacterDetailWindow:RefreshDisplay()
     self.Content:SetHeight(contentHeight)
     
     -- Dynamically resize window based on content
-    -- Account for: title area (35px), content, bottom padding (20px), backdrop insets (23px top+bottom)
-    local neededHeight = contentHeight + 78  -- 35 (top) + 20 (bottom) + 23 (backdrop insets)
+    -- Account for: title area (45px), content, bottom padding (20px), backdrop insets (23px)
+    local neededHeight = 45 + contentHeight + 20 + 23
     local finalHeight = math.max(minCharacterDetailWindowHeight, math.min(neededHeight, maxCharacterDetailWindowHeight))
     self:SetHeight(finalHeight)
 end
