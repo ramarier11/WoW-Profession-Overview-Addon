@@ -603,7 +603,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
                 
                 local treasureText = treasureBtn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
                 treasureText:SetPoint("LEFT", 0, 0)
-                treasureText:SetText(string.format("%s - %s", TruncateText(treasure.name, 10), mapName))
+                treasureText:SetText(string.format("%s - %s", TruncateText(treasure.name, 10), TruncateText(mapName, 17))
                 treasureText:SetTextColor(0.8, 0.8, 1, 1)
                 
                 -- Add hover tooltip with coordinates
