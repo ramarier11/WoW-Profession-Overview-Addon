@@ -598,7 +598,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
                 
                 -- Create a button frame to enable hover effects
                 local treasureBtn = CreateFrame("Button", nil, self.Content)
-                treasureBtn:SetSize(300, 14)
+                treasureBtn:SetSize(160, 14)
                 treasureBtn:SetPoint("TOPLEFT", xOffset + 12, yOffset)
                 
                 local treasureText = treasureBtn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
