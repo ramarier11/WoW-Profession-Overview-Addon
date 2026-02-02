@@ -13,9 +13,15 @@ CharacterDetailWindow:Hide()
 CharacterDetailWindow:SetFrameStrata("DIALOG")
 CharacterDetailWindow:SetMovable(true)
 CharacterDetailWindow:EnableMouse(true)
+CharacterDetailWindow:EnableKeyboard(true)
 CharacterDetailWindow:RegisterForDrag("LeftButton")
 CharacterDetailWindow:SetScript("OnDragStart", function(self) self:StartMoving() end)
 CharacterDetailWindow:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
+CharacterDetailWindow:SetScript("OnKeyDown", function(self, key)
+    if key == "ESCAPE" then
+        self:Hide()
+    end
+end)
 
 -- Apply backdrop
 local DETAIL_BACKDROP = {
@@ -605,9 +611,15 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
         treasureWin:SetFrameStrata("DIALOG")
         treasureWin:SetMovable(true)
         treasureWin:EnableMouse(true)
+        treasureWin:EnableKeyboard(true)
         treasureWin:RegisterForDrag("LeftButton")
         treasureWin:SetScript("OnDragStart", function(self) self:StartMoving() end)
         treasureWin:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
+        treasureWin:SetScript("OnKeyDown", function(self, key)
+            if key == "ESCAPE" then
+                self:Hide()
+            end
+        end)
         
         treasureWin:SetBackdrop(DETAIL_BACKDROP)
         treasureWin:SetBackdropColor(0, 0, 0, 0.95)
