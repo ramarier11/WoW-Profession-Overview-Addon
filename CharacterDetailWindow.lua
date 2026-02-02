@@ -674,7 +674,7 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
             GameTooltip:Hide()
         end)
         
-        yOffset = yOffset - 20
+        yOffset = yOffset - 25
 
     end
     
