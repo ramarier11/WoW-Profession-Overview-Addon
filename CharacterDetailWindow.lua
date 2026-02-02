@@ -590,15 +590,14 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
         return
     end
     
-    -- Check for existing global frame first
-    local treasureWin = _G["ProfessionTrackerMissingTreasures"]
-    if treasureWin then
-        self.missingTreasureWindow = treasureWin
+    -- Hide existing window if it's already showing to prevent multiple instances
+    if self.missingTreasureWindow and self.missingTreasureWindow:IsShown() then
+        self.missingTreasureWindow:Hide()
     end
     
     -- Create or reuse treasure window
     if not self.missingTreasureWindow then
-        treasureWin = CreateFrame("Frame", "ProfessionTrackerMissingTreasures", UIParent, "BackdropTemplate")
+        local treasureWin = CreateFrame("Frame", "ProfessionTrackerMissingTreasures", UIParent, "BackdropTemplate")
         treasureWin:SetSize(500, 400)
         treasureWin:SetPoint("CENTER")
         treasureWin:SetFrameStrata("TOOLTIP")
@@ -627,11 +626,9 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
         treasureWin.ScrollFrame:SetScrollChild(treasureWin.ScrollChild)
         
         self.missingTreasureWindow = treasureWin
-    else
-        treasureWin = self.missingTreasureWindow
     end
     
-    treasureWin:Hide()  -- Always hide first to ensure clean state
+    local treasureWin = self.missingTreasureWindow
     treasureWin.Title:SetText(string.format("Missing Treasures - %s (%s)", profName, expName))
     
     -- Clear existing content
