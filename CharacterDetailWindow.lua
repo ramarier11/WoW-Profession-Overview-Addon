@@ -572,7 +572,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
         yOffset = yOffset - 50
     end
     
-    yOffset = yOffset - 5
+    yOffset = yOffset - 20
     return yOffset
 end
 
