@@ -628,7 +628,7 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
     end
     
     local treasureWin = self.missingTreasureWindow
-    treasureWin.Title:SetText(string.format("Missing Treasures - %s (%s)", profName, expName))
+    treasureWin.Title:SetText(string.format("%s (%s)", profName, expName))
     
     -- Clear existing content (both frames and font strings)
     for _, child in ipairs({treasureWin.ScrollChild:GetChildren()}) do
