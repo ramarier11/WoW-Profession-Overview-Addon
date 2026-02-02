@@ -631,10 +631,20 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
     local treasureWin = self.missingTreasureWindow
     treasureWin.Title:SetText(string.format("Missing Treasures - %s (%s)", profName, expName))
     
-    -- Clear existing content
+    -- Clear existing content (both frames and font strings)
     for _, child in ipairs({treasureWin.ScrollChild:GetChildren()}) do
         child:Hide()
         child:SetParent(nil)
+    end
+    
+    -- Clear font strings
+    local regions = {treasureWin.ScrollChild:GetRegions()}
+    for _, region in ipairs(regions) do
+        if region:GetObjectType() == "FontString" then
+            region:Hide()
+            region:SetText("")
+            region:ClearAllPoints()
+        end
     end
     
     local yOffset = -10
