@@ -666,12 +666,12 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
             treasure.y or 0))
         yOffset = yOffset - 18
         
-        -- Quest ID (for reference)
-        local questText = treasureWin.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-        questText:SetPoint("TOPLEFT", 20, yOffset)
-        questText:SetText(string.format("Quest ID: %d", treasure.questID or 0))
-        questText:SetTextColor(0.7, 0.7, 0.7, 1)
-        yOffset = yOffset - 20
+        -- -- Quest ID (for reference)
+        -- local questText = treasureWin.ScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        -- questText:SetPoint("TOPLEFT", 20, yOffset)
+        -- questText:SetText(string.format("Quest ID: %d", treasure.questID or 0))
+        -- questText:SetTextColor(0.7, 0.7, 0.7, 1)
+        -- yOffset = yOffset - 20
     end
     
     treasureWin.ScrollChild:SetHeight(math.abs(yOffset) + 20)
