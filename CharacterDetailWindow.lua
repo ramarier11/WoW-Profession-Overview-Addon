@@ -7,7 +7,7 @@ local minTreasureWindowHeight = 100
 local maxTreasureWindowHeight = 600
 -- Create the detail window frame
 local CharacterDetailWindow = CreateFrame("Frame", "ProfessionTrackerCharacterDetail", UIParent, "BackdropTemplate")
-CharacterDetailWindow:SetSize(400, minCharacterDetailWindowHeight)
+CharacterDetailWindow:SetSize(400, 800)
 CharacterDetailWindow:SetPoint("CENTER")
 CharacterDetailWindow:Hide()
 CharacterDetailWindow:SetFrameStrata("DIALOG")
