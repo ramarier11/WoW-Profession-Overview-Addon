@@ -665,8 +665,10 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
     
     -- Register for quest events if not already registered
     if not treasureWin.questEventRegistered then
+        print("|cffff00ff[DEBUG]|r Registering QUEST_TURNED_IN event on treasure window")
         treasureWin:RegisterEvent("QUEST_TURNED_IN")
         treasureWin:SetScript("OnEvent", function(self, event)
+            print("|cffff00ff[DEBUG]|r EVENT FIRED:", event, "IsShown:", self:IsShown())
             if event == "QUEST_TURNED_IN" and self:IsShown() then
                 print("|cffff00ff[DEBUG]|r QUEST_TURNED_IN fired in treasure window")
                 C_Timer.After(0.1, function()
@@ -703,6 +705,9 @@ function CharacterDetailWindow:ShowMissingTreasures(profName, expName, expData)
             end
         end)
         treasureWin.questEventRegistered = true
+        print("|cffff00ff[DEBUG]|r Event registration complete, flag set")
+    else
+        print("|cffff00ff[DEBUG]|r Event already registered on treasure window, skipping")
     end
     
     -- Refresh the treasure window content
