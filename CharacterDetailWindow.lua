@@ -522,65 +522,25 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
     yOffset = yOffset - 3
     
     -- Helper for status display with icons
-    local function CreateStatusLine(icon, label, completed, isAtlas, tooltipText)
-        -- Create button frame if tooltip is needed
-        if tooltipText then
-            local statusBtn = CreateFrame("Button", nil, self.Content)
-            statusBtn:SetSize(50, 14)
-            statusBtn:SetPoint("TOPLEFT", xOffset + 6, yOffset)
-            
-            local statusText = statusBtn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-            statusText:SetPoint("LEFT", 0, 0)
-            
-            local statusIcon = completed 
-                and "|TInterface\\RaidFrame\\ReadyCheck-Ready:12:12|t" 
-                or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:12:12|t"
-            
-            -- Handle atlas textures differently from regular textures
-            local iconDisplay
-            if isAtlas then
-                iconDisplay = icon  -- Already formatted with |A:...|a
-            else
-                iconDisplay = string.format("|T%s:14:14|t", icon)
-            end
-            
-            statusText:SetText(string.format("%s %s %s", iconDisplay, TruncateText(label, 22), statusIcon))
-            
-            -- Add tooltip on hover
-            statusBtn:SetScript("OnEnter", function(self)
-                statusText:SetTextColor(1, 1, 0.3, 1)  -- Bright yellow on hover
-                GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-                GameTooltip:AddLine(tooltipText)
-                GameTooltip:Show()
-            end)
-            
-            statusBtn:SetScript("OnLeave", function(self)
-                statusText:SetTextColor(1, 1, 1, 1)  -- Reset to white
-                GameTooltip:Hide()
-            end)
-            
-            yOffset = yOffset - 16
-            return statusBtn
+    local function CreateStatusLine(icon, label, completed, isAtlas)
+        local statusText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        statusText:SetPoint("TOPLEFT", xOffset + 6, yOffset)
+        
+        local statusIcon = completed 
+            and "|TInterface\\RaidFrame\\ReadyCheck-Ready:12:12|t" 
+            or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:12:12|t"
+        
+        -- Handle atlas textures differently from regular textures
+        local iconDisplay
+        if isAtlas then
+            iconDisplay = icon  -- Already formatted with |A:...|a
         else
-            local statusText = self.Content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-            statusText:SetPoint("TOPLEFT", xOffset + 6, yOffset)
-            
-            local statusIcon = completed 
-                and "|TInterface\\RaidFrame\\ReadyCheck-Ready:12:12|t" 
-                or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:12:12|t"
-            
-            -- Handle atlas textures differently from regular textures
-            local iconDisplay
-            if isAtlas then
-                iconDisplay = icon  -- Already formatted with |A:...|a
-            else
-                iconDisplay = string.format("|T%s:14:14|t", icon)
-            end
-            
-            statusText:SetText(string.format("%s %s %s", iconDisplay, TruncateText(label, 22), statusIcon))
-            yOffset = yOffset - 16
-            return statusText
+            iconDisplay = string.format("|T%s:14:14|t", icon)
         end
+        
+        statusText:SetText(string.format("%s %s %s", iconDisplay, TruncateText(label, 22), statusIcon))
+        yOffset = yOffset - 16
+        return statusText
     end
     
     if hasKnowledgeSystem then
@@ -589,10 +549,35 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
         if isCraftingOrderAtlas then
             craftingOrderIcon = "|A:RecurringAvailableQuestIcon:14:14|a"
         end
-        CreateStatusLine(craftingOrderIcon, "Order", weekly.craftingOrderQuest == true, isCraftingOrderAtlas, "from crafting order / inscription")
+        CreateStatusLine(craftingOrderIcon, "Order", weekly.craftingOrderQuest == true, isCraftingOrderAtlas)
         
         -- Treatise
-        CreateStatusLine(treatiseIcon, "Treatise", weekly.treatise == true, false)
+        local treatiseBtn = CreateFrame("Button", nil, self.Content)
+        treatiseBtn:SetSize(50, 14)
+        treatiseBtn:SetPoint("TOPLEFT", xOffset + 6, yOffset)
+        
+        local treatiseText = treatiseBtn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        treatiseText:SetPoint("LEFT", 0, 0)
+        
+        local treatiseIcon_display = string.format("|T%s:14:14|t", treatiseIcon)
+        local treatiseStatusIcon = weekly.treatise == true
+            and "|TInterface\\RaidFrame\\ReadyCheck-Ready:12:12|t"
+            or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:12:12|t"
+        treatiseText:SetText(string.format("%s %s %s", treatiseIcon_display, "Treatise", treatiseStatusIcon))
+        
+        treatiseBtn:SetScript("OnEnter", function(self)
+            treatiseText:SetTextColor(1, 1, 0.3, 1)
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:AddLine("From Crafting Order / Inscription")
+            GameTooltip:Show()
+        end)
+        
+        treatiseBtn:SetScript("OnLeave", function(self)
+            treatiseText:SetTextColor(1, 1, 1, 1)
+            GameTooltip:Hide()
+        end)
+        
+        yOffset = yOffset - 16
         
         -- Detailed Treasures list (exclude for gathering professions)
         if not isGathering and ref and ref.weekly and type(ref.weekly.treasures) == "table" then
