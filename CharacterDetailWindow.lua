@@ -302,9 +302,25 @@ function CharacterDetailWindow:RefreshDisplay()
             
             -- Make the button clickable to open the profession window
             profHeaderBtn:SetScript("OnClick", function(self)
-                local skillLineID = profData.skillLineID or (profData.expansions and next(profData.expansions) and profData.expansions[next(profData.expansions)].skillLineID)
+                print("|cffff00ff[DEBUG]|r Profession header clicked: " .. profName)
+                print("|cffff00ff[DEBUG]|r profData.skillLineID: " .. tostring(profData.skillLineID))
+                
+                local skillLineID = profData.skillLineID
+                if not skillLineID and profData.expansions then
+                    local firstExp = next(profData.expansions)
+                    if firstExp then
+                        skillLineID = profData.expansions[firstExp].skillLineID
+                        print("|cffff00ff[DEBUG]|r Found skillLineID from expansion: " .. tostring(skillLineID))
+                    end
+                end
+                
+                print("|cffff00ff[DEBUG]|r Final skillLineID: " .. tostring(skillLineID))
+                
                 if skillLineID then
+                    print("|cffff00ff[DEBUG]|r Opening trade skill with ID: " .. skillLineID)
                     C_TradeSkillUI.OpenTradeSkill(skillLineID)
+                else
+                    print("|cffff00ff[DEBUG]|r ERROR: No skillLineID found for profession: " .. profName)
                 end
             end)
             
