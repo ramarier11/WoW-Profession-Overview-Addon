@@ -606,16 +606,22 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
                 treasureText:SetText(string.format("%s - %s", TruncateText(treasure.name, 10), TruncateText(mapName, 17)))
                 treasureText:SetTextColor(0.8, 0.8, 1, 1)
                 
-                -- Add hover tooltip with coordinates
+                -- Add hover tooltip with coordinates and highlighting
                 treasureBtn:SetScript("OnEnter", function(self)
+                    -- Highlight text on hover
+                    treasureText:SetTextColor(1, 1, 0.3, 1)  -- Bright yellow
+                    
                     GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
                     GameTooltip:AddLine(treasure.name)
+                    GameTooltip:AddLine(mapName)
                     GameTooltip:AddLine(string.format("%.1f, %.1f", treasure.x or 0, treasure.y or 0))
                     GameTooltip:AddLine("|cff00ff00Click to set waypoint|r", 1, 1, 1)
                     GameTooltip:Show()
                 end)
                 
                 treasureBtn:SetScript("OnLeave", function(self)
+                    -- Revert color on leave
+                    treasureText:SetTextColor(0.8, 0.8, 1, 1)
                     GameTooltip:Hide()
                 end)
                 
