@@ -1,7 +1,7 @@
 -- ########################################################
 -- ## Character Detail Window
 -- ########################################################
-local minCharacterDetailWindowHeight = 285
+local minCharacterDetailWindowHeight = 150
 local maxCharacterDetailWindowHeight = 800
 local minTreasureWindowHeight = 100
 local maxTreasureWindowHeight = 600
