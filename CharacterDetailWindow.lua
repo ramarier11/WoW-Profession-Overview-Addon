@@ -619,33 +619,34 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
                 local icon = tDef.icon or treasuresIcon
                 local label = tDef.name or tDef.label or ("Treasure " .. i)
                 
-                -- Create button for hover effect
-                local treasureLineBtn = CreateFrame("Button", nil, self.Content)
-                treasureLineBtn:SetSize(160, 14)
-                treasureLineBtn:SetPoint("TOPLEFT", xOffset + 6, yOffset)
-                
-                local treasureLineText = treasureLineBtn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-                treasureLineText:SetPoint("LEFT", 0, 0)
-                
-                local iconDisplay = string.format("|T%s:14:14|t", icon)
-                local statusIcon = completed == true
-                    and "|TInterface\\RaidFrame\\ReadyCheck-Ready:12:12|t"
-                    or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:12:12|t"
-                treasureLineText:SetText(string.format("%s %s %s", iconDisplay, TruncateText(label, 22), statusIcon))
-                
-                treasureLineBtn:SetScript("OnEnter", function(self)
-                    treasureLineText:SetTextColor(1, 1, 0.3, 1)
-                    GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-                    GameTooltip:AddLine("From Misc. Treasures")
-                    GameTooltip:Show()
-                end)
-                
-                treasureLineBtn:SetScript("OnLeave", function(self)
-                    treasureLineText:SetTextColor(1, 1, 1, 1)
-                    GameTooltip:Hide()
-                end)
-                
-                yOffset = yOffset - 16
+                -- Skip displaying completed treasures
+                if not completed then
+                    -- Create button for hover effect
+                    local treasureLineBtn = CreateFrame("Button", nil, self.Content)
+                    treasureLineBtn:SetSize(160, 14)
+                    treasureLineBtn:SetPoint("TOPLEFT", xOffset + 6, yOffset)
+                    
+                    local treasureLineText = treasureLineBtn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+                    treasureLineText:SetPoint("LEFT", 0, 0)
+                    
+                    local iconDisplay = string.format("|T%s:14:14|t", icon)
+                    local statusIcon = "|TInterface\\RaidFrame\\ReadyCheck-NotReady:12:12|t"
+                    treasureLineText:SetText(string.format("%s %s %s", iconDisplay, TruncateText(label, 22), statusIcon))
+                    
+                    treasureLineBtn:SetScript("OnEnter", function(self)
+                        treasureLineText:SetTextColor(1, 1, 0.3, 1)
+                        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+                        GameTooltip:AddLine("From Misc. Treasures")
+                        GameTooltip:Show()
+                    end)
+                    
+                    treasureLineBtn:SetScript("OnLeave", function(self)
+                        treasureLineText:SetTextColor(1, 1, 1, 1)
+                        GameTooltip:Hide()
+                    end)
+                    
+                    yOffset = yOffset - 16
+                end
             end
         elseif not isGathering and ref and ref.weekly and ref.weekly.treasures == nil then
             -- No treasures defined in reference
