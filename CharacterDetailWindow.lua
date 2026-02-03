@@ -554,7 +554,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
         end
         
         local orderBtn = CreateFrame("Button", nil, self.Content)
-        orderBtn:SetSize(160, 14)
+        orderBtn:SetSize(60, 14)
         orderBtn:SetPoint("TOPLEFT", xOffset + 6, yOffset)
         
         local orderText = orderBtn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
