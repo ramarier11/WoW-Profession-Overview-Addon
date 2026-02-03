@@ -302,38 +302,19 @@ function CharacterDetailWindow:RefreshDisplay()
             
             -- Make the button clickable to open the profession window
             profHeaderBtn:SetScript("OnClick", function(self)
-                print("|cffff00ff[DEBUG]|r Profession header clicked: " .. profName)
-                
                 local skillLineID = nil
                 
-                -- Try to get skillLineID from expansions
                 if profData.expansions then
-                    -- Get the first expansion (or any expansion with skillLineID)
                     for expName, expData in pairs(profData.expansions) do
-                        print("|cffff00ff[DEBUG]|r Checking expansion: " .. expName)
-                        print("|cffff00ff[DEBUG]|r   baseSkillLineID: " .. tostring(expData.baseSkillLineID))
-                        print("|cffff00ff[DEBUG]|r   skillLineID: " .. tostring(expData.skillLineID))
-                        
-                        -- Try baseSkillLineID first (from database)
                         if expData.baseSkillLineID and expData.baseSkillLineID > 0 then
                             skillLineID = expData.baseSkillLineID
-                            print("|cffff00ff[DEBUG]|r   Using baseSkillLineID: " .. skillLineID)
-                            break
-                        elseif expData.skillLineID and expData.skillLineID > 0 then
-                            skillLineID = expData.skillLineID
-                            print("|cffff00ff[DEBUG]|r   Using skillLineID: " .. skillLineID)
                             break
                         end
                     end
                 end
                 
-                print("|cffff00ff[DEBUG]|r Final skillLineID: " .. tostring(skillLineID))
-                
                 if skillLineID and skillLineID > 0 then
-                    print("|cffff00ff[DEBUG]|r Opening trade skill with ID: " .. skillLineID)
                     C_TradeSkillUI.OpenTradeSkill(skillLineID)
-                else
-                    print("|cffff00ff[DEBUG]|r ERROR: No skillLineID found for profession: " .. profName)
                 end
             end)
             
