@@ -303,9 +303,9 @@ function CharacterDetailWindow:RefreshDisplay()
             -- Make the button clickable to open the profession window
             profHeaderBtn:SetScript("OnClick", function(self)
                 print("|cffff00ff[DEBUG]|r Profession header clicked: " .. profName)
-                print("|cffff00ff[DEBUG]|r profData.skillLineID: " .. tostring(profData.skillLineID))
+                print("|cffff00ff[DEBUG]|r profData.skillLineID: " .. tostring(profData.baseSkillLineID))
                 
-                local skillLineID = profData.skillLineID
+                local skillLineID = profData.baseSkillLineID
                 if not skillLineID and profData.expansions then
                     local firstExp = next(profData.expansions)
                     if firstExp then
