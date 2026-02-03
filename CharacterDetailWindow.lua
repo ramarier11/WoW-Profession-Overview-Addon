@@ -526,7 +526,7 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
         -- Create button frame if tooltip is needed
         if tooltipText then
             local statusBtn = CreateFrame("Button", nil, self.Content)
-            statusBtn:SetSize(200, 14)
+            statusBtn:SetSize(50, 14)
             statusBtn:SetPoint("TOPLEFT", xOffset + 6, yOffset)
             
             local statusText = statusBtn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
