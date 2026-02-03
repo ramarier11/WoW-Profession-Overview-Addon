@@ -546,14 +546,47 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
     if hasKnowledgeSystem then
         -- Crafting Order
         local isCraftingOrderAtlas = (craftingOrderIcon == "Interface\\Icons\\inv_crafting_orders")
+        local craftingOrderIconDisplay
         if isCraftingOrderAtlas then
-            craftingOrderIcon = "|A:RecurringAvailableQuestIcon:14:14|a"
+            craftingOrderIconDisplay = "|A:RecurringAvailableQuestIcon:14:14|a"
+        else
+            craftingOrderIconDisplay = string.format("|T%s:14:14|t", craftingOrderIcon)
         end
-        CreateStatusLine(craftingOrderIcon, "Order", weekly.craftingOrderQuest == true, isCraftingOrderAtlas)
+        
+        local orderBtn = CreateFrame("Button", nil, self.Content)
+        orderBtn:SetSize(160, 14)
+        orderBtn:SetPoint("TOPLEFT", xOffset + 6, yOffset)
+        
+        local orderText = orderBtn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        orderText:SetPoint("LEFT", 0, 0)
+        
+        local orderStatusIcon = weekly.craftingOrderQuest == true
+            and "|TInterface\\RaidFrame\\ReadyCheck-Ready:12:12|t"
+            or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:12:12|t"
+        orderText:SetText(string.format("%s %s %s", craftingOrderIconDisplay, "Order", orderStatusIcon))
+        
+        orderBtn:SetScript("OnEnter", function(self)
+            orderText:SetTextColor(1, 1, 0.3, 1)
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            local skillLevel = expData.skillLevel or 0
+            if skillLevel < 25 then
+                GameTooltip:AddLine("Skill 25 req. to Unlock Quest")
+            else
+                GameTooltip:AddLine("Check Trainer / Artisan Consortium")
+            end
+            GameTooltip:Show()
+        end)
+        
+        orderBtn:SetScript("OnLeave", function(self)
+            orderText:SetTextColor(1, 1, 1, 1)
+            GameTooltip:Hide()
+        end)
+        
+        yOffset = yOffset - 16
         
         -- Treatise
         local treatiseBtn = CreateFrame("Button", nil, self.Content)
-        treatiseBtn:SetSize(50, 14)
+        treatiseBtn:SetSize(60, 14)
         treatiseBtn:SetPoint("TOPLEFT", xOffset + 6, yOffset)
         
         local treatiseText = treatiseBtn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
