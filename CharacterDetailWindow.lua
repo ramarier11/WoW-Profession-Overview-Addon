@@ -584,33 +584,33 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
         
         yOffset = yOffset - 16
         
-        -- Treatise
-        local treatiseBtn = CreateFrame("Button", nil, self.Content)
-        treatiseBtn:SetSize(60, 14)
-        treatiseBtn:SetPoint("TOPLEFT", xOffset + 6, yOffset)
-        
-        local treatiseText = treatiseBtn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-        treatiseText:SetPoint("LEFT", 0, 0)
-        
-        local treatiseIcon_display = string.format("|T%s:14:14|t", treatiseIcon)
-        local treatiseStatusIcon = weekly.treatise == true
-            and "|TInterface\\RaidFrame\\ReadyCheck-Ready:12:12|t"
-            or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:12:12|t"
-        treatiseText:SetText(string.format("%s %s %s", treatiseIcon_display, "Treatise", treatiseStatusIcon))
-        
-        treatiseBtn:SetScript("OnEnter", function(self)
-            treatiseText:SetTextColor(1, 1, 0.3, 1)
-            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-            GameTooltip:AddLine("From Crafting Order / Inscription")
-            GameTooltip:Show()
-        end)
-        
-        treatiseBtn:SetScript("OnLeave", function(self)
-            treatiseText:SetTextColor(1, 1, 1, 1)
-            GameTooltip:Hide()
-        end)
-        
-        yOffset = yOffset - 16
+        -- Treatise (skip if completed)
+        if weekly.treatise ~= true then
+            local treatiseBtn = CreateFrame("Button", nil, self.Content)
+            treatiseBtn:SetSize(60, 14)
+            treatiseBtn:SetPoint("TOPLEFT", xOffset + 6, yOffset)
+            
+            local treatiseText = treatiseBtn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+            treatiseText:SetPoint("LEFT", 0, 0)
+            
+            local treatiseIcon_display = string.format("|T%s:14:14|t", treatiseIcon)
+            local treatiseStatusIcon = "|TInterface\\RaidFrame\\ReadyCheck-NotReady:12:12|t"
+            treatiseText:SetText(string.format("%s %s %s", treatiseIcon_display, "Treatise", treatiseStatusIcon))
+            
+            treatiseBtn:SetScript("OnEnter", function(self)
+                treatiseText:SetTextColor(1, 1, 0.3, 1)
+                GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+                GameTooltip:AddLine("From Crafting Order / Inscription")
+                GameTooltip:Show()
+            end)
+            
+            treatiseBtn:SetScript("OnLeave", function(self)
+                treatiseText:SetTextColor(1, 1, 1, 1)
+                GameTooltip:Hide()
+            end)
+            
+            yOffset = yOffset - 16
+        end
         
         -- Detailed Treasures list (exclude for gathering professions)
         if not isGathering and ref and ref.weekly and type(ref.weekly.treasures) == "table" then
