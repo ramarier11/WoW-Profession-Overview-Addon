@@ -307,9 +307,9 @@ function ProfessionTrackerDashboard:CreateCharacterEntry(charKey, charData)
     entry.charKey = charKey
     entry.charData = charData
     -- Set character info
-    entry.Info:SetText(string.format("Level %d %s", 
-        charData.level or 0,
-        charData.class or "Unknown"))
+    -- entry.Info:SetText(string.format("Level %d %s", 
+    --     charData.level or 0,
+    --     charData.class or "Unknown"))
     
     -- Create profession progress indicators
     local profCount = 0
