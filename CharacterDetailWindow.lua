@@ -289,13 +289,34 @@ function CharacterDetailWindow:RefreshDisplay()
             local xOffset = (currentColumn == 0) and leftColumnX or rightColumnX
             local startY = yOffset
             
-            -- Create profession header (centered within column)
-            local profHeader = self.Content:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-            profHeader:SetPoint("TOPLEFT", self.Content, "TOPLEFT", xOffset, yOffset)
-            profHeader:SetPoint("TOPRIGHT", self.Content, "TOPLEFT", xOffset + columnWidth, yOffset)
-            profHeader:SetJustifyH("CENTER")
-            profHeader:SetText(profName)
-            profHeader:SetTextColor(1, 0.82, 0, 1)
+            -- Create profession header as a clickable button
+            local profHeaderBtn = CreateFrame("Button", nil, self.Content)
+            profHeaderBtn:SetSize(columnWidth, 20)
+            profHeaderBtn:SetPoint("TOPLEFT", self.Content, "TOPLEFT", xOffset, yOffset)
+            
+            local profHeaderText = profHeaderBtn:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+            profHeaderText:SetPoint("CENTER", profHeaderBtn, "CENTER", 0, 0)
+            profHeaderText:SetJustifyH("CENTER")
+            profHeaderText:SetText(profName)
+            profHeaderText:SetTextColor(1, 0.82, 0, 1)
+            
+            -- Make the button clickable to open the profession window
+            profHeaderBtn:SetScript("OnClick", function(self)
+                local skillLineID = profData.skillLineID or (profData.expansions and next(profData.expansions) and profData.expansions[next(profData.expansions)].skillLineID)
+                if skillLineID then
+                    C_TradeSkillUI.OpenTradeSkill(skillLineID)
+                end
+            end)
+            
+            -- Visual feedback on hover
+            profHeaderBtn:SetScript("OnEnter", function(self)
+                profHeaderText:SetTextColor(1, 1, 0.5, 1)
+            end)
+            
+            profHeaderBtn:SetScript("OnLeave", function(self)
+                profHeaderText:SetTextColor(1, 0.82, 0, 1)
+            end)
+            
             yOffset = yOffset - 20
 
             -- Build list of ALL expansions from saved data (no knowledge filter)
