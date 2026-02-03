@@ -664,33 +664,34 @@ function CharacterDetailWindow:CreateExpansionSection(expName, expData, profName
                 local label = total > 0 and string.format("%s (%d/%d)", name, count, total) or name
                 local completed = nodeStatus and nodeStatus.completed == true
                 
-                -- Create button for hover effect
-                local nodeLineBtn = CreateFrame("Button", nil, self.Content)
-                nodeLineBtn:SetSize(160, 14)
-                nodeLineBtn:SetPoint("TOPLEFT", xOffset + 6, yOffset)
-                
-                local nodeLineText = nodeLineBtn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-                nodeLineText:SetPoint("LEFT", 0, 0)
-                
-                local iconDisplay = string.format("|T%s:14:14|t", icon)
-                local statusIcon = completed == true
-                    and "|TInterface\\RaidFrame\\ReadyCheck-Ready:12:12|t"
-                    or "|TInterface\\RaidFrame\\ReadyCheck-NotReady:12:12|t"
-                nodeLineText:SetText(string.format("%s %s %s", iconDisplay, TruncateText(label, 22), statusIcon))
-                
-                nodeLineBtn:SetScript("OnEnter", function(self)
-                    nodeLineText:SetTextColor(1, 1, 0.3, 1)
-                    GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-                    GameTooltip:AddLine("From Gathering Nodes")
-                    GameTooltip:Show()
-                end)
-                
-                nodeLineBtn:SetScript("OnLeave", function(self)
-                    nodeLineText:SetTextColor(1, 1, 1, 1)
-                    GameTooltip:Hide()
-                end)
-                
-                yOffset = yOffset - 16
+                -- Skip displaying completed nodes
+                if not completed then
+                    -- Create button for hover effect
+                    local nodeLineBtn = CreateFrame("Button", nil, self.Content)
+                    nodeLineBtn:SetSize(160, 14)
+                    nodeLineBtn:SetPoint("TOPLEFT", xOffset + 6, yOffset)
+                    
+                    local nodeLineText = nodeLineBtn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+                    nodeLineText:SetPoint("LEFT", 0, 0)
+                    
+                    local iconDisplay = string.format("|T%s:14:14|t", icon)
+                    local statusIcon = "|TInterface\\RaidFrame\\ReadyCheck-NotReady:12:12|t"
+                    nodeLineText:SetText(string.format("%s %s %s", iconDisplay, TruncateText(label, 22), statusIcon))
+                    
+                    nodeLineBtn:SetScript("OnEnter", function(self)
+                        nodeLineText:SetTextColor(1, 1, 0.3, 1)
+                        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+                        GameTooltip:AddLine("From Gathering Nodes")
+                        GameTooltip:Show()
+                    end)
+                    
+                    nodeLineBtn:SetScript("OnLeave", function(self)
+                        nodeLineText:SetTextColor(1, 1, 1, 1)
+                        GameTooltip:Hide()
+                    end)
+                    
+                    yOffset = yOffset - 16
+                end
             end
         end
         
